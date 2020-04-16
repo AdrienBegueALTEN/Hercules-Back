@@ -10,10 +10,10 @@ import com.alten.hercules.controller.UserController;
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan("com.company")
 @ComponentScan(basePackageClasses = UserController.class)
-public class AuthApplication {
+public class MainApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AuthApplication.class, args);
+		SpringApplication.run(MainApp.class, args);
 	}
 
 }
