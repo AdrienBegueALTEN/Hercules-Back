@@ -6,3 +6,4 @@
 .settings/org.springframework.ide.eclipse.prefs
 bin/*
 target/*
+.metadata/*
