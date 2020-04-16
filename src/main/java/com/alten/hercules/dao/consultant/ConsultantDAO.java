@@ -30,5 +30,6 @@ public interface ConsultantDAO extends JpaRepository<Consultant,Integer> {
 	
 	public Consultant findByEmail(String email);
 	
-	//TODO public List<Mission> getMissionsOfConsultant(int id);
+	//@Query("SELECT COUNT(m) FROM Mission m WHERE m.consultant_id=?1",nativeQuery = true)
+	//TODO public int getMissionsOfConsultant(int id);
 }
