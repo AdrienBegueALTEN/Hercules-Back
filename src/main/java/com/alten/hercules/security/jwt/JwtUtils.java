@@ -1,8 +1,6 @@
 package com.alten.hercules.security.jwt;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,17 +20,11 @@ public class JwtUtils {
 
 	public static String generateJWT(Authentication authentication) {
 		AppUser user = (AppUser) authentication.getPrincipal();
-		
-		Map<String, Object> claims = new HashMap<String, Object>();
-		claims.put("sub", user.getId());
-		claims.put("iat", new Date());
-		claims.put("exp", new Date((new Date()).getTime() + JWT_EXP_MS));
-		claims.put("firstname", user.getFirstname());
-		claims.put("lastname", user.getLastname());
-		claims.put("role", user.getRole());
 
 		return Jwts.builder()
-				.setClaims(claims)
+				.setSubject(Long.toString(user.getId()))
+				.setIssuedAt(new Date())
+				.setExpiration(new Date((new Date()).getTime() + JWT_EXP_MS))
 				.signWith(SignatureAlgorithm.HS512, JWT_SECRET)
 				.compact();
 	}
