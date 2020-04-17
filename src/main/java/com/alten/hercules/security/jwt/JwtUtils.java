@@ -1,13 +1,15 @@
 package com.alten.hercules.security.jwt;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.alten.hercules.model.UserDetailsImpl;
+import com.alten.hercules.model.user.AppUser;
 
 import io.jsonwebtoken.*;
 
@@ -17,22 +19,26 @@ public class JwtUtils {
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 	private static final String JWT_SECRET = "7FC2DFF16D23F8914AD318F7156438AB88371C18A2C8BBC7A767DF9B92";
 	private static final long JWT_EXP_MS = 86400000;
-	private static final SignatureAlgorithm SIGNATURE = SignatureAlgorithm.HS512;
 
-	public static String generateJwtToken(Authentication authentication) {
-
-		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+	public static String generateJWT(Authentication authentication) {
+		AppUser user = (AppUser) authentication.getPrincipal();
+		
+		Map<String, Object> claims = new HashMap<String, Object>();
+		claims.put("sub", user.getId());
+		claims.put("iat", new Date());
+		claims.put("exp", new Date((new Date()).getTime() + JWT_EXP_MS));
+		claims.put("firstname", user.getFirstname());
+		claims.put("lastname", user.getLastname());
+		claims.put("role", user.getRole());
 
 		return Jwts.builder()
-				.setSubject((userPrincipal.getUsername()))
-				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + JWT_EXP_MS))
-				.signWith(SIGNATURE, JWT_SECRET)
+				.setClaims(claims)
+				.signWith(SignatureAlgorithm.HS512, JWT_SECRET)
 				.compact();
 	}
 
-	public static String getUserNameFromJwtToken(String token) {
-		return Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody().getSubject();
+	public static Long getIdFromJwtToken(String token) {
+		return Long.parseLong(Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody().getSubject());
 	}
 
 	public static boolean validateJwtToken(String authToken) {

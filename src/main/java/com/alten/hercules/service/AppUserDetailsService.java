@@ -1,29 +1,26 @@
-package com.alten.hercules.security.service;
+package com.alten.hercules.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alten.hercules.dao.UserDAO;
-import com.alten.hercules.model.AppUser;
-import com.alten.hercules.model.UserDetailsImpl;
+import com.alten.hercules.model.user.AppUser;
 
-@Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class AppUserDetailsService implements UserDetailsService {
 	
-	@Autowired
-	UserDAO dao;
+	@Autowired UserDAO userDAO;
 
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		AppUser user = dao.findByEmail(username)
+		AppUser user = userDAO.findByEmail(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-		return UserDetailsImpl.build(user);
+		return user;
 	}
+	
 
 }
