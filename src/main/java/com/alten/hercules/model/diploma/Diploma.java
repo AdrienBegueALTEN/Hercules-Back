@@ -18,7 +18,7 @@ public class Diploma {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	private Date graduationDate;
+	private int graduationYear;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@MapsId("id")
@@ -27,14 +27,16 @@ public class Diploma {
 	@ManyToOne(fetch=FetchType.LAZY)
 	@MapsId("id")
 	private DiplomaName diplomaName;
-	
 
-	public Diploma(Date graduationDate, DiplomaLocation diplomaLocation, DiplomaName diplomaName) {
+	public Diploma(int graduationYear, DiplomaLocation diplomaLocation, DiplomaName diplomaName) {
 		super();
-		this.graduationDate = graduationDate;
+		this.graduationYear = graduationYear;
 		this.diplomaLocation = diplomaLocation;
 		this.diplomaName = diplomaName;
 	}
+	
+	
+	
 	
 	
 	
