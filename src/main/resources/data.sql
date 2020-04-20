@@ -1,3 +1,1 @@
-INSERT INTO role(name) VALUES ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
-INSERT INTO role(name) VALUES ('ROLE_MANAGER') ON CONFLICT DO NOTHING;
-INSERT INTO role(name) VALUES ('ROLE_RECRUIT_OFF') ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'ADMIN', '$2y$10$vahGp2WQXilHSfVDqEagNux2kZ1kUzQXQCGJHVkFnD2K/kHjm3Hkq', true) ON CONFLICT DO NOTHING;
