@@ -2,6 +2,7 @@ package com.alten.hercules.model.request;
 
 import javax.validation.constraints.NotBlank;
 
+
 public class DiplomaRequest {
 	@NotBlank
 	private int graduationYear;
@@ -21,6 +22,10 @@ public class DiplomaRequest {
 		this.levelName = levelName;
 	}
 	
+	public DiplomaRequest() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getGraduationYear() {
 		return graduationYear;
 	}
@@ -46,6 +51,14 @@ public class DiplomaRequest {
 		this.levelName = levelName;
 	}
 	
+	public static void main(String[] args) {
+		/*final GsonBuilder builder = new GsonBuilder();
+	    final Gson gson = builder.create();
+	    
+	    System.out.println(gson.toJson(new DiplomaRequest(2020,"stq","ingé info","ingé3")));
+	    
+	    {"graduationYear":2020,"graduationCity":"stq","diplomaName":"ingé info","levelName":"ingé3"}*/
+	}
 	
 
 }

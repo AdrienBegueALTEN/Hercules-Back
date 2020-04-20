@@ -17,6 +17,18 @@ public class DiplomaLocation {
 		super();
 		this.city = city;
 	}
+
+	public DiplomaLocation(Long id, String city) {
+		super();
+		this.id = id;
+		this.city = city;
+	}
+
+	public DiplomaLocation() {
+		super();
+	}
+	
+	
 	
 	
 }

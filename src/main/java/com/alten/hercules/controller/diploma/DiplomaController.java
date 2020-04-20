@@ -1,7 +1,11 @@
 package com.alten.hercules.controller.diploma;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,46 +55,56 @@ public class DiplomaController {
 	@PostMapping
 	public ResponseEntity<?> addDiploma(@RequestBody DiplomaRequest diplomaRequest) {
 		
-		if(diplomaRequest.getDiplomaName().isEmpty() || 
-		diplomaRequest.getGraduationCity().isEmpty() ||
-		(diplomaRequest.getGraduationYear() < 1900) ||
-		diplomaRequest.getLevelName().isEmpty()) {
+		String name = diplomaRequest.getDiplomaName();
+		String city = diplomaRequest.getGraduationCity();
+		String levelName = diplomaRequest.getLevelName();
+		int year = diplomaRequest.getGraduationYear();
+		
+		if(name.isEmpty() || city.isEmpty() || (year < 1900) || levelName.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
 		
-		Level level = new Level(diplomaRequest.getLevelName());
-		DiplomaName diplomaName = new DiplomaName(diplomaRequest.getDiplomaName(), level);
-		DiplomaLocation diplomaLocation = new DiplomaLocation(diplomaRequest.getGraduationCity());
 		
-		if(this.levelDAO.findByName(diplomaRequest.getLevelName())==null) 
-			this.levelDAO.save(level);
+		Level level = new Level(levelName);
+		if(this.levelDAO.findByName(levelName)==null) 
+			level = this.levelDAO.save(level);
 		else 
-			level = this.levelDAO.findByName(diplomaRequest.getLevelName());
+			level = this.levelDAO.findByName(levelName);
+		System.out.println(level);
 		
-		if(this.diplomaNameDAO.findByName(diplomaRequest.getDiplomaName())==null)
-			this.diplomaNameDAO.save(diplomaName);
+		DiplomaName diplomaName = new DiplomaName(name, level);
+		if(this.diplomaNameDAO.findByName(name)==null)
+			diplomaName = this.diplomaNameDAO.save(diplomaName);
 		else
-			diplomaName = this.diplomaNameDAO.findByName(diplomaRequest.getDiplomaName());
+			diplomaName = this.diplomaNameDAO.findByName(name);
 		
-		if(this.diplomaLocationDAO.findByCity(diplomaRequest.getDiplomaName())==null)
-			this.diplomaLocationDAO.save(diplomaLocation);
+		
+		DiplomaLocation diplomaLocation = new DiplomaLocation(city);
+		if(this.diplomaLocationDAO.findByCity(city)==null)
+			diplomaLocation = this.diplomaLocationDAO.save(diplomaLocation);
 		else
-			diplomaLocation = this.diplomaLocationDAO.findByCity(diplomaRequest.getDiplomaName());
+			diplomaLocation = this.diplomaLocationDAO.findByCity(city);
 		
 		//TODO trouver dans la table diploma un diplome avec même level, même ville, même diplomaName et même année
-		// => return Conflict
+		if(this.diplomaDAO.findDiplome(year, city, name, levelName)!=null) 
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		
-		//Diploma diploma = new Diploma(diplomaRequest.getGraduationYear(),diplomaLocation, diplomaName);
-		//this.diplomaDAO.save(diploma);
+		Diploma diploma = new Diploma(diplomaRequest.getGraduationYear(),diplomaLocation, diplomaName);
+		this.diplomaDAO.save(diploma);
 		
 		
-		return null;
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
 	@PutMapping
 	public ResponseEntity<?> updateDiploma(@RequestBody DiplomaRequest diplomaRequest) {
 		return null;
 		
+	}
+	
+	@GetMapping
+	public List<Diploma> getAll(){
+		return this.diplomaDAO.findAll();
 	}
 	
 
