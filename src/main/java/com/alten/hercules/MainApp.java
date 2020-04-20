@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
-import com.alten.hercules.controller.UserController;
+import com.alten.hercules.controller.user.RecruitementOfficerController;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan("com.company")
-@ComponentScan(basePackageClasses = UserController.class)
+@ComponentScan(basePackageClasses = RecruitementOfficerController.class)
 public class MainApp {
 
 	public static void main(String[] args) {

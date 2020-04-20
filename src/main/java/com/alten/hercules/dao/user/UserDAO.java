@@ -1,4 +1,4 @@
-package com.alten.hercules.dao;
+package com.alten.hercules.dao.user;
 
 import java.util.Optional;
 
@@ -9,7 +9,7 @@ import com.alten.hercules.model.user.AppUser;
 @Repository
 public interface UserDAO extends JpaRepository<AppUser, Long>  {
 	
-	Optional<AppUser> findByEmail(String email);
 	boolean existsByEmail(String email);
+	Optional<AppUser> findByEmail(String email);
 	
 }

@@ -1,183 +1,92 @@
 package com.alten.hercules.model.consultant;
 
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.GeneratorType;
+import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.user.Manager;
 
 @Entity
 public class Consultant {
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
-	@NotNull
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(nullable = false)
 	private String email;
+	
+	@Column(nullable = false)
 	private String firstname;
+	
+	@Column(nullable = false)
 	private String lastname;
-	private String formation;
-	private String school;
-	private String experience;
-	private boolean isEnabled;
-	private int idManager;
-	private Date deactivationDate;
 	
+	@Column(nullable = false)
+	private int experience;
 	
+	@Column(nullable = true)
+	private LocalDate releaseDate = null;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Manager manager;
 	
-	public Consultant(int id, @NotNull String email, String firstname, String lastname, String formation, String school,
-			String experience, boolean isEnabled, int idManager, Date deactivationDate) {
-		super();
-		this.id = id;
+	@OneToMany
+	private Set<Diploma> diplomas;
+	
+	public Consultant() { super(); }
+	
+	public Consultant(String email, String firstname, String lastname, int experience, Manager manager, Diploma[] diplomas) {
 		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
-		this.formation = formation;
-		this.school = school;
 		this.experience = experience;
-		this.isEnabled = isEnabled;
-		this.idManager = idManager;
-		this.deactivationDate = deactivationDate;
+		this.manager = manager;
+		this.diplomas = Set.of(diplomas);
 	}
 
-	public Consultant() {
-		super();
-	}
+	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id; }
 
-	public int getId() {
-		return id;
-	}
+	public String getEmail() { return email; }
+	public void setEmail(String email) { this.email = email; }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+	public String getFirstname() { return firstname; }
+	public void setFirstname(String firstname) { this.firstname = firstname; }
 
-	public String getEmail() {
-		return email;
-	}
+	public String getLastname() { return lastname; }
+	public void setLastname(String lastname) { this.lastname = lastname; }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+	public int getExperience() { return experience; }
+	public void setExperience(int experience) { this.experience = experience; }
+	
+	public LocalDate getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
 
-	public String getFirstname() {
-		return firstname;
-	}
+	public Manager getManager() { return manager; }
+	public void setManager(Manager manager) { this.manager = manager; }
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-
-	public String getLastname() {
-		return lastname;
-	}
-
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
-
-	public String getFormation() {
-		return formation;
-	}
-
-	public void setFormation(String formation) {
-		this.formation = formation;
-	}
-
-	public String getSchool() {
-		return school;
-	}
-
-	public void setSchool(String school) {
-		this.school = school;
-	}
-
-	public String getExperience() {
-		return experience;
-	}
-
-	public void setExperience(String experience) {
-		this.experience = experience;
-	}
-
-	public boolean isEnabled() {
-		return isEnabled;
-	}
-
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
-	}
-
-	public int getIdManager() {
-		return idManager;
-	}
-
-	public void setIdManager(int idManager) {
-		this.idManager = idManager;
-	}
-
-	public Date getDeactivationDate() {
-		return deactivationDate;
-	}
-
-	public void setDeactivationDate(Date deactivationDate) {
-		this.deactivationDate = deactivationDate;
-	}
+	public Set<Diploma> getDiplomas() { return diplomas; }
+	public void setDiploma(Set<Diploma> diplomas) { this.diplomas = diplomas; }
 
 	@Override
-	public String toString() {
-		return "Consultant [id=" + id + ", email=" + email + ", firstname=" + firstname + ", lastname=" + lastname
-				+ ", formation=" + formation + ", school=" + school + ", experience=" + experience + ", isEnabled="
-				+ isEnabled + ", idManager=" + idManager + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		result = prime * result + ((firstname == null) ? 0 : firstname.hashCode());
-		result = prime * result + id;
-		result = prime * result + ((lastname == null) ? 0 : lastname.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(Object o) {
+		if (this == o)
 			return true;
-		if (obj == null)
+		if (o == null || getClass() != o.getClass())
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Consultant other = (Consultant) obj;
-		if (email == null) {
-			if (other.email != null)
-				return false;
-		} else if (!email.equals(other.email))
-			return false;
-		if (firstname == null) {
-			if (other.firstname != null)
-				return false;
-		} else if (!firstname.equals(other.firstname))
-			return false;
-		if (id != other.id)
-			return false;
-		if (lastname == null) {
-			if (other.lastname != null)
-				return false;
-		} else if (!lastname.equals(other.lastname))
-			return false;
-		return true;
+		Consultant consultant = (Consultant) o;
+		return Objects.equals(id, consultant.id);
 	}
-	
-	
-	
-	
-	
 }

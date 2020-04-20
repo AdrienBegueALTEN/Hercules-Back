@@ -1,31 +1,32 @@
 package com.alten.hercules.model.user;
 
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+
+import com.alten.hercules.model.consultant.Consultant;
 
 @Entity
 public class Manager extends AppUser {
 	@Transient
 	private static final long serialVersionUID = 1L;
 	
-	private boolean isAdmin;
+	private boolean isAdmin = false;
+	
+    @OneToMany
+    private Set<Consultant> consultants = new HashSet<>();
 	
 	public Manager() { super(); }
 	
 	public Manager(String email, String password, String firstname, String lastname) {
 		super(email, password, firstname, lastname);
-		this.setAdmin(false);
 	}
 	
 	public Manager(String email, String password, String firstname, String lastname, boolean isAdmin) {
 		super(email, password, firstname, lastname);
-		this.setAdmin(isAdmin);
-	}
-	
-	public Manager(String email, String password, String firstname, String lastname, boolean isAdmin, LocalDate releaseDate) {
-		super(email, password, firstname, lastname, releaseDate);
 		this.setAdmin(isAdmin);
 	}
 
@@ -36,5 +37,8 @@ public class Manager extends AppUser {
 
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
+	
+	public Set<Consultant> getConsultants() { return consultants; }
+	public void setConsultants(Set<Consultant> consultants) { this.consultants = consultants; }
 
 }

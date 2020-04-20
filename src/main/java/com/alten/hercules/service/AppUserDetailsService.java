@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alten.hercules.dao.UserDAO;
+import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.user.AppUser;
 
 public class AppUserDetailsService implements UserDetailsService {
