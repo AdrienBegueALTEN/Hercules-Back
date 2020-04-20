@@ -1,12 +1,14 @@
 package com.alten.hercules.dao.customer;
 
 import java.util.List;
+
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import com.alten.hercules.customer.model.Customer;
+
+import com.alten.hercules.model.customer.Customer;
 
 
 @Repository
