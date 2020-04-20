@@ -4,7 +4,7 @@ import javax.validation.constraints.NotBlank;
 
 public class DiplomaRequest {
 	@NotBlank
-	private Long graduationYear;
+	private int graduationYear;
 	@NotBlank
 	private String graduationCity;
 	@NotBlank
@@ -12,7 +12,7 @@ public class DiplomaRequest {
 	@NotBlank
 	private String levelName;
 	
-	public DiplomaRequest(@NotBlank Long graduationYear, @NotBlank String graduationCity,
+	public DiplomaRequest(@NotBlank int graduationYear, @NotBlank String graduationCity,
 			@NotBlank String diplomaName, @NotBlank String levelName) {
 		super();
 		this.graduationYear = graduationYear;
@@ -21,10 +21,10 @@ public class DiplomaRequest {
 		this.levelName = levelName;
 	}
 	
-	public Long getGraduationYear() {
+	public int getGraduationYear() {
 		return graduationYear;
 	}
-	public void setGraduationYear(Long graduationYear) {
+	public void setGraduationYear(int graduationYear) {
 		this.graduationYear = graduationYear;
 	}
 	public String getGraduationCity() {
