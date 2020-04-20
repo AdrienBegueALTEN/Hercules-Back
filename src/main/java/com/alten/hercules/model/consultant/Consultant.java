@@ -2,6 +2,7 @@ package com.alten.hercules.model.consultant;
 
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -47,13 +48,13 @@ public class Consultant {
 	
 	public Consultant() { super(); }
 	
-	public Consultant(String email, String firstname, String lastname, int experience, Manager manager, Diploma[] diplomas) {
+	public Consultant(String email, String firstname, String lastname, int experience, Manager manager, Set<Diploma> diplomas) {
 		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.experience = experience;
 		this.manager = manager;
-		this.diplomas = Set.of(diplomas);
+		this.diplomas = diplomas;
 	}
 
 	public Long getId() { return id; }
