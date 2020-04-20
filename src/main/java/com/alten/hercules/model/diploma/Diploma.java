@@ -18,15 +18,11 @@ public class Diploma {
 
 	private int graduationYear;
 	
-	@ManyToOne(fetch=FetchType.LAZY,cascade = {
-            CascadeType.ALL
-    })
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "diploma_location_id", nullable = false)
 	private DiplomaLocation diplomaLocation;
 	
-	@ManyToOne(fetch=FetchType.LAZY,cascade = {
-            CascadeType.ALL
-    })
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "diploma_name_id", nullable = false)
 	private DiplomaName diplomaName;
 

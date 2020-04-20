@@ -20,9 +20,7 @@ public class DiplomaName {
 	
 	private String name;
 	
-	@ManyToOne(fetch = FetchType.LAZY,cascade = {
-            CascadeType.ALL
-    })
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "level_id", nullable = false)
 	private Level level;
 
@@ -41,6 +39,30 @@ public class DiplomaName {
 
 	public DiplomaName() {
 		super();
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Level getLevel() {
+		return level;
+	}
+
+	public void setLevel(Level level) {
+		this.level = level;
 	}
 	
 	
