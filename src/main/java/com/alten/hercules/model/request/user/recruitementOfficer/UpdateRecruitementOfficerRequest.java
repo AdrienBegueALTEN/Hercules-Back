@@ -1,4 +1,4 @@
-package com.alten.hercules.model.request.user;
+package com.alten.hercules.model.request.user.recruitementOfficer;
 
 import java.time.LocalDate;
 
@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.UserConst;
 
-public class UpdateUserRequest {
+public class UpdateRecruitementOfficerRequest {
 	
 	@NotNull
 	private Long id;
@@ -21,10 +21,16 @@ public class UpdateUserRequest {
 	
 	private String lastname;
 	
-	@Pattern(regexp = "ADMIN|MANAGER", message = "Le rôle doit être soit 'ADMIN', soit 'MANAGER'")
-	private String role;
-	
 	private LocalDate releaseDate;
+	
+	public UpdateRecruitementOfficerRequest(Long id, String email, String password, String firstname, String lastname, LocalDate releaseDate) {
+		this.id = id;
+		this.email = email;
+		this.password = password;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.releaseDate = releaseDate;
+	}
 	
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
@@ -41,9 +47,6 @@ public class UpdateUserRequest {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 	
-	public String getRole() { return role; }
-	public void setRole(String role) { this.role = role; }
-
 	public LocalDate getReleaseDate() { return releaseDate; }
 	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate;}
 

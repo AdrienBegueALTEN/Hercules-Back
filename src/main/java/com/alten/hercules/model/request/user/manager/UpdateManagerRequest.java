@@ -1,38 +1,44 @@
-package com.alten.hercules.model.request.user;
+package com.alten.hercules.model.request.user.manager;
+
+import java.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.UserConst;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class RegisterUserRequest {
+public class UpdateManagerRequest {
 	
 	@NotNull
+	private Long id;
+	
 	@Pattern(regexp = UserConst.EMAIL_PATTERN, message = UserConst.EMAIL_PATTERN_MSG)
 	private String email;
 	
-	@NotNull
 	private String password;
 	
-	@NotNull
 	private String firstname;
 	
-	@NotNull
 	private String lastname;
 	
-	@NotNull
-	@Pattern(
-			regexp = "ADMIN|MANAGER|RECRUITEMENT_OFFICER", 
-			message = "Le rôle doit être soit 'ADMIN', soit 'MANAGER', soit 'RECRUITEMENT_OFFICER'")
-	private String role;
-
-	public RegisterUserRequest(String email, String password, String firstname, String lastname, String role) {
+	@JsonFormat(pattern="dd/MM/yyy")
+	private LocalDate releaseDate;
+	
+	public UpdateManagerRequest(Long id, String email, String password, String firstname, String lastname, LocalDate releaseDate, boolean isAdmin) {
+		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.firstname = firstname;
 		this.lastname = lastname;
-		this.role = role;
+		this.releaseDate = releaseDate;
+		this.isAdmin = isAdmin;
 	}
+	
+	private boolean isAdmin;
+	
+	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id; }
 	
 	public void setEmail(String email) { this.email = email; }
 	public String getEmail() { return this.email; }
@@ -46,7 +52,10 @@ public class RegisterUserRequest {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 	
-	public String getRole() { return role; }
-	public void setRole(String role) { this.role = role; }
-
+	public LocalDate getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+	
+	public boolean isAdmin() { return isAdmin; }
+	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
+	
 }

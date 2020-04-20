@@ -57,14 +57,6 @@ public abstract class AppUser implements UserDetails {
 		this.releaseDate = null;
 	}
 	
-	public AppUser(String email, String password, String firstname, String lastname, LocalDate releaseDate) {
-		this.email = email;
-		this.password = new BCryptPasswordEncoder().encode(password);
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.releaseDate = releaseDate;
-	}
-	
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
 	
