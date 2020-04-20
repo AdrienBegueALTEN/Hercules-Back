@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "9a1703fb-2606-4f31-8367-e15660197984",
+		"name": "customer-collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET all customers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customer_id\": 3,\r\n  \"activity_sector\": \"Electronik\",\r\n  \"description\": \"Societe de vente\",\r\n  \"name\": \"farnell\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/hercules/customers/customers-list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hercules",
+						"customers",
+						"customers-list"
+					]
+				},
+				"description": "GET all customers"
+			},
+			"response": []
+		},
+		{
+			"name": "POST a customer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customer_id\": 1,\r\n  \"activity_sector\": \"Electronique\",\r\n  \"description\": \"Societe de vente\",\r\n  \"name\": \"farnell\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/hercules/customers/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hercules",
+						"customers",
+						"customers"
+					]
+				},
+				"description": "POST a customer"
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE a customer",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customer_id\": 1,\r\n    \"description\": \"Societe de vente\",\r\n    \"name\": \"farnell\",\r\n    \"activity_sector\": \"Electronique\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/hercules/customers/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hercules",
+						"customers",
+						"customers"
+					]
+				},
+				"description": "DELETE a customer"
+			},
+			"response": []
+		},
+		{
+			"name": "GET a customer By ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customer_id\": 3,\r\n  \"activity_sector\": \"Electronik\",\r\n  \"description\": \"Societe de vente\",\r\n  \"name\": \"farnell\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/hercules/customers/customers/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hercules",
+						"customers",
+						"customers",
+						"1"
+					]
+				},
+				"description": "PUT a customer"
+			},
+			"response": []
+		},
+		{
+			"name": "GET a customer By Name Or ActivitySector",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customer_id\": 3,\r\n  \"activity_sector\": \"Electronik\",\r\n  \"description\": \"Societe de vente\",\r\n  \"name\": \"farnell\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/hercules/customers/customers/search?q=farnell",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hercules",
+						"customers",
+						"customers",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "farnell"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
