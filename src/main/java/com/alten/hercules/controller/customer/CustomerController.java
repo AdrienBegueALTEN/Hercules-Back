@@ -22,8 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.customer.dao.CustomerDAO;
-import com.alten.hercules.customer.model.Customer;
+import com.alten.hercules.dao.customer.CustomerDAO;
+import com.alten.hercules.model.customer.Customer;
+
 
 
 @CrossOrigin(origins="*")
