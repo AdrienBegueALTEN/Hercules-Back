@@ -1,5 +1,6 @@
 package com.alten.hercules.model.customer;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,26 +20,23 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
-	private String activitySector;
-	
-	private String description;
-	
+	@Column(nullable = false)
 	private String name;
 	
-	private byte[] logo;
+	@Column(nullable = false)
+	private String activitySector;
 	
+	private String description = null;
+	
+	private byte[] logo = null;
+	
+	public Customer() {}
 
-	public Customer() {
-		super();
-	}
 
-
-	public Customer(String activitySector, String description, String name, byte[] logo) {
-		super();
+	public Customer(String name, String activitySector, String description) {
+		this.name = name;
 		this.activitySector = activitySector;
 		this.description = description;
-		this.name = name;
-		this.logo = logo;
 	}
 
 

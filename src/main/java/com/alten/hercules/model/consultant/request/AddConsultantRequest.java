@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.UserConst;
+import com.alten.hercules.model.consultant.Consultant;
 
 public class AddConsultantRequest {
 	
@@ -29,7 +30,6 @@ public class AddConsultantRequest {
 	private Set<Long> diplomas;
 	
 	public AddConsultantRequest(String email, String firstname, String lastname, int experience, Long manager, Set<Long> diplomas) {
-		super();
 		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -55,5 +55,6 @@ public class AddConsultantRequest {
 
 	public Set<Long> getDiplomas() { return diplomas; }
 	public void setDiplomas(Set<Long> diplomas) { this.diplomas = diplomas; }
+
 
 }

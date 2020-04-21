@@ -1,6 +1,7 @@
 package com.alten.hercules.controller.customer;
 
 
+import java.net.URI;
 import java.util.ArrayList;
 
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.request.customer.AddCustomerRequest;
 
 
 @CrossOrigin(origins="*")
@@ -62,20 +64,11 @@ public class CustomerController {
 	
 	
 	@PostMapping
-    public ResponseEntity<?> createCustomer(@Valid @RequestBody Customer customer) { //OK pour toutes les conditions
-		
-		if(customer.getName()==null || customer.getName().isEmpty())
-		{
-			return ResponseEntity.noContent().build();
-		}
-		
-		if(this.customerDAO.findByName(customer.getName())!=null)
-		{
-			return new ResponseEntity<>(HttpStatus.CONFLICT);
-		}
-		
+    public ResponseEntity<?> createCustomer(@Valid @RequestBody AddCustomerRequest request) {
+		Customer customer = request.buildCustomer();
 		customerDAO.save(customer);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		URI location = URI.create(String.format("/customers/%s", customer.getId()));
+		return ResponseEntity.created(location).build();
 	} 
 	
 	
