@@ -17,4 +17,5 @@ public interface DiplomaDAO extends JpaRepository<Diploma, Long>{
 			+ "AND n.name = ?3 "
 			+ "AND l.name = ?4", nativeQuery = true)
 	public Diploma findDiplome(int year, String city, String name, String level);
+	
 }

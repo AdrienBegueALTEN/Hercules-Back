@@ -13,6 +13,7 @@ import javax.persistence.MapsId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "id"})
 public class DiplomaName {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

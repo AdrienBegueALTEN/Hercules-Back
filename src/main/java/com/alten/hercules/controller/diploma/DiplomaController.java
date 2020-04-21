@@ -1,6 +1,7 @@
 package com.alten.hercules.controller.diploma;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,11 +59,15 @@ public class DiplomaController {
 		String name = diplomaRequest.getDiplomaName();
 		String city = diplomaRequest.getGraduationCity();
 		String levelName = diplomaRequest.getLevelName();
+		String school = diplomaRequest.getSchool();
 		int year = diplomaRequest.getGraduationYear();
 		
-		if(name.isEmpty() || city.isEmpty() || (year < 1900) || levelName.isEmpty()) {
+		if(name.isEmpty() || city.isEmpty() || levelName.isEmpty( )|| school.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
+		
+		if(year < 1900)
+			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		
 		
 		Level level = new Level(levelName);
@@ -70,7 +75,6 @@ public class DiplomaController {
 			level = this.levelDAO.save(level);
 		else 
 			level = this.levelDAO.findByName(levelName);
-		System.out.println(level);
 		
 		DiplomaName diplomaName = new DiplomaName(name, level);
 		if(this.diplomaNameDAO.findByName(name)==null)
@@ -79,7 +83,7 @@ public class DiplomaController {
 			diplomaName = this.diplomaNameDAO.findByName(name);
 		
 		
-		DiplomaLocation diplomaLocation = new DiplomaLocation(city);
+		DiplomaLocation diplomaLocation = new DiplomaLocation(city, school);
 		if(this.diplomaLocationDAO.findByCity(city)==null)
 			diplomaLocation = this.diplomaLocationDAO.save(diplomaLocation);
 		else
@@ -98,7 +102,53 @@ public class DiplomaController {
 	
 	@PutMapping
 	public ResponseEntity<?> updateDiploma(@RequestBody DiplomaRequest diplomaRequest) {
-		return null;
+		if(diplomaRequest.getId()==null) {
+			return ResponseEntity.noContent().build();
+		}
+		
+		long id = diplomaRequest.getId();
+		String name = diplomaRequest.getDiplomaName();
+		String city = diplomaRequest.getGraduationCity();
+		String levelName = diplomaRequest.getLevelName();
+		String school = diplomaRequest.getSchool();
+		int year = diplomaRequest.getGraduationYear();
+		
+		Optional<Diploma> optionnalD = this.diplomaDAO.findById(id);
+		if(!optionnalD.isPresent())
+			return ResponseEntity.notFound().build();
+		Diploma diploma = optionnalD.get();
+		
+		DiplomaLocation dl = diploma.getDiplomaLocation();
+		DiplomaName dn = diploma.getDiplomaName();
+		Level l = dn.getLevel();
+		
+		if(school!=null && !school.isEmpty()) {
+			dl.setSchool(school);
+			this.diplomaLocationDAO.save(dl);
+		}
+		
+		if(city!=null && !city.isEmpty()) {
+			dl.setSchool(school);
+			this.diplomaLocationDAO.save(dl);
+		}
+		
+		if(levelName!=null && !levelName.isEmpty()) {
+			l.setName(levelName);
+			this.levelDAO.save(l);
+		}
+		
+		if(name!=null && !name.isEmpty()) {
+			dn.setName(name);
+			this.diplomaNameDAO.save(dn);
+		}
+		
+		if(year>1900) {
+			diploma.setGraduationYear(year);
+			this.diplomaDAO.save(diploma);
+		}
+					
+		
+		return new ResponseEntity<>(HttpStatus.OK);
 		
 	}
 	
