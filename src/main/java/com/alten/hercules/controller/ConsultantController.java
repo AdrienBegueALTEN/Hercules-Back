@@ -56,8 +56,7 @@ public class ConsultantController {
 			
 			Consultant consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), request.getExperience(), manager, diplomas);
 			dal.save(consultant);
-			URI location = URI.create(String.format("/consultants/%s", consultant.getId()));
-			return ResponseEntity.created(location).build();
+			return ResponseEntity.status(HttpStatus.CREATED).body(consultant.getId());
 		} catch (RessourceNotFoundException e) {
 			return ResponseEntity.notFound().build();
 		}

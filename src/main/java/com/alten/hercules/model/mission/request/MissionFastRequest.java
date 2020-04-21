@@ -1,22 +1,20 @@
 package com.alten.hercules.model.mission.request;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class MissionFastRequest {
-	@NotBlank
+	
+	@NotNull
 	private Long customerId;
 	
-	@NotBlank
+	@NotNull
 	private Long consultantId;
-	
-	
 
 	public MissionFastRequest() {
 		super();
 	}
 
-	public MissionFastRequest(@NotBlank Long customerId, @NotBlank Long consultantId) {
-		super();
+	public MissionFastRequest(Long customerId, Long consultantId) {
 		this.customerId = customerId;
 		this.consultantId = consultantId;
 	}

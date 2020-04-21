@@ -1,32 +1,25 @@
 package com.alten.hercules.controller.mission;
 
-import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.dao.mission.MissionDAO;
-import com.alten.hercules.model.consultant.Consultant;
-import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.mission.EState;
-import com.alten.hercules.model.mission.EType;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.request.MissionFastRequest;
-import com.alten.hercules.model.mission.request.MissionRequest;
 
 @RestController
+@CrossOrigin(origins="*")
 @RequestMapping("/hercules/missions")
 public class MissionController {
 	
@@ -42,7 +35,7 @@ public class MissionController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> fastInsertion(@RequestBody MissionFastRequest req){
+	public ResponseEntity<?> fastInsertion(@Valid @RequestBody MissionFastRequest req){
 		
 		Long cons = req.getConsultantId();
 		Long cust = req.getCustomerId();
@@ -50,8 +43,8 @@ public class MissionController {
 		if(cons==null || cust==null) 
 			return ResponseEntity.noContent().build();
 		
-		if(!this.missionDAL.existsConsultant(cons) || !this.missionDAL.existsCustomer(cust))
-			return ResponseEntity.notFound().build();
+		/*if(!this.missionDAL.existsConsultant(cons) || !this.missionDAL.existsCustomer(cust))
+			return ResponseEntity.notFound().build();*/
 		
 		this.missionDAL.fastInsert(cons, cust);
 		

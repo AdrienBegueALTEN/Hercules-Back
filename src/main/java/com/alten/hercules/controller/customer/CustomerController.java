@@ -67,8 +67,7 @@ public class CustomerController {
     public ResponseEntity<?> createCustomer(@Valid @RequestBody AddCustomerRequest request) {
 		Customer customer = request.buildCustomer();
 		customerDAO.save(customer);
-		URI location = URI.create(String.format("/customers/%s", customer.getId()));
-		return ResponseEntity.created(location).build();
+		return ResponseEntity.status(HttpStatus.CREATED).body(customer.getId());
 	} 
 	
 	
