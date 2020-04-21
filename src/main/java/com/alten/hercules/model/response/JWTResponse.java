@@ -8,6 +8,7 @@ import com.alten.hercules.security.jwt.JwtUtils;
 public class JWTResponse {
 	
 	private String token;
+	private Long id;
 	private String firstname;
 	private String lastname;
 	private String role;
@@ -15,6 +16,7 @@ public class JWTResponse {
 	public JWTResponse(Authentication authentication) {
 		this.token = JwtUtils.generateJWT(authentication);
 		AppUser user = (AppUser) authentication.getPrincipal();
+		this.id = user.getId();
 		this.firstname = user.getFirstname();
 		this.lastname = user.getLastname();
 		this.role = user.getRole().name();
@@ -22,6 +24,9 @@ public class JWTResponse {
 
 	public String getAccessToken() { return token; }
 	public void setAccessToken(String accessToken) { this.token = accessToken; }
+	
+	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id; }
 
 	public String getFirstname() { return firstname; }
 	public void setFirstname(String firstname) { this.firstname = firstname; }
