@@ -1,20 +1,14 @@
 package com.alten.hercules.model.diploma;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Diploma {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,12 +16,12 @@ public class Diploma {
 
 	private int graduationYear;
 	
-	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name = "diploma_location_id", nullable = false)
+	@ManyToOne(fetch=FetchType.LAZY)
+	@MapsId("id")
 	private DiplomaLocation diplomaLocation;
 	
-	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name = "diploma_name_id", nullable = false)
+	@ManyToOne(fetch=FetchType.LAZY)
+	@MapsId("id")
 	private DiplomaName diplomaName;
 
 	public Diploma(int graduationYear, DiplomaLocation diplomaLocation, DiplomaName diplomaName) {
@@ -37,10 +31,6 @@ public class Diploma {
 		this.diplomaName = diplomaName;
 	}
 	
-	public Diploma() {
-		// TODO Auto-generated constructor stub
-	}
-
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
 
