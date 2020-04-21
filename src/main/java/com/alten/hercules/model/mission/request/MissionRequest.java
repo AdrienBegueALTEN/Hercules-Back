@@ -1,89 +1,61 @@
-package com.alten.hercules.model.mission;
+package com.alten.hercules.model.mission.request;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.lang.Nullable;
 
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
-import com.fasterxml.jackson.annotation.JsonGetter;
+import com.alten.hercules.model.mission.EState;
+import com.alten.hercules.model.mission.EType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity
-public class Mission {
-	//TODO contraintes tailles
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+public class MissionRequest {
 	
-	@Nullable
+	private Long id;
+	
 	private int version;
 	
-	@Nullable
 	private Date lastUpdate;
 	
-	@Nullable
 	private String title;
 	
-	@Nullable
 	@Length(max = 1000)
 	private String description;
 	
-	@Nullable
-	@Enumerated(EnumType.STRING)
 	private EType type;
 	
-	@Nullable
 	private String city;
 	
-	@Nullable
 	private String country;
 	
-	@Nullable
 	@Length(max = 250)
 	private String comment;
 	
-	@Nullable
 	private String consultantRole;
 	
-	@Nullable
 	private int consultantExperience;
 	
-	@Enumerated(EnumType.STRING)
-	@Nullable
 	private EState state;
 	
-	@Nullable
 	private int teamSize;
 	
-	@JsonIgnore
-	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name = "consultant_id", nullable = false)
-	private Consultant consultant;
+	private Long consultantId;
 	
-	@JsonIgnore
-	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name = "customer_id", nullable = false)
-	private Customer customer;
+	private Long customerId;
+
 	
 
-	public Mission(long id, int version, Date lastUpdate, String title, @Length(max = 1000) String description,
+	public MissionRequest(Long id, int version, Date lastUpdate, String title, @Length(max = 1000) String description,
 			EType type, String city, String country, @Length(max = 250) String comment, String consultantRole,
-			int consultantExperience, EState state, int teamSize, Consultant consultant,
-			Customer customer) {
+			int consultantExperience, EState state, int teamSize, Long consultantId, Long customerId) {
 		super();
 		this.id = id;
 		this.version = version;
@@ -98,44 +70,25 @@ public class Mission {
 		this.consultantExperience = consultantExperience;
 		this.state = state;
 		this.teamSize = teamSize;
-		this.consultant = consultant;
-		this.customer = customer;
+		this.consultantId = consultantId;
+		this.customerId = customerId;
 	}
 
-	public Mission(int version, Date lastUpdate, String title, @Length(max = 1000) String description, EType type,
-			String city, String country, @Length(max = 250) String comment, String consultantRole,
-			int consultantExperience, EState state, int teamSize, Consultant consultant,
-			Customer customer) {
-		super();
-		this.version = version;
-		this.lastUpdate = lastUpdate;
-		this.title = title;
-		this.description = description;
-		this.type = type;
-		this.city = city;
-		this.country = country;
-		this.comment = comment;
-		this.consultantRole = consultantRole;
-		this.consultantExperience = consultantExperience;
-		this.state = state;
-		this.teamSize = teamSize;
-		this.consultant = consultant;
-		this.customer = customer;
-	}
-
-	public Mission() {
+	public MissionRequest() {
 		super();
 	}
+	
+	
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public int getVersion() {
+	public Integer getVersion() {
 		return version;
 	}
 
@@ -207,7 +160,7 @@ public class Mission {
 		this.consultantRole = consultantRole;
 	}
 
-	public int getConsultantExperience() {
+	public Integer getConsultantExperience() {
 		return consultantExperience;
 	}
 
@@ -223,7 +176,7 @@ public class Mission {
 		this.state = state;
 	}
 
-	public int getTeamSize() {
+	public Integer getTeamSize() {
 		return teamSize;
 	}
 
@@ -231,37 +184,23 @@ public class Mission {
 		this.teamSize = teamSize;
 	}
 
-	public Consultant getConsultant() {
-		return consultant;
+	public Long getConsultantId() {
+		return consultantId;
 	}
 
-	public void setConsultant(Consultant consultant) {
-		this.consultant = consultant;
+	public void setConsultantId(Long consultantId) {
+		this.consultantId = consultantId;
 	}
 
-	public Customer getCustomer() {
-		return customer;
+	public Long getCustomerId() {
+		return customerId;
 	}
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+	public void setCustomerId(Long customerId) {
+		this.customerId = customerId;
 	}
+
 	
-	@JsonGetter("customerId")
-    private Long getConsultantId() {
-		Long customerId=null;
-        if (this.customer != null)
-            customerId = this.customer.getId();
-        return customerId;
-    }
-	
-	@JsonGetter("consultantId")
-    private Long getCustomerId() {
-		Long consultantId=null;
-        if (this.consultant != null)
-        	consultantId = this.consultant.getId();
-        return consultantId;
-    }
 	
 	
 	
