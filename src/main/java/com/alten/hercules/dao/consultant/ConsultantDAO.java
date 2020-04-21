@@ -10,5 +10,6 @@ public interface ConsultantDAO extends JpaRepository<Consultant,Integer> {
 
 	public boolean existsByEmail(String email);
 	public Iterable<Consultant> findByReleaseDateIsNull();
+	public Consultant findById(Long id);
 	
 }
