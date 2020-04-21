@@ -14,16 +14,14 @@ import com.alten.hercules.model.customer.Customer;
 @Repository
 public interface CustomerDAO extends JpaRepository<Customer, Long> { 
 	
-	List<Customer> findAll();
 	Customer findByName(String name);
-	Optional<Customer> findById(Long customer_id);
 	Customer save(Optional<Customer> customer);
 	
-	@Query("SELECT c FROM Customer c WHERE c.name LIKE %?1% OR c.activitysector LIKE %?1% ")
-	List<Customer> findByNameOrActivitysector(String key);
+	@Query(value = "SELECT * FROM Customer c WHERE c.name LIKE %?1% OR c.activity_sector LIKE %?1% ", nativeQuery = true)
+	List<Customer> findByNameOrActivitySector(String key);
 	
 	
-	boolean existsByNameOrActivitysector(String name, String activitysector); //
+	boolean existsByNameOrActivitySector(String name, String activitySector); //
 	boolean existsByName(String name);
 
 }

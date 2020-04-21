@@ -37,33 +37,31 @@ public class CustomerController {
 	@Autowired
     private CustomerDAO customerDAO;
 		
-	@GetMapping("/customers-list")
+	@GetMapping
     public List<Customer> getAllCustomers() {
         return customerDAO.findAll();
         
     }
 	
 	
-	@GetMapping("/customers/{customer_id}")
+	@GetMapping("/{customer_id}")
 	public ResponseEntity<Optional<Customer>> getCustomerById(@PathVariable(value = "customer_id") Long customer_id)
     {
     	
 		Optional<Customer> customer = customerDAO.findById(customer_id);
 		
-		if(customer_id == null || this.customerDAO.findById(customer_id)==null)
+		if(customer_id == null || !customer.isPresent())
 		{
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
-		else
-		{
 		return ResponseEntity.ok().body(customer);	
-		}
+		
     }
 	
 	
 	
-	@PostMapping("/customers")
+	@PostMapping
     public ResponseEntity<?> createCustomer(@Valid @RequestBody Customer customer) { //OK pour toutes les conditions
 		
 		if(customer.getName()==null || customer.getName().isEmpty())
@@ -81,10 +79,10 @@ public class CustomerController {
 	} 
 	
 	
-	@PutMapping("/customers")
+	@PutMapping
     public ResponseEntity<?> updateCustomer(@Valid @RequestBody Customer customer) { 
 		
-		if (this.customerDAO.findById(customer.getCustomer_id()) == null)
+		if (this.customerDAO.findById(customer.getId()) == null)
 		 {
 			 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		 }
@@ -99,10 +97,10 @@ public class CustomerController {
 		 
 	}
 	
-	 @DeleteMapping("/customers")
+	 @DeleteMapping
 	 public ResponseEntity<?> deleteCustomer(@Valid @RequestBody Customer customer)
 	 {
-		 if (customerDAO.findById(customer.getCustomer_id()) == null)
+		 if (customerDAO.findById(customer.getId()) == null)
 		 {
 			 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			 
@@ -115,11 +113,11 @@ public class CustomerController {
 	
 	
 	
-	@GetMapping("customers/search")
+	@GetMapping("/search")
 	public List<Customer> searchCustomer(@RequestParam(name = "q") List<String> keys){
 		List<Customer> customers = new ArrayList<>();
 		for(String key : keys) {
-			customers.addAll(this.customerDAO.findByNameOrActivitysector(key));
+			customers.addAll(this.customerDAO.findByNameOrActivitySector(key));
 		}
 		List<Customer> listRes = new ArrayList<>(new HashSet<>(customers));
 		return listRes;
