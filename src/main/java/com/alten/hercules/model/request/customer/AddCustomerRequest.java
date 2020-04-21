@@ -15,7 +15,6 @@ public class AddCustomerRequest {
 	private String description;
 	
 	public AddCustomerRequest(String name, String activitySector, String description) {
-		super();
 		this.name = name;
 		this.activitySector = activitySector;
 		this.description = description;
