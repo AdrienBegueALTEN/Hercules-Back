@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,54 +43,54 @@ public class DiplomaController {
 	
 	/**
 	 * Save a new diploma in the database. Checks first if :
-	 * - the level exists. If not then the level is created.
-	 * - the diploma name exists. If not then the name is created.
-	 * - the location of diploma exists. If not then the location is created.
+	 * <ul>
+	 * 	<li>the level exists. If not then the level is created.</li>
+	 *  <li>the diploma name exists. If not then the name is created.</li>
+	 * 	<li>the location of diploma exists. If not then the location is created.</li>
+	 * </ul>
 	 * 
-	 * NO CONTENT if request is not complete is null
-	 * CONFLICT if diploma can be already found
-	 * OK if created
 	 * 
 	 * @param diplomaRequest
 	 * @return
+	 * NO CONTENT if request is not complete<br>
+	 * CONFLICT if diploma can be already found<br>
+	 * OK if created
 	 */
 	@PostMapping
 	public ResponseEntity<?> addDiploma(@RequestBody DiplomaRequest diplomaRequest) {
 		
-		String name = diplomaRequest.getDiplomaName();
-		String city = diplomaRequest.getGraduationCity();
-		String levelName = diplomaRequest.getLevelName();
-		String school = diplomaRequest.getSchool();
+		String name = (diplomaRequest.getDiplomaName()==null)?"":diplomaRequest.getDiplomaName();
+		String city = (diplomaRequest.getGraduationCity()==null)?"":diplomaRequest.getGraduationCity();
+		String levelName = (diplomaRequest.getLevelName()==null)?"":diplomaRequest.getLevelName();
+		String school = (diplomaRequest.getSchool()==null)?"":diplomaRequest.getSchool();
 		int year = diplomaRequest.getGraduationYear();
 		
-		if(name.isEmpty() || city.isEmpty() || levelName.isEmpty( )|| school.isEmpty()) {
+		/*if(name.isEmpty() || city.isEmpty() || levelName.isEmpty( )|| school.isEmpty()) {
 			return ResponseEntity.noContent().build();
-		}
+		}*/
 		
 		if(year < 1900)
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		
 		
 		Level level = new Level(levelName);
-		if(this.levelDAO.findByName(levelName)==null) 
+		//if(this.levelDAO.findByName(levelName)==null) 
 			level = this.levelDAO.save(level);
-		else 
-			level = this.levelDAO.findByName(levelName);
+		//else 
+		//	level = this.levelDAO.findByName(levelName);
 		
 		DiplomaName diplomaName = new DiplomaName(name, level);
-		if(this.diplomaNameDAO.findByName(name)==null)
+		//if(this.diplomaNameDAO.findByName(name)==null)
 			diplomaName = this.diplomaNameDAO.save(diplomaName);
-		else
-			diplomaName = this.diplomaNameDAO.findByName(name);
-		
+		//else
+		//	diplomaName = this.diplomaNameDAO.findByName(name);
 		
 		DiplomaLocation diplomaLocation = new DiplomaLocation(city, school);
-		if(this.diplomaLocationDAO.findByCity(city)==null)
+		//if(this.diplomaLocationDAO.findByCity(city)==null)
 			diplomaLocation = this.diplomaLocationDAO.save(diplomaLocation);
-		else
-			diplomaLocation = this.diplomaLocationDAO.findByCity(city);
+		//else
+		//	diplomaLocation = this.diplomaLocationDAO.findByCity(city);
 		
-		//TODO trouver dans la table diploma un diplome avec même level, même ville, même diplomaName et même année
 		if(this.diplomaDAO.findDiplome(year, city, name, levelName)!=null) 
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		
@@ -100,6 +101,30 @@ public class DiplomaController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
+	/**
+	 * Update a diploma (diploma, location, name or level).
+	 * You must give a diplomaRequest.
+	 * Ex:<br>
+	 * <code>
+	 *  {
+	 *     "id":4, <br>
+	 *     "graduationYear":2000,<br>
+	 *     "graduationCity":"belf",<br>
+	 *     "diplomaName":"ingé info",<br>
+	 *     "levelName":"ingé3", <br>
+	 *     "school":"utbm"
+	 *  }
+	 *  </code>
+	 *  <br>
+	 * The id parameter is mandatory but other are optional to update what is needed.
+	 * 
+	 * 
+	 * @param diplomaRequest
+	 * @return
+	 * NOT FOUND if no diploma is found with the id<br>
+	 * NO CONTENT if no id is given<br>
+	 * OK after entities are updated
+	 */
 	@PutMapping
 	public ResponseEntity<?> updateDiploma(@RequestBody DiplomaRequest diplomaRequest) {
 		if(diplomaRequest.getId()==null) {
@@ -123,12 +148,13 @@ public class DiplomaController {
 		Level l = dn.getLevel();
 		
 		if(school!=null && !school.isEmpty()) {
+			
 			dl.setSchool(school);
 			this.diplomaLocationDAO.save(dl);
 		}
 		
 		if(city!=null && !city.isEmpty()) {
-			dl.setSchool(school);
+			dl.setCity(city);
 			this.diplomaLocationDAO.save(dl);
 		}
 		
@@ -155,6 +181,22 @@ public class DiplomaController {
 	@GetMapping
 	public List<Diploma> getAll(){
 		return this.diplomaDAO.findAll();
+	}
+	
+	/**
+	 * Return a diploma.
+	 * 
+	 * @param id
+	 * @return
+	 * NOT FOUND if none is found with the given id<br>
+	 * OK if found
+	 */
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getByid(@PathVariable Long id) {
+		if(!this.diplomaDAO.findById(id).isPresent())
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+		return new ResponseEntity<>(this.diplomaDAO.findById(id).get(), HttpStatus.OK);
 	}
 	
 
