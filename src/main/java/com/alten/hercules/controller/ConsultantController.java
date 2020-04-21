@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
+import com.alten.hercules.model.consultant.request.AddConsultantRequest;
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
-import com.alten.hercules.model.request.consultant.AddConsultantRequest;
 import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.Manager;
 
@@ -36,7 +36,7 @@ public class ConsultantController {
 	
 	@GetMapping("")
 	public ResponseEntity<Object> getAllConsultant() {
-		return ResponseEntity.ok(dal.findAll());
+		return ResponseEntity.ok(dal.findAllEnabled());
 	}
 	
 	@PostMapping("")

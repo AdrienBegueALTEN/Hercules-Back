@@ -1,4 +1,4 @@
-package com.alten.hercules.model.request.consultant;
+package com.alten.hercules.model.consultant.request;
 
 import java.util.Set;
 

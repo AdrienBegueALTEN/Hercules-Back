@@ -12,8 +12,9 @@ import com.alten.hercules.dao.diploma.DiplomaDAO;
 import com.alten.hercules.dao.user.ManagerDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.consultant.Consultant;
+import com.alten.hercules.model.consultant.response.BasicConsultantResponse;
+import com.alten.hercules.model.consultant.response.ConsultantResponse;
 import com.alten.hercules.model.diploma.Diploma;
-import com.alten.hercules.model.response.ConsultantResponse;
 import com.alten.hercules.model.user.Manager;
 
 @Service
@@ -33,9 +34,10 @@ public class ConsultantDAL {
 	
 	public ConsultantDAL() {}
 	
-	public List<ConsultantResponse> findAll() {
-		List<ConsultantResponse> consultants = new ArrayList<>();
-		consultantDAO.findAll().forEach((consultant) -> { consultants.add(new ConsultantResponse(consultant)); });
+	public List<BasicConsultantResponse> findAllEnabled() {
+		List<BasicConsultantResponse> consultants = new ArrayList<>();
+		consultantDAO.findByReleaseDateIsNull().forEach((consultant) -> {
+			consultants.add(new BasicConsultantResponse(consultant)); });
 		return consultants;
 	}
 
