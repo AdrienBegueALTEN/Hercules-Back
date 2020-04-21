@@ -17,9 +17,9 @@ public class Customer {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	private long customer_id;
+	private long id;
 	
-	private String activitysector;
+	private String activitySector;
 	
 	private String description;
 	
@@ -33,55 +33,65 @@ public class Customer {
 	}
 
 
-	public Customer(long customer_id, String activitysector, String description, String name, byte[] logo) {
+	public Customer(String activitySector, String description, String name, byte[] logo) {
 		super();
-		this.customer_id = customer_id;
-		this.activitysector = activitysector;
+		this.activitySector = activitySector;
 		this.description = description;
 		this.name = name;
 		this.logo = logo;
 	}
 
-	
-	
 
-
-	public long getCustomer_id() {
-		return customer_id;
+	public Customer(long id, String activitySector, String description, String name, byte[] logo) {
+		super();
+		this.id = id;
+		this.activitySector = activitySector;
+		this.description = description;
+		this.name = name;
+		this.logo = logo;
 	}
 
-	public void setCustomer_id(long customer_id) {
-		this.customer_id = customer_id;
+
+	public long getId() {
+		return id;
 	}
 
-	
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+
+	public String getActivitySector() {
+		return activitySector;
+	}
+
+
+	public void setActivitySector(String activitySector) {
+		this.activitySector = activitySector;
+	}
+
+
 	public String getDescription() {
 		return description;
 	}
+
 
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	
+
 	public String getName() {
 		return name;
-	}
-
-	public String getActivitysector() {
-		return activitysector;
-	}
-
-
-	public void setActivitysector(String activitysector) {
-		this.activitysector = activitysector;
 	}
 
 
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
+
 	public byte[] getLogo() {
 		return logo;
 	}
@@ -90,5 +100,10 @@ public class Customer {
 	public void setLogo(byte[] logo) {
 		this.logo = logo;
 	}
+	
+	
+
+
+	
 	
 }
