@@ -1,9 +1,7 @@
 package com.alten.hercules.controller;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dal.ConsultantDAL;
@@ -35,7 +34,9 @@ public class ConsultantController {
 	private ConsultantDAL dal;
 	
 	@GetMapping("")
-	public ResponseEntity<Object> getAllConsultant() {
+	public ResponseEntity<Object> getAllConsultant(@RequestParam(required = false) Boolean basic) {
+		if (basic == null) basic = false;
+
 		return ResponseEntity.ok(dal.findAllEnabled());
 	}
 	
