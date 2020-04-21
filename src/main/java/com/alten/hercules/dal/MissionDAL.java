@@ -46,4 +46,14 @@ public class MissionDAL {
 	public boolean existsCustomer(Long id) {
 		return this.customerDAO.findById(id).isPresent();
 	}
+	
+	public Consultant getConsultant(Long id) {
+		return this.consultantDAO.findById(id);
+	}
+	
+	public Customer getCustomer(Long id) {
+		if(this.existsCustomer(id))
+			return this.customerDAO.findById(id).get();
+		return null;
+	}
 }
