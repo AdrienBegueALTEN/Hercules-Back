@@ -1,1 +1,7 @@
-INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'ADMIN', '$2y$10$vahGp2WQXilHSfVDqEagNux2kZ1kUzQXQCGJHVkFnD2K/kHjm3Hkq', true) ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.un@alten.com', 'Admin', 'Un', '$2y$10$vahGp2WQXilHSfVDqEagNux2kZ1kUzQXQCGJHVkFnD2K/kHjm3Hkq', true) ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.deux@alten.com', 'Admin', 'Deux', '$2y$10$vahGp2WQXilHSfVDqEagNux2kZ1kUzQXQCGJHVkFnD2K/kHjm3Hkq', true) ON CONFLICT DO NOTHING;
+INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('julien.baudot@alten.com', 'Julien', 'Baudot', 7, 2) ON CONFLICT DO NOTHING;
+INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('adrien.begue@alten.com', 'Adrien', 'Bègue', 1, 1) ON CONFLICT DO NOTHING;
+INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('robin.jesson@alten.com', 'Robin', 'Jesson', 7, 1) ON CONFLICT DO NOTHING;
+INSERT INTO CUSTOMER(name, activity_sector) VALUES('TESLA', 'Automobile') ON CONFLICT DO NOTHING;
+INSERT INTO CUSTOMER(name, activity_sector) VALUES('ALTEN', 'Consulting technologique') ON CONFLICT DO NOTHING;
