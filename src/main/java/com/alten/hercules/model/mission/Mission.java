@@ -2,6 +2,7 @@ package com.alten.hercules.model.mission;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -27,46 +28,47 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Mission {
 	//TODO contraintes tailles
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Nullable
+	@Column(nullable = true)
 	private Date lastUpdate;
 	
-	@Nullable
+	@Column(nullable = true)
 	private String title;
 	
-	@Nullable
+	@Column(nullable = true)
 	@Length(max = 1000)
 	private String description;
 	
-	@Nullable
+	@Column(nullable = true)
 	@Enumerated(EnumType.STRING)
 	private EType type;
 	
-	@Nullable
+	@Column(nullable = true)
 	private String city;
 	
-	@Nullable
+	@Column(nullable = true)
 	private String country;
 	
-	@Nullable
+	@Column(nullable = true)
 	@Length(max = 250)
 	private String comment;
 	
-	@Nullable
+	@Column(nullable = true)
 	private String consultantRole;
 	
-	@Nullable
+	@Column(columnDefinition = "integer default 0")
 	private int consultantExperience;
 	
 	@Enumerated(EnumType.STRING)
-	@Nullable
+	@Column(nullable = false)
 	private EState state;
 	
-	@Nullable
+	@Column(columnDefinition = "integer default 0")
 	private int teamSize;
 	
+	@Column(nullable = false)
 	private Long reference;
 	
 	@JsonIgnore

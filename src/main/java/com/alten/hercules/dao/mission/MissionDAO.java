@@ -18,4 +18,8 @@ public interface MissionDAO extends JpaRepository<Mission, Long>{
 	
 	@Query(value="SELECT * FROM mission WHERE reference=?1 ", nativeQuery = true)
 	public List<Mission> byReference(Long reference);
+	
+	@Query(value="SELECT * FROM mission WHERE last_update IN "
+			+ "(SELECT MAX(last_update) FROM mission GROUP BY reference)", nativeQuery = true)
+	public List<Mission> allMissionLastUpdate();
 }

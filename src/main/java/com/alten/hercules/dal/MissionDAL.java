@@ -13,6 +13,7 @@ import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.mission.EState;
 import com.alten.hercules.model.mission.Mission;
 
 @Service
@@ -34,6 +35,7 @@ public class MissionDAL {
 		Mission mission = new Mission();
 		mission.setConsultant(consultant);
 		mission.setCustomer(customer);
+		mission.setState(EState.WAITING);
 		mission.setLastUpdate(new Date());
 		
 		this.missionDAO.save(mission);
@@ -65,7 +67,7 @@ public class MissionDAL {
 	}
 	
 	public Mission findById(Long id) {
-		return this.missionDAO.findById(id)==null?null:this.missionDAO.findById(id).get();
+		return this.missionDAO.findById(id).isPresent()?this.missionDAO.findById(id).get():null;
 	}
 	
 	public List<Mission> byReference(Long reference){
@@ -78,5 +80,13 @@ public class MissionDAL {
 	
 	public Mission save(Mission mission) {
 		return this.missionDAO.save(mission);
+	}
+	
+	public List<Mission> allMissionLastUpdate(){
+		return this.missionDAO.allMissionLastUpdate();
+	}
+	
+	public void delete(Mission mission) {
+		this.missionDAO.delete(mission);
 	}
 }

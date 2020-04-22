@@ -5,3 +5,7 @@ INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUE
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('robin.jesson@alten.com', 'Robin', 'Jesson', 7, 1) ON CONFLICT DO NOTHING;
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('TESLA', 'Automobile') ON CONFLICT DO NOTHING;
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('ALTEN', 'Consulting technologique') ON CONFLICT DO NOTHING;
+
+INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (1,1,'WAITING',NOW(),1) ON CONFLICT DO NOTHING;
+INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (1,2,'WAITING',NOW(),1) ON CONFLICT DO NOTHING;
+INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (2,2,'WAITING',NOW(),3) ON CONFLICT DO NOTHING;
