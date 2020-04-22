@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.request.MissionFastRequest;
+import com.alten.hercules.model.mission.request.MissionRequest;
 
 @RestController
 @CrossOrigin(origins="*")
