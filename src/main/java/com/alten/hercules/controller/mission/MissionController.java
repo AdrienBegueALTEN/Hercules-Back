@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,14 +35,30 @@ import com.alten.hercules.model.response.MsgResponse;
 public class MissionController {
 
 	@Autowired
-	private MissionDAO missionDAO;
-
-	@Autowired
 	private MissionDAL missionDAL;
 
 	@GetMapping
 	public List<Mission> getAll() {
-		return this.missionDAO.findAll();
+		return this.missionDAL.findAll();
+	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getById(@PathVariable Long id){
+		if(this.missionDAL.findById(id)!=null)
+			return new ResponseEntity<>(this.missionDAL.findById(id),HttpStatus.OK);
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
+	}
+	
+	/**
+	 * 
+	 * @param reference
+	 * @return
+	 */
+	@GetMapping("/reference/{reference}")
+	public ResponseEntity<?> getLastMossionOfReference(@PathVariable Long reference){
+		if(this.missionDAL.byReference(reference)==null)
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("No mission with reference="+reference));
+		return new ResponseEntity<>(this.missionDAL.byReference(reference),HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -60,9 +77,9 @@ public class MissionController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("Customer ("+cust+") not found."));
 		 
 
-		this.missionDAL.fastInsert(cons, cust);
+		Mission created = this.missionDAL.fastInsert(cons, cust);
 
-		return new ResponseEntity(HttpStatus.CREATED);
+		return ResponseEntity.status(HttpStatus.CREATED).body(created.getId());
 	}
 
 	/**
@@ -81,11 +98,11 @@ public class MissionController {
 		if (reference == null)
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new MsgResponse("No reference in request."));
 
-		if (this.missionDAO.lastVersionByReference(reference) == null)
+		if (this.missionDAL.lastVersionByReference(reference) == null)
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new MsgResponse("No mission found with the reference."));
 
-		Mission mission = this.missionDAO.lastVersionByReference(reference);
+		Mission mission = this.missionDAL.lastVersionByReference(reference);
 
 		Date now = new Date();
 		long diffTime = getDateDiff(now, mission.getLastUpdate(), TimeUnit.HOURS);
@@ -94,7 +111,7 @@ public class MissionController {
 		if (diffTime < 24) {
 			// if last update is less than 24h then update last version
 
-			setMissionParameters(mission, req);
+			Mission.setMissionParameters(mission, req);
 
 			if (req.getConsultantId() != null) {
 				if (this.missionDAL.existsConsultant(req.getConsultantId()))
@@ -113,19 +130,19 @@ public class MissionController {
 			}
 
 			mission.setLastUpdate(now);
-			this.missionDAO.save(mission);
+			this.missionDAL.save(mission);
 		} else {
 			// last update is more than 24h => new version is created
 			System.out.println("new version");
 			Mission newMission = new Mission(mission);
-			setMissionParameters(newMission, req);
+			Mission.setMissionParameters(newMission, req);
 
 			if (req.getConsultantId() != null) {
 				if (this.missionDAL.existsConsultant(req.getConsultantId()))
 					newMission.setConsultant(this.missionDAL.getConsultant(req.getConsultantId()));
 				else
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse(
-							"Update new mission: no consultant found with id=" + req.getConsultantId()));
+							"Update new version: no consultant found with id=" + req.getConsultantId()));
 			}
 
 			if (req.getCustomerId() != null) {
@@ -133,49 +150,19 @@ public class MissionController {
 					newMission.setCustomer(this.missionDAL.getCustomer(req.getCustomerId()));
 				else
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-							new MsgResponse("Update new mission: no customer found with id=" + req.getCustomerId()));
+							new MsgResponse("Update new version: no customer found with id=" + req.getCustomerId()));
 			}
 
 			newMission.setLastUpdate(now);
-			this.missionDAO.save(newMission);
+			this.missionDAL.save(newMission);
 
 		}
 		return ResponseEntity.ok().build();
 	}
+	
+	
 
-	private static Mission setMissionParameters(Mission mission, MissionRequest req) {
-		if (req.getTitle() != null && !req.getTitle().isEmpty())
-			mission.setTitle(req.getTitle());
-
-		if (req.getDescription() != null && !req.getDescription().isEmpty())
-			mission.setDescription(req.getDescription());
-
-		if (req.getType() != null)
-			mission.setType(req.getType());
-
-		if (req.getCity() != null && !req.getCity().isEmpty())
-			mission.setCity(req.getCity());
-
-		if (req.getCountry() != null && !req.getCountry().isEmpty())
-			mission.setCountry(req.getCountry());
-
-		if (req.getComment() != null && !req.getComment().isEmpty())
-			mission.setComment(req.getComment());
-
-		if (req.getConsultantRole() != null && !req.getConsultantRole().isEmpty())
-			mission.setConsultantRole(req.getConsultantRole());
-
-		if (req.getConsultantExperience() != null)
-			mission.setConsultantExperience(req.getConsultantExperience());
-
-		if (req.getState() != null)
-			mission.setState(req.getState());
-
-		if (req.getTeamSize() != null)
-			mission.setTeamSize(req.getTeamSize());
-
-		return mission;
-	}
+	
 
 	private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
 		long diffInMillies = date1.getTime() - date2.getTime();

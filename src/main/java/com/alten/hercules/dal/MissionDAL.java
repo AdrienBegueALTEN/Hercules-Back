@@ -1,6 +1,7 @@
 package com.alten.hercules.dal;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,5 +58,25 @@ public class MissionDAL {
 		if(this.existsCustomer(id))
 			return this.customerDAO.findById(id).get();
 		return null;
+	}
+	
+	public List<Mission> findAll(){
+		return this.missionDAO.findAll();
+	}
+	
+	public Mission findById(Long id) {
+		return this.missionDAO.findById(id)==null?null:this.missionDAO.findById(id).get();
+	}
+	
+	public List<Mission> byReference(Long reference){
+		return this.missionDAO.byReference(reference);
+	}
+	
+	public Mission lastVersionByReference(Long reference) {
+		return this.missionDAO.lastVersionByReference(reference);
+	}
+	
+	public Mission save(Mission mission) {
+		return this.missionDAO.save(mission);
 	}
 }

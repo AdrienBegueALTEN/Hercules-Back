@@ -19,6 +19,7 @@ import org.springframework.lang.Nullable;
 
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.mission.request.MissionRequest;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -279,6 +280,37 @@ public class Mission {
         return consultantId;
     }
 	
-	
+	public static void setMissionParameters(Mission mission, MissionRequest req) {
+		if (req.getTitle() != null && !req.getTitle().isEmpty())
+			mission.setTitle(req.getTitle());
+
+		if (req.getDescription() != null && !req.getDescription().isEmpty())
+			mission.setDescription(req.getDescription());
+
+		if (req.getType() != null)
+			mission.setType(req.getType());
+
+		if (req.getCity() != null && !req.getCity().isEmpty())
+			mission.setCity(req.getCity());
+
+		if (req.getCountry() != null && !req.getCountry().isEmpty())
+			mission.setCountry(req.getCountry());
+
+		if (req.getComment() != null && !req.getComment().isEmpty())
+			mission.setComment(req.getComment());
+
+		if (req.getConsultantRole() != null && !req.getConsultantRole().isEmpty())
+			mission.setConsultantRole(req.getConsultantRole());
+
+		if (req.getConsultantExperience() != null)
+			mission.setConsultantExperience(req.getConsultantExperience());
+
+		if (req.getState() != null)
+			mission.setState(req.getState());
+
+		if (req.getTeamSize() != null)
+			mission.setTeamSize(req.getTeamSize());
+
+	}
 	
 }
