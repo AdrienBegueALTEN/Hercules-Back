@@ -1,6 +1,9 @@
 package com.alten.hercules.controller.mission;
 
+import java.time.Period;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,30 +54,77 @@ public class MissionController {
 		return new ResponseEntity(HttpStatus.CREATED);
 	}
 	
-	/*@PutMapping
+	/**
+	 * Update the mission.<br>
+	 * The mission id in the request is mandatory. Other parameters are not obligatory.<br> 
+	 * If a modification appears 24h after the previous one, then the version is incremented.
+	 * 
+	 * @param req
+	 * @return
+	 * NOT FOUND
+	 * OK once it is updated
+	 */
+	@PutMapping
 	public ResponseEntity<?> updateMission(@RequestBody MissionRequest req){
 		if(!this.missionDAO.findById(req.getId()).isPresent())
-			return new ResponseEntity(HttpStatus.CONFLICT);
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		
+		Date now = new Date();
 		
 		Mission mission = this.missionDAO.findById(req.getId()).get();
 		
-		if(mission.getLastUpdate())
+		if(getDateDiff(now, mission.getLastUpdate(), TimeUnit.HOURS)>=24)
+			mission.setVersion(mission.getVersion()+1);
 		
-		String title = (req.getTitle()==null)?null:req.getTitle();
-		String description = (req.getDescription()==null)?null:req.getDescription();
-		EType type = (req.getType()==null)?null:req.getType();
-		String city = (req.getCity()==null)?null:req.getCity();
-		String country = (req.getCountry()==null)?null:req.getCountry();
-		String comment = (req.getComment()==null)?null:req.getComment();
-		String consultantRole  = (req.getConsultantRole()==null)?null:req.getConsultantRole();
-		int consultantExperience = (req.getConsultantExperience()==null)?0:req.getConsultantExperience();
-		EState state  = (req.getState()==null)?null:req.getState();
-		int teamSize =(req.getTeamSize()==null)?0:req.getTeamSize();
+		if(req.getTitle()!=null && !req.getTitle().isEmpty()) 
+			mission.setTitle(req.getTitle());
 		
+		if(req.getDescription()!=null && !req.getDescription().isEmpty()) 
+			mission.setDescription(req.getDescription());
 		
+		if(req.getType()!=null) 
+			mission.setType(req.getType());		
 		
+		if(req.getCity()!=null && !req.getCity().isEmpty()) 
+			mission.setCity(req.getCity());		
+		
+		if(req.getCountry()!=null && !req.getCountry().isEmpty()) 
+			mission.setCountry(req.getCountry());		
+		
+		if(req.getComment()!=null && !req.getComment().isEmpty()) 
+			mission.setComment(req.getComment());		
+		
+		if(req.getConsultantRole()!=null && !req.getConsultantRole().isEmpty()) 
+			mission.setConsultantRole(req.getConsultantRole());		
+		
+		if(req.getConsultantExperience()!=null) 
+			mission.setConsultantExperience(req.getConsultantExperience());
+		
+		if(req.getState()!=null)
+			mission.setState(req.getState());
+		
+		if(req.getTeamSize()!=null) 
+			mission.setTeamSize(req.getTeamSize());
+		
+		if(req.getConsultantId()!=null && this.missionDAL.existsConsultant(req.getConsultantId()))
+			mission.setConsultant(this.missionDAL.getConsultant(req.getConsultantId()));
+		else
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		
+		if(req.getCustomerId()!=null && this.missionDAL.existsCustomer(req.getCustomerId()))
+			mission.setCustomer(this.missionDAL.getCustomer(req.getCustomerId()));
+		else
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		
+		mission.setLastUpdate(now);
+		this.missionDAO.save(mission);
 		return ResponseEntity.ok().build();
-	}*/
+	}
+	
+	private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+	    long diffInMillies = date2.getTime() - date1.getTime();
+	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+	}
 	
 	
 }
