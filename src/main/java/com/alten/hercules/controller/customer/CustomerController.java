@@ -1,12 +1,12 @@
 package com.alten.hercules.controller.customer;
 
 
-import java.net.URI;
 import java.util.ArrayList;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.validation.Valid;
 
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.customer.response.BasicCustomerResponse;
 import com.alten.hercules.model.request.customer.AddCustomerRequest;
 
 
@@ -34,17 +35,20 @@ import com.alten.hercules.model.request.customer.AddCustomerRequest;
 @RequestMapping("/hercules/customers")
 public class CustomerController {
 	
-	
-	
 	@Autowired
     private CustomerDAO customerDAO;
 		
-	@GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerDAO.findAll();
-        
-    }
 	
+	@GetMapping("")
+	public ResponseEntity<Object> getAllCustomer(@RequestParam(required = false) Boolean basic) {
+		if (basic == null || !basic)
+			return ResponseEntity.ok(customerDAO.findAll());
+			List<BasicCustomerResponse> customers = new ArrayList<>();
+			customerDAO.findAll().forEach((customer) -> {
+				customers.add(new BasicCustomerResponse(customer)); });;
+
+		return ResponseEntity.ok(customers);
+	}
 	
 	@GetMapping("/{customer_id}")
 	public ResponseEntity<Optional<Customer>> getCustomerById(@PathVariable(value = "customer_id") Long customer_id)
