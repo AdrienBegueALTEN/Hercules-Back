@@ -30,9 +30,6 @@ public class Mission {
 	private long id;
 	
 	@Nullable
-	private int version;
-	
-	@Nullable
 	private Date lastUpdate;
 	
 	@Nullable
@@ -69,6 +66,8 @@ public class Mission {
 	@Nullable
 	private int teamSize;
 	
+	private Long reference;
+	
 	@JsonIgnore
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "consultant_id", nullable = false)
@@ -80,13 +79,12 @@ public class Mission {
 	private Customer customer;
 	
 
-	public Mission(long id, int version, Date lastUpdate, String title, @Length(max = 1000) String description,
+	public Mission(long id, Date lastUpdate, String title, @Length(max = 1000) String description,
 			EType type, String city, String country, @Length(max = 250) String comment, String consultantRole,
-			int consultantExperience, EState state, int teamSize, Consultant consultant,
+			int consultantExperience, EState state, int teamSize, Long reference, Consultant consultant,
 			Customer customer) {
 		super();
 		this.id = id;
-		this.version = version;
 		this.lastUpdate = lastUpdate;
 		this.title = title;
 		this.description = description;
@@ -98,16 +96,16 @@ public class Mission {
 		this.consultantExperience = consultantExperience;
 		this.state = state;
 		this.teamSize = teamSize;
+		this.reference = reference;
 		this.consultant = consultant;
 		this.customer = customer;
 	}
 
-	public Mission(int version, Date lastUpdate, String title, @Length(max = 1000) String description, EType type,
+	public Mission(Date lastUpdate, String title, @Length(max = 1000) String description, EType type,
 			String city, String country, @Length(max = 250) String comment, String consultantRole,
-			int consultantExperience, EState state, int teamSize, Consultant consultant,
+			int consultantExperience, EState state, int teamSize, Long reference, Consultant consultant,
 			Customer customer) {
 		super();
-		this.version = version;
 		this.lastUpdate = lastUpdate;
 		this.title = title;
 		this.description = description;
@@ -119,8 +117,26 @@ public class Mission {
 		this.consultantExperience = consultantExperience;
 		this.state = state;
 		this.teamSize = teamSize;
+		this.reference = reference;
 		this.consultant = consultant;
 		this.customer = customer;
+	}
+	
+	public Mission(Mission other) {
+		this(other.lastUpdate,
+				other.title,
+				other.description,
+				other.type,
+				other.city,
+				other.country,
+				other.comment,
+				other.consultantRole,
+				other.consultantExperience,
+				other.state,
+				other.teamSize,
+				other.reference,
+				other.consultant,
+				other.customer);
 	}
 
 	public Mission() {
@@ -135,12 +151,12 @@ public class Mission {
 		this.id = id;
 	}
 
-	public int getVersion() {
-		return version;
+	public Long getReference() {
+		return reference;
 	}
 
-	public void setVersion(int version) {
-		this.version = version;
+	public void setReference(Long reference) {
+		this.reference = reference;
 	}
 
 	public Date getLastUpdate() {

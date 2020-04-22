@@ -33,9 +33,11 @@ public class MissionDAL {
 		Mission mission = new Mission();
 		mission.setConsultant(consultant);
 		mission.setCustomer(customer);
-		mission.setVersion(0);
 		mission.setLastUpdate(new Date());
 		
+		this.missionDAO.save(mission);
+		
+		mission.setReference(mission.getId());
 		return this.missionDAO.save(mission);
 	}
 	

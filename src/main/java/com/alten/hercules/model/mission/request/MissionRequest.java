@@ -21,7 +21,7 @@ public class MissionRequest {
 	
 	private Long id;
 	
-	private int version;
+	private Long reference;
 	
 	private Date lastUpdate;
 	
@@ -50,29 +50,7 @@ public class MissionRequest {
 	private Long consultantId;
 	
 	private Long customerId;
-
 	
-
-	public MissionRequest(Long id, int version, Date lastUpdate, String title, @Length(max = 1000) String description,
-			EType type, String city, String country, @Length(max = 250) String comment, String consultantRole,
-			int consultantExperience, EState state, int teamSize, Long consultantId, Long customerId) {
-		super();
-		this.id = id;
-		this.version = version;
-		this.lastUpdate = lastUpdate;
-		this.title = title;
-		this.description = description;
-		this.type = type;
-		this.city = city;
-		this.country = country;
-		this.comment = comment;
-		this.consultantRole = consultantRole;
-		this.consultantExperience = consultantExperience;
-		this.state = state;
-		this.teamSize = teamSize;
-		this.consultantId = consultantId;
-		this.customerId = customerId;
-	}
 
 	public MissionRequest() {
 		super();
@@ -88,13 +66,19 @@ public class MissionRequest {
 		this.id = id;
 	}
 
-	public Integer getVersion() {
-		return version;
+	
+
+	public Long getReference() {
+		return reference;
 	}
 
-	public void setVersion(int version) {
-		this.version = version;
+
+
+	public void setReference(Long reference) {
+		this.reference = reference;
 	}
+
+
 
 	public Date getLastUpdate() {
 		return lastUpdate;
