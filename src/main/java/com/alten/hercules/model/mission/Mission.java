@@ -68,7 +68,7 @@ public class Mission {
 	@Column(columnDefinition = "integer default 0")
 	private int teamSize;
 	
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private Long reference;
 	
 	@JsonIgnore
