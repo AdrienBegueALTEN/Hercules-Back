@@ -1,6 +1,7 @@
 package com.alten.hercules.dao.mission;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,7 @@ public interface MissionDAO extends JpaRepository<Mission, Long>{
 	
 	@Query(value="SELECT * FROM mission WHERE reference=?1 AND last_update = "
 			+ "(SELECT MAX(last_update) FROM mission WHERE reference=?1)", nativeQuery = true)
-	public Mission lastVersionByReference(Long reference);
+	public Optional<Mission> lastVersionByReference(Long reference);
 	
 	@Query(value="SELECT * FROM mission WHERE reference=?1 ", nativeQuery = true)
 	public List<Mission> byReference(Long reference);

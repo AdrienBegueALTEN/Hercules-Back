@@ -2,7 +2,10 @@ package com.alten.hercules.controller.mission;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.request.MissionFastRequest;
-import com.alten.hercules.model.mission.request.MissionRequest;
+import com.alten.hercules.model.mission.request.UpdateMissionRequest;
 import com.alten.hercules.model.response.MsgResponse;
 
 @RestController
@@ -42,10 +45,10 @@ public class MissionController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getById(@PathVariable Long id){
+	public ResponseEntity<Object> getById(@PathVariable Long id){
 		if(this.missionDAL.findById(id)!=null)
 			return new ResponseEntity<>(this.missionDAL.findById(id),HttpStatus.OK);
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return ResponseEntity.notFound().build();
 	}
 	
 	/**
@@ -54,7 +57,7 @@ public class MissionController {
 	 * @return
 	 */
 	@GetMapping("/reference/{reference}")
-	public ResponseEntity<?> getLastMossionOfReference(@PathVariable Long reference){
+	public ResponseEntity<Object> getLastMossionOfReference(@PathVariable Long reference){
 		if(this.missionDAL.byReference(reference)==null)
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("No mission with reference="+reference));
 		return new ResponseEntity<>(this.missionDAL.byReference(reference),HttpStatus.OK);
@@ -62,14 +65,9 @@ public class MissionController {
 	
 	//@PreAuthorize("hasAuthority('ADMIN ')")
 	@PostMapping
-	public ResponseEntity<?> fastInsertion(@RequestBody MissionFastRequest req) {
-
+	public ResponseEntity<Object> fastInsertion(@Valid @RequestBody MissionFastRequest req) {
 		Long cons = req.getConsultantId();
 		Long cust = req.getCustomerId();
-
-		if (cons == null || cust == null)
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new MsgResponse("Consultant or customer is null."));
-
 		
 		if(!this.missionDAL.existsConsultant(cons))	
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("Consultant ("+cons+")not found."));	
@@ -89,96 +87,47 @@ public class MissionController {
 	 * If a modification appears 24h after the previous one, then the version is
 	 * incremented.
 	 * 
-	 * @param req
+	 * @param request
 	 * @return NOT FOUND OK once it is updated
 	 */
 	@PutMapping
-	public ResponseEntity<?> updateMission(@RequestBody MissionRequest req) {
-		Long reference = req.getReference();
-		if (reference == null)
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new MsgResponse("No reference in request."));
+	public ResponseEntity<Object> updateMission(@Valid @RequestBody UpdateMissionRequest request) {
+		Optional<Mission> otpMission = missionDAL.lastVersionByReference(request.getReference());
 
-		if (this.missionDAL.lastVersionByReference(reference) == null)
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new MsgResponse("No mission found with the reference."));
-
-		Mission mission = this.missionDAL.lastVersionByReference(reference);
-
+		if (!otpMission.isPresent())
+			 return ResponseEntity.notFound().build();
+		
+		Mission mission = otpMission.get();
 		Date now = new Date();
-		long diffTime = getDateDiff(now, mission.getLastUpdate(), TimeUnit.HOURS);
-		System.out.println(diffTime);
 
-		if (diffTime < 24) {
-			// if last update is less than 24h then update last version
+		if (moreThan24hDifference(now, mission.getLastUpdate()))
+			mission = new Mission(mission);
 
-			Mission.setMissionParameters(mission, req);
-
-			if (req.getConsultantId() != null) {
-				if (this.missionDAL.existsConsultant(req.getConsultantId()))
-					mission.setConsultant(this.missionDAL.getConsultant(req.getConsultantId()));
-				else
-					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse(
-							"Update current mission: no consultant found with id=" + req.getConsultantId()));
-			}
-
-			if (req.getCustomerId() != null) {
-				if (this.missionDAL.existsCustomer(req.getCustomerId()))
-					mission.setCustomer(this.missionDAL.getCustomer(req.getCustomerId()));
-				else
-					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse(
-							"Update current mission: no customer found with id=" + req.getCustomerId()));
-			}
-
-			mission.setLastUpdate(now);
-			this.missionDAL.save(mission);
-		} else {
-			// last update is more than 24h => new version is created
-			System.out.println("new version");
-			Mission newMission = new Mission(mission);
-			Mission.setMissionParameters(newMission, req);
-
-			if (req.getConsultantId() != null) {
-				if (this.missionDAL.existsConsultant(req.getConsultantId()))
-					newMission.setConsultant(this.missionDAL.getConsultant(req.getConsultantId()));
-				else
-					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse(
-							"Update new version: no consultant found with id=" + req.getConsultantId()));
-			}
-
-			if (req.getCustomerId() != null) {
-				if (this.missionDAL.existsCustomer(req.getCustomerId()))
-					newMission.setCustomer(this.missionDAL.getCustomer(req.getCustomerId()));
-				else
-					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-							new MsgResponse("Update new version: no customer found with id=" + req.getCustomerId()));
-			}
-
-			newMission.setLastUpdate(now);
-			this.missionDAL.save(newMission);
-
-		}
-		return ResponseEntity.ok().build();
+		Mission.setMissionParameters(mission, request);
+		mission.setLastUpdate(now);
+		this.missionDAL.save(mission);
+		
+		return ResponseEntity.ok(mission.getId());
 	}
 	
-	@DeleteMapping
-	public ResponseEntity<?> deleteMission(@RequestBody Mission mission){
-		if(this.missionDAL.findById(mission.getId())==null) 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new MsgResponse("Mission id="+mission.getId()+" not found"));
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Object> deleteMission(@PathVariable Long id){
+		Optional<Mission> otpMission = missionDAL.findById(id);
 		
-		//TODO nb projets==0
-		this.missionDAL.delete(mission);
+		if (!otpMission.isPresent())
+			 return ResponseEntity.notFound().build();
 		
+		Mission mission = otpMission.get();
+		/*TODO
+		if (nombre de projets != 0)
+			return ResponseEntity.status(HttpStatus.CONFLICT).build()*/
+		missionDAL.delete(mission);
 		return ResponseEntity.ok().build();
 	}
-	
-	
 
-	
-
-	private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
-		long diffInMillies = date1.getTime() - date2.getTime();
-		return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
+	private static boolean moreThan24hDifference(Date date1, Date date2) {
+		long diffInMillies = Math.abs(date1.getTime() - date2.getTime());
+		return TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS) > 24;
 	}
 
 }

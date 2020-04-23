@@ -20,7 +20,7 @@ import org.springframework.lang.Nullable;
 
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.mission.request.MissionRequest;
+import com.alten.hercules.model.mission.request.UpdateMissionRequest;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -282,7 +282,7 @@ public class Mission {
         return consultantId;
     }
 	
-	public static void setMissionParameters(Mission mission, MissionRequest req) {
+	public static void setMissionParameters(Mission mission, UpdateMissionRequest req) {
 		if (req.getTitle() != null && !req.getTitle().isEmpty())
 			mission.setTitle(req.getTitle());
 
