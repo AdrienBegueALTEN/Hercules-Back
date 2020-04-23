@@ -1,17 +1,13 @@
 package com.alten.hercules.controller.mission;
 
-import java.time.Period;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,17 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dal.MissionDAL;
-import com.alten.hercules.dao.mission.MissionDAO;
-import com.alten.hercules.model.consultant.Consultant;
-import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.mission.EState;
-import com.alten.hercules.model.mission.EType;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.request.MissionFastRequest;
 import com.alten.hercules.model.mission.request.MissionRequest;
 import com.alten.hercules.model.response.MsgResponse;
 
 @RestController
+@CrossOrigin(origins="*")
 @RequestMapping("/hercules/missions")
 public class MissionController {
 
