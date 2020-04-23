@@ -2,10 +2,9 @@ package com.alten.hercules.dal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.alten.hercules.dao.consultant.ConsultantDAO;
@@ -66,15 +65,15 @@ public class MissionDAL {
 		return this.missionDAO.findAll();
 	}
 	
-	public Mission findById(Long id) {
-		return this.missionDAO.findById(id).isPresent()?this.missionDAO.findById(id).get():null;
+	public Optional<Mission> findById(Long id) {
+		return missionDAO.findById(id);
 	}
 	
 	public List<Mission> byReference(Long reference){
 		return this.missionDAO.byReference(reference);
 	}
 	
-	public Mission lastVersionByReference(Long reference) {
+	public Optional<Mission> lastVersionByReference(Long reference) {
 		return this.missionDAO.lastVersionByReference(reference);
 	}
 	
