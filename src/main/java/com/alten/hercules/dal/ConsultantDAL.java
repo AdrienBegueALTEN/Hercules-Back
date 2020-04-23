@@ -54,4 +54,8 @@ public class ConsultantDAL {
 	public Optional<Diploma> findDiplomaById(Long id) {
 		return diplomaDAO.findById(id);
 	}
+	
+	public List<Consultant> findAll() {
+		return this.consultantDAO.findAll();
+	}
 }

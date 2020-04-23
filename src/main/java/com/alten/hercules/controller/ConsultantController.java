@@ -40,6 +40,12 @@ public class ConsultantController {
 		return ResponseEntity.ok(dal.findAllEnabled());
 	}
 	
+	@GetMapping("/all")
+	public ResponseEntity<Object> getAllConsultant() {
+
+		return ResponseEntity.ok(dal.findAll());
+	}
+	
 	@PostMapping("")
 	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest request) {
 

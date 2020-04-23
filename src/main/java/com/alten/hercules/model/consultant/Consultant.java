@@ -2,6 +2,7 @@ package com.alten.hercules.model.consultant;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -17,6 +18,8 @@ import javax.persistence.OneToMany;
 
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.user.Manager;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Consultant {
@@ -39,10 +42,12 @@ public class Consultant {
 	
 	@Column(nullable = true)
 	private LocalDate releaseDate = null;
-
+	
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Manager manager;
 	
+	@JsonIgnore
 	@OneToMany
 	private Set<Diploma> diplomas;
 	
@@ -90,4 +95,23 @@ public class Consultant {
 		Consultant consultant = (Consultant) o;
 		return Objects.equals(id, consultant.id);
 	}
+	
+	@JsonGetter("managerId")
+    private Long getManagerId() {
+		Long managerId=null;
+        if (this.manager != null)
+        	managerId = this.manager.getId();
+        return managerId;
+    }
+	
+	@JsonGetter("diplomas")
+    private List<Long> getDiplomasId() {
+		List<Long> diplomasId=new ArrayList<>();
+        if (this.diplomas != null)
+        	for(Diploma d: this.diplomas)
+        		diplomasId.add(d.getId());
+        diplomasId.add((long) 1);
+        diplomasId.add((long) 2);
+        return diplomasId;
+    }
 }
