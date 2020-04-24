@@ -58,4 +58,9 @@ public class ConsultantDAL {
 	public List<Consultant> findAll() {
 		return this.consultantDAO.findAll();
 	}
+	
+	public Consultant findById(Long id){
+		System.out.println(this.consultantDAO.findById(id));
+		return this.consultantDAO.findById(id);
+	}
 }
