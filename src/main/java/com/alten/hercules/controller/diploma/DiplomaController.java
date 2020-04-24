@@ -23,7 +23,7 @@ import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.diploma.DiplomaLocation;
 import com.alten.hercules.model.diploma.DiplomaName;
 import com.alten.hercules.model.diploma.Level;
-import com.alten.hercules.model.request.DiplomaRequest;
+import com.alten.hercules.model.diploma.request.DiplomaRequest;
 
 @RestController
 @RequestMapping("/hercules/diplomas")
@@ -65,40 +65,23 @@ public class DiplomaController {
 		String school = (diplomaRequest.getSchool()==null)?"":diplomaRequest.getSchool();
 		int year = diplomaRequest.getGraduationYear();
 		
-		/*if(name.isEmpty() || city.isEmpty() || levelName.isEmpty( )|| school.isEmpty()) {
-			return ResponseEntity.noContent().build();
-		}*/
-		
 		if(year < 1900)
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		
 		
 		Level level = new Level(levelName);
-		//if(this.levelDAO.findByName(levelName)==null) 
-			level = this.levelDAO.save(level);
-		//else 
-		//	level = this.levelDAO.findByName(levelName);
+		level = this.levelDAO.save(level);
 		
 		DiplomaName diplomaName = new DiplomaName(name, level);
-		//if(this.diplomaNameDAO.findByName(name)==null)
-			diplomaName = this.diplomaNameDAO.save(diplomaName);
-		//else
-		//	diplomaName = this.diplomaNameDAO.findByName(name);
+		diplomaName = this.diplomaNameDAO.save(diplomaName);
 		
 		DiplomaLocation diplomaLocation = new DiplomaLocation(city, school);
-		//if(this.diplomaLocationDAO.findByCity(city)==null)
-			diplomaLocation = this.diplomaLocationDAO.save(diplomaLocation);
-		//else
-		//	diplomaLocation = this.diplomaLocationDAO.findByCity(city);
-		
-		if(this.diplomaDAO.findDiplome(year, city, name, levelName)!=null) 
-			return new ResponseEntity<>(HttpStatus.CONFLICT);
+		diplomaLocation = this.diplomaLocationDAO.save(diplomaLocation);
 		
 		Diploma diploma = new Diploma(diplomaRequest.getGraduationYear(),diplomaLocation, diplomaName);
-		this.diplomaDAO.save(diploma);
+		diploma = this.diplomaDAO.save(diploma);
 		
-		
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		return ResponseEntity.status(HttpStatus.CREATED).body(diploma.getId());
 	}
 	
 	/**
