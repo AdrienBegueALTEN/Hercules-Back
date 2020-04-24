@@ -8,10 +8,10 @@ import javax.persistence.Id;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "id"})
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class DiplomaLocation {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String city;
