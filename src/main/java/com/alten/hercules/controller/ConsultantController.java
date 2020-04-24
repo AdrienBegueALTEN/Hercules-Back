@@ -49,9 +49,9 @@ public class ConsultantController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getById(@PathVariable Long id) {
 		
-		if(this.dal.findById(id)==null)
+		if(!this.dal.findById(id).isPresent())
 			return ResponseEntity.notFound().build();
-		return ResponseEntity.ok(this.dal.findById(id));
+		return ResponseEntity.ok(this.dal.findById(id).get());
 	}
 	
 	@PostMapping("")

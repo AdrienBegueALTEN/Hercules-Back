@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.user.Manager;
+import com.alten.hercules.model.user.response.ManagerResponse;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -47,7 +48,6 @@ public class Consultant {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Manager manager;
 	
-	@JsonIgnore
 	@OneToMany
 	private Set<Diploma> diplomas;
 	
@@ -96,22 +96,11 @@ public class Consultant {
 		return Objects.equals(id, consultant.id);
 	}
 	
-	@JsonGetter("managerId")
-    private Long getManagerId() {
-		Long managerId=null;
+	@JsonGetter("manager")
+    private ManagerResponse getManagerId() {
+		
         if (this.manager != null)
-        	managerId = this.manager.getId();
-        return managerId;
-    }
-	
-	@JsonGetter("diplomas")
-    private List<Long> getDiplomasId() {
-		List<Long> diplomasId=new ArrayList<>();
-        if (this.diplomas != null)
-        	for(Diploma d: this.diplomas)
-        		diplomasId.add(d.getId());
-        diplomasId.add((long) 1);
-        diplomasId.add((long) 2);
-        return diplomasId;
+        	return new ManagerResponse(this.manager);
+        return null;
     }
 }
