@@ -1,6 +1,5 @@
 package com.alten.hercules.controller;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +21,6 @@ import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.consultant.request.AddConsultantRequest;
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
-import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.Manager;
 
 @RestController
@@ -42,9 +40,13 @@ public class ConsultantController {
 	
 	@PostMapping("")
 	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest request) {
-
-		if (dal.existsByEmail(request.getEmail()))
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
+		Consultant consultant = dal.findByEmail(request.getEmail()).get();
+		
+		if (consultant != null)
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(consultant.getId());
+		
+		if (dal.userExistsByEmail(request.getEmail()))
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
 		try {
 			Manager manager = dal.findManagerById(request.getManager()).orElseThrow(() -> new RessourceNotFoundException());
@@ -54,7 +56,7 @@ public class ConsultantController {
 				for (Long diploma : request.getDiplomas())
 					diplomas.add(dal.findDiplomaById(diploma).orElseThrow(() -> new RessourceNotFoundException()));
 			
-			Consultant consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), request.getExperience(), manager, diplomas);
+			consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), request.getExperience(), manager, diplomas);
 			dal.save(consultant);
 			return ResponseEntity.status(HttpStatus.CREATED).body(consultant.getId());
 		} catch (RessourceNotFoundException e) {

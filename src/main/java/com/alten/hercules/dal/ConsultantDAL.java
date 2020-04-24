@@ -13,7 +13,6 @@ import com.alten.hercules.dao.user.ManagerDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.consultant.response.BasicConsultantResponse;
-import com.alten.hercules.model.consultant.response.ConsultantResponse;
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.user.Manager;
 
@@ -41,8 +40,12 @@ public class ConsultantDAL {
 		return consultants;
 	}
 
-	public boolean existsByEmail(String email) {
-		return consultantDAO.existsByEmail(email) || userDAO.existsByEmail(email);
+	public Optional<Consultant> findByEmail(String email) {
+		return consultantDAO.findByEmail(email);
+	}
+	
+	public boolean userExistsByEmail(String email) {
+		return userDAO.existsByEmail(email);
 	}
 
 	public void save(Consultant consultant) { consultantDAO.save(consultant); }

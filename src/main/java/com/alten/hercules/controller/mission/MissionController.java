@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dal.MissionDAL;
+import com.alten.hercules.model.consultant.Consultant;
+import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.request.MissionFastRequest;
 import com.alten.hercules.model.mission.request.UpdateMissionRequest;
@@ -32,22 +34,22 @@ import com.alten.hercules.model.response.MsgResponse;
 public class MissionController {
 
 	@Autowired
-	private MissionDAL missionDAL;
+	private MissionDAL dal;
 
 	@GetMapping
 	public List<Mission> getAll() {
-		return this.missionDAL.findAll();
+		return this.dal.findAll();
 	}
 	
 	@GetMapping("/last-versions")
 	public List<Mission> getAllUniqueVersion() {
-		return this.missionDAL.allMissionLastUpdate();
+		return this.dal.allMissionLastUpdate();
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getById(@PathVariable Long id){
-		if(this.missionDAL.findById(id)!=null)
-			return new ResponseEntity<>(this.missionDAL.findById(id),HttpStatus.OK);
+		if(this.dal.findById(id)!=null)
+			return new ResponseEntity<>(this.dal.findById(id),HttpStatus.OK);
 		return ResponseEntity.notFound().build();
 	}
 	
@@ -58,26 +60,28 @@ public class MissionController {
 	 */
 	@GetMapping("/reference/{reference}")
 	public ResponseEntity<Object> getLastMossionOfReference(@PathVariable Long reference){
-		if(this.missionDAL.byReference(reference)==null)
+		if(this.dal.byReference(reference)==null)
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("No mission with reference="+reference));
-		return new ResponseEntity<>(this.missionDAL.byReference(reference),HttpStatus.OK);
+		return new ResponseEntity<>(this.dal.byReference(reference),HttpStatus.OK);
 	}
 	
 	//@PreAuthorize("hasAuthority('ADMIN ')")
 	@PostMapping
 	public ResponseEntity<Object> fastInsertion(@Valid @RequestBody MissionFastRequest req) {
-		Long cons = req.getConsultantId();
-		Long cust = req.getCustomerId();
+		Consultant consultant = dal.findConsultantById(req.getConsultantId()).get();
+		if (consultant != null)
+			ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error : consultant not found");
 		
-		if(!this.missionDAL.existsConsultant(cons))	
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("Consultant ("+cons+")not found."));	
-		if(!this.missionDAL.existsCustomer(cust)) 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MsgResponse("Customer ("+cust+") not found."));
-		 
+		Customer customer = dal.findCustomerById(req.getCustomerId()).get();
+		if (customer != null)
+			ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error : customer not found");
 
-		Mission created = this.missionDAL.fastInsert(cons, cust);
+		Mission mission = new Mission(consultant, customer);
+		dal.save(mission);
+		mission.setReference(mission.getId());
+		dal.save(mission);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(created.getId());
+		return ResponseEntity.status(HttpStatus.CREATED).body(mission.getId());
 	}
 
 	/**
@@ -92,7 +96,7 @@ public class MissionController {
 	 */
 	@PutMapping
 	public ResponseEntity<Object> updateMission(@Valid @RequestBody UpdateMissionRequest request) {
-		Optional<Mission> otpMission = missionDAL.lastVersionByReference(request.getReference());
+		Optional<Mission> otpMission = dal.lastVersionByReference(request.getReference());
 
 		if (!otpMission.isPresent())
 			 return ResponseEntity.notFound().build();
@@ -105,14 +109,14 @@ public class MissionController {
 
 		Mission.setMissionParameters(mission, request);
 		mission.setLastUpdate(now);
-		this.missionDAL.save(mission);
+		this.dal.save(mission);
 		
 		return ResponseEntity.ok(mission.getId());
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> deleteMission(@PathVariable Long id){
-		Optional<Mission> otpMission = missionDAL.findById(id);
+		Optional<Mission> otpMission = dal.findById(id);
 		
 		if (!otpMission.isPresent())
 			 return ResponseEntity.notFound().build();
@@ -121,7 +125,7 @@ public class MissionController {
 		/*TODO
 		if (nombre de projets != 0)
 			return ResponseEntity.status(HttpStatus.CONFLICT).build()*/
-		missionDAL.delete(mission);
+		dal.delete(mission);
 		return ResponseEntity.ok().build();
 	}
 

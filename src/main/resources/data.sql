@@ -10,9 +10,9 @@ INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) V
 INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (1,2,'WAITING',NOW(),1) ON CONFLICT DO NOTHING;
 INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (2,2,'WAITING',NOW(),3) ON CONFLICT DO NOTHING;
 
-INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 1',1) ON CONFLICT DO NOTHING;
+/*INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 2 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 3 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 2',2) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 2 de mission 2',2) ON CONFLICT DO NOTHING;
-INSERT INTO PROJECT(mission_id) VALUES (2) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(mission_id) VALUES (2) ON CONFLICT DO NOTHING;*/

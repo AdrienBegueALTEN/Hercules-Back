@@ -12,12 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.Length;
-import org.springframework.lang.Nullable;
-
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.mission.request.UpdateMissionRequest;
@@ -31,7 +26,7 @@ public class Mission {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private Date lastUpdate;
 	
 	@Column(nullable = true)
@@ -41,7 +36,7 @@ public class Mission {
 	@Length(max = 1000)
 	private String description;
 	
-	@Column(nullable = true)
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private EType type;
 	
@@ -81,6 +76,12 @@ public class Mission {
 	@JoinColumn(name = "customer_id", nullable = false)
 	private Customer customer;
 	
+	public Mission(Consultant consultant, Customer customer) {
+		this.consultant = consultant;
+		this.customer = customer;
+		this.state = EState.WAITING;
+		this.lastUpdate = new Date();
+	}
 
 	public Mission(long id, Date lastUpdate, String title, @Length(max = 1000) String description,
 			EType type, String city, String country, @Length(max = 250) String comment, String consultantRole,
