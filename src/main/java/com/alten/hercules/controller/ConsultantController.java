@@ -1,6 +1,7 @@
 package com.alten.hercules.controller;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -40,10 +41,10 @@ public class ConsultantController {
 	
 	@PostMapping("")
 	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest request) {
-		Consultant consultant = dal.findByEmail(request.getEmail()).get();
 		
-		if (consultant != null)
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(consultant.getId());
+		Optional<Consultant> optConsultant = dal.findByEmail(request.getEmail());
+		if (optConsultant.isPresent())
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(optConsultant.get().getId());
 		
 		if (dal.userExistsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -56,7 +57,7 @@ public class ConsultantController {
 				for (Long diploma : request.getDiplomas())
 					diplomas.add(dal.findDiplomaById(diploma).orElseThrow(() -> new RessourceNotFoundException()));
 			
-			consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), request.getExperience(), manager, diplomas);
+			Consultant consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), request.getExperience(), manager, diplomas);
 			dal.save(consultant);
 			return ResponseEntity.status(HttpStatus.CREATED).body(consultant.getId());
 		} catch (RessourceNotFoundException e) {
