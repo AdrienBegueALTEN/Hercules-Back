@@ -36,7 +36,7 @@ public class Mission {
 	@Length(max = 1000)
 	private String description;
 	
-	@Column(nullable = false)
+	@Column(nullable = true)
 	@Enumerated(EnumType.STRING)
 	private EType type;
 	
@@ -56,8 +56,8 @@ public class Mission {
 	@Column(columnDefinition = "integer default 0")
 	private int consultantExperience;
 	
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private EState state;
 	
 	@Column(columnDefinition = "integer default 0")
