@@ -44,7 +44,7 @@ public class ConsultantController {
 		
 		Optional<Consultant> optConsultant = dal.findByEmail(request.getEmail());
 		if (optConsultant.isPresent())
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(optConsultant.get().getId());
+			return ResponseEntity.accepted().body(optConsultant.get().getId());
 		
 		if (dal.userExistsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -59,7 +59,7 @@ public class ConsultantController {
 			
 			Consultant consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), request.getExperience(), manager, diplomas);
 			dal.save(consultant);
-			return ResponseEntity.status(HttpStatus.CREATED).body(consultant.getId());
+			return ResponseEntity.created(null).body(consultant.getId());
 		} catch (RessourceNotFoundException e) {
 			return ResponseEntity.notFound().build();
 		}
