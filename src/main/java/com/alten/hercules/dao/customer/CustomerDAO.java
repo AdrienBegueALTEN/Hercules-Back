@@ -14,14 +14,9 @@ import com.alten.hercules.model.customer.Customer;
 @Repository
 public interface CustomerDAO extends JpaRepository<Customer, Long> { 
 	
-	Customer findByName(String name);
-	Customer save(Optional<Customer> customer);
+	Optional<Customer> findByNameIgnoreCase(String name);
 	
 	@Query(value = "SELECT * FROM Customer c WHERE c.name LIKE %?1% OR c.activity_sector LIKE %?1% ", nativeQuery = true)
 	List<Customer> findByNameOrActivitySector(String key);
 	
-	
-	boolean existsByNameOrActivitySector(String name, String activitySector); //
-	boolean existsByName(String name);
-
 }

@@ -59,10 +59,14 @@ public class ConsultantDAL {
 	}
 	
 	public List<Consultant> findAll() {
-		return this.consultantDAO.findAll();
+		return consultantDAO.findAll();
 	}
 	
 	public Optional<Consultant> findById(Long id){
-		return this.consultantDAO.findById(id);
+		return consultantDAO.findById(id);
+	}
+
+	public void delete(Consultant consultant) {
+		consultantDAO.delete(consultant);
 	}
 }

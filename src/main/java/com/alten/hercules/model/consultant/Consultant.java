@@ -2,8 +2,6 @@ package com.alten.hercules.model.consultant;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
 import com.alten.hercules.model.user.response.ManagerResponse;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -50,6 +49,9 @@ public class Consultant {
 	
 	@OneToMany
 	private Set<Diploma> diplomas;
+	
+	@OneToMany
+	private Set<Mission> missions;
 	
 	public Consultant() { super(); }
 	
@@ -85,6 +87,9 @@ public class Consultant {
 
 	public Set<Diploma> getDiplomas() { return diplomas; }
 	public void setDiploma(Set<Diploma> diplomas) { this.diplomas = diplomas; }
+	
+	public Set<Mission> getMissions() { return missions; }
+	public void setMissions(Set<Mission> missions) { this.missions = missions; }
 
 	@Override
 	public boolean equals(Object o) {
