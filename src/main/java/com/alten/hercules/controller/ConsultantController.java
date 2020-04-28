@@ -126,6 +126,14 @@ public class ConsultantController {
 		if(req.getReleaseDate()!=null)
 			consultant.setReleaseDate(req.getReleaseDate());
 		
+		if(req.getManager()!=null) {
+			Optional<Manager> optManager = dal.findManagerById(req.getManager());
+			if(!optManager.isPresent())
+				return ResponseEntity.notFound().build();
+			Manager m = optManager.get();
+			consultant.setManager(m);
+		}
+		
 		this.dal.save(consultant);
 
 		return ResponseEntity.ok().build();
