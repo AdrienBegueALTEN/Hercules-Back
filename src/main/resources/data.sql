@@ -16,7 +16,7 @@ INSERT INTO DIPLOMA(graduation_year,diploma_location_id,diploma_name_id) VALUES(
 
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'Admin', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', true) ON CONFLICT DO NOTHING;
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'manager.manager@alten.com', 'Manager', 'Manager', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', false) ON CONFLICT DO NOTHING;
-INSERT INTO APP_USER(dtype, email, firstname, lastname, password) VALUES('Recruitement Officer', 'recruitement.officer@alten.com', 'Recruitement', 'Officer', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW') ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password) VALUES('RecruitementOfficer', 'recruitement.officer@alten.com', 'Recruitement', 'Officer', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW') ON CONFLICT DO NOTHING;
 
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('julien.baudot@alten.com', 'Julien', 'Baudot', 7, 2) ON CONFLICT DO NOTHING;
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('adrien.begue@alten.com', 'Adrien', 'Bègue', 1, 1) ON CONFLICT DO NOTHING;
