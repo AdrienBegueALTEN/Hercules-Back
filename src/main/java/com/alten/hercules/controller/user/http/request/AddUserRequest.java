@@ -1,4 +1,4 @@
-package com.alten.hercules.model.request.user;
+package com.alten.hercules.controller.user.http.request;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;

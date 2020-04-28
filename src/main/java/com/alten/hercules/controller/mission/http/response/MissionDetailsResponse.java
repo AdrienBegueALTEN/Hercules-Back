@@ -87,6 +87,7 @@ public class MissionDetailsResponse {
 	
 	private void fillCustomer(Customer customer) {
 		this.customer.put("activitySector", customer.getActivitySector());
+		this.customer.put("description", customer.getDescription());
 		this.customer.put("id", customer.getId());
 		this.customer.put("logo", customer.getLogo());
 		this.customer.put("name", customer.getName());

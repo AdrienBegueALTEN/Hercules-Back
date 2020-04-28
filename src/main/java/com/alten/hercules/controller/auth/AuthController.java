@@ -1,4 +1,4 @@
-package com.alten.hercules.controller;
+package com.alten.hercules.controller.auth;
 
 import javax.validation.Valid;
 
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.model.request.LoginRequest;
+import com.alten.hercules.controller.auth.http.request.LoginRequest;
 import com.alten.hercules.model.response.JWTResponse;
 
 @RestController

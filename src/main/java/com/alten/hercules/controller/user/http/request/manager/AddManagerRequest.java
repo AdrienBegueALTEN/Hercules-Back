@@ -1,6 +1,6 @@
-package com.alten.hercules.model.request.user.manager;
+package com.alten.hercules.controller.user.http.request.manager;
 
-import com.alten.hercules.model.request.user.AddUserRequest;
+import com.alten.hercules.controller.user.http.request.AddUserRequest;
 import com.alten.hercules.model.user.Manager;
 
 public class AddManagerRequest extends AddUserRequest {

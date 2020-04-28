@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.user.http.request.recruitementOfficer.AddRecruitementOfficerRequest;
+import com.alten.hercules.controller.user.http.request.recruitementOfficer.UpdateRecruitementOfficerRequest;
 import com.alten.hercules.dao.user.RecruitementOfficerDAO;
 import com.alten.hercules.dao.user.UserDAO;
-import com.alten.hercules.model.request.user.recruitementOfficer.AddRecruitementOfficerRequest;
-import com.alten.hercules.model.request.user.recruitementOfficer.UpdateRecruitementOfficerRequest;
 import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.RecruitementOfficer;
 

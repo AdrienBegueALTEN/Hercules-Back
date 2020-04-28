@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.diploma.http.request.DiplomaRequest;
 import com.alten.hercules.dao.diploma.DiplomaDAO;
 import com.alten.hercules.dao.diploma.DiplomaLocationDAO;
 import com.alten.hercules.dao.diploma.DiplomaNameDAO;
@@ -23,7 +24,6 @@ import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.diploma.DiplomaLocation;
 import com.alten.hercules.model.diploma.DiplomaName;
 import com.alten.hercules.model.diploma.Level;
-import com.alten.hercules.model.diploma.request.DiplomaRequest;
 
 @RestController
 @RequestMapping("/hercules/diplomas")

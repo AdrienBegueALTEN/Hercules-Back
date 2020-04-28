@@ -1,4 +1,4 @@
-package com.alten.hercules.model.diploma.request;
+package com.alten.hercules.controller.diploma.http.request;
 
 import javax.validation.constraints.NotBlank;
 

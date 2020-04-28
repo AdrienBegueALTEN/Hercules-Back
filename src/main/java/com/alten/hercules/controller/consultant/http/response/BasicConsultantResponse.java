@@ -1,12 +1,8 @@
-package com.alten.hercules.model.consultant.response;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+package com.alten.hercules.controller.consultant.http.response;
 
 import com.alten.hercules.model.consultant.Consultant;
 
-public class ConsultantResponse {
+public class BasicConsultantResponse {
 	
 	private Long id;
 
@@ -16,24 +12,14 @@ public class ConsultantResponse {
 	
 	private String lastname;
 	
-	private int experience;
-	
-	private Date releaseDate;
-	
 	private Long manager;
 	
-	private List<Long> diplomas;
-	
-	public ConsultantResponse(Consultant consultant) {
+	public BasicConsultantResponse(Consultant consultant) {
 		this.id = consultant.getId();
 		this.email = consultant.getEmail();
 		this.firstname = consultant.getFirstname();
 		this.lastname = consultant.getLastname();
-		this.experience = consultant.getExperience();
-		this.releaseDate = consultant.getReleaseDate();
 		this.manager = consultant.getManager().getId();
-		this.diplomas = new ArrayList<>();
-		consultant.getDiplomas().forEach((diploma) -> { this.diplomas.add(diploma.getId());});
 	}
 
 	public Long getId() { return id; }
@@ -48,18 +34,7 @@ public class ConsultantResponse {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 
-	public int getExperience() { return experience; }
-	public void setExperience(int experience) { this.experience = experience; }
-
-	public Date getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
-
 	public Long getManager() { return manager; }
 	public void setManager(Long manager) { this.manager = manager; }
-
-	public List<Long> getDiplomas() { return diplomas; }
-	public void setDiplomas(List<Long> diplomas) { this.diplomas = diplomas; }
-
-
 
 }

@@ -1,4 +1,4 @@
-package com.alten.hercules.controller;
+package com.alten.hercules.controller.consultant;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.consultant.http.request.AddConsultantRequest;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
-import com.alten.hercules.model.consultant.request.AddConsultantRequest;
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
 import com.alten.hercules.model.user.Manager;

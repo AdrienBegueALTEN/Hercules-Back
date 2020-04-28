@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.user.http.request.manager.AddManagerRequest;
+import com.alten.hercules.controller.user.http.request.manager.UpdateManagerRequest;
 import com.alten.hercules.dal.AuthenticationDAL;
-import com.alten.hercules.model.request.user.manager.AddManagerRequest;
-import com.alten.hercules.model.request.user.manager.UpdateManagerRequest;
 import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.Manager;
 

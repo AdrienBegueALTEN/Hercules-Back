@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.customer.http.request.AddCustomerRequest;
+import com.alten.hercules.controller.customer.http.response.BasicCustomerResponse;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.customer.response.BasicCustomerResponse;
-import com.alten.hercules.model.request.customer.AddCustomerRequest;
 
 
 @CrossOrigin(origins="*")

@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.alten.hercules.model.mission.OldMission;
+import com.alten.hercules.model.mission.Mission;
 
 @Entity
 public class Customer {
@@ -24,12 +24,13 @@ public class Customer {
 	@Column(nullable = false)
 	private String activitySector;
 	
+	@Column(length = 1000)
 	private String description = null;
 	
 	private byte[] logo = null;
 	
 	@OneToMany
-	private Set<OldMission> missions;
+	private Set<Mission> missions;
 	
 	public Customer() {}
 
@@ -64,7 +65,7 @@ public class Customer {
 	public byte[] getLogo() { return logo; }
 	public void setLogo(byte[] logo) { this.logo = logo; }
 	
-	public Set<OldMission> getMissions() { return missions; }
-	public void setMissions(Set<OldMission> missions) { this.missions = missions; }
+	public Set<Mission> getMissions() { return missions; }
+	public void setMissions(Set<Mission> missions) { this.missions = missions; }
 
 }

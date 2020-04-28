@@ -1,4 +1,4 @@
-package com.alten.hercules.model.customer.response;
+package com.alten.hercules.controller.customer.http.response;
 
 import com.alten.hercules.model.customer.Customer;
 

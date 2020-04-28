@@ -1,6 +1,6 @@
-package com.alten.hercules.model.request.user.recruitementOfficer;
+package com.alten.hercules.controller.user.http.request.recruitementOfficer;
 
-import com.alten.hercules.model.request.user.AddUserRequest;
+import com.alten.hercules.controller.user.http.request.AddUserRequest;
 import com.alten.hercules.model.user.RecruitementOfficer;
 
 public class AddRecruitementOfficerRequest extends AddUserRequest {
