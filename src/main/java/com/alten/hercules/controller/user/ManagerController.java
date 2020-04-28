@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.dao.user.ManagerDAO;
-import com.alten.hercules.dao.user.UserDAO;
+import com.alten.hercules.dal.AuthenticationDAL;
 import com.alten.hercules.model.request.user.manager.AddManagerRequest;
 import com.alten.hercules.model.request.user.manager.UpdateManagerRequest;
 import com.alten.hercules.model.response.MsgResponse;
@@ -31,12 +30,11 @@ import com.alten.hercules.model.user.Manager;
 @RequestMapping("/hercules/managers")
 public class ManagerController {
 	
-	@Autowired ManagerDAO managerDAO;
-	@Autowired UserDAO userDAO;
+	@Autowired private AuthenticationDAL dal;
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getManager(@PathVariable Long id) {
-		Optional<Manager> manager = managerDAO.findById(id);
+		Optional<Manager> manager = dal.findManagerById(id);
 		
 		if (!manager.isPresent())
 			return ResponseEntity.notFound().build();
@@ -47,12 +45,11 @@ public class ManagerController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("")
 	public ResponseEntity<Object> addManager(@Valid @RequestBody AddManagerRequest request) {
-
-		if (userDAO.existsByEmail(request.getEmail()))
+		if (dal.userExistsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
 		
 		Manager manager = request.buildUser();
-		managerDAO.save(manager);
+		dal.saveManager(manager);
 		URI location = URI.create(String.format("/manager/%s", manager.getId()));
 			
 		return ResponseEntity.created(location).build();
@@ -61,7 +58,7 @@ public class ManagerController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PutMapping("")
 	public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateManagerRequest request) {
-		Optional<Manager> optManager = managerDAO.findById(request.getId());
+		Optional<Manager> optManager = dal.findManagerById(request.getId());
 		
 		if (!optManager.isPresent())
 			return ResponseEntity.notFound().build();
@@ -69,7 +66,7 @@ public class ManagerController {
 		Manager manager = optManager.get();
 		
 		if (request.getEmail() != null) {
-			if (userDAO.existsByEmail(request.getEmail()))
+			if (dal.userExistsByEmail(request.getEmail()))
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			manager.setEmail(request.getEmail());
 		}
@@ -96,7 +93,7 @@ public class ManagerController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		Optional<Manager> optManager = managerDAO.findById(id);
+		Optional<Manager> optManager = dal.findManagerById(id);
 		
 		if (optManager.isPresent()) {
 			Manager manager = optManager.get();
@@ -104,7 +101,7 @@ public class ManagerController {
 			if (!manager.getConsultants().isEmpty())
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	
-			managerDAO.delete(manager);
+			dal.deleteManager(manager);
 			return ResponseEntity.ok().build();
 		}
 		 return ResponseEntity.notFound().build();

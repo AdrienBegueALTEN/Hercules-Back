@@ -1,9 +1,6 @@
 package com.alten.hercules.model.user;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -14,8 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.Transient;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -71,19 +66,9 @@ public abstract class AppUser implements UserDetails {
 
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
-	
-	public abstract ERole getRole();
 
 	public LocalDate getReleaseDate() { return releaseDate; }
 	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(getRole().name()));
-		
-		return authorities;
-	}
 
 	@Override
 	public String getUsername() { return email; }
@@ -109,5 +94,4 @@ public abstract class AppUser implements UserDetails {
 		AppUser user = (AppUser) o;
 		return Objects.equals(id, user.id);
 	}
-
 }

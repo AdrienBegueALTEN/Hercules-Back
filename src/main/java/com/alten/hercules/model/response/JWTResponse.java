@@ -1,7 +1,8 @@
 package com.alten.hercules.model.response;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
-
 import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.security.jwt.JwtUtils;
 
@@ -11,7 +12,7 @@ public class JWTResponse {
 	private Long id;
 	private String firstname;
 	private String lastname;
-	private String role;
+	private List<String> roles;
 	
 	public JWTResponse(Authentication authentication) {
 		this.token = JwtUtils.generateJWT(authentication);
@@ -19,7 +20,9 @@ public class JWTResponse {
 		this.id = user.getId();
 		this.firstname = user.getFirstname();
 		this.lastname = user.getLastname();
-		this.role = user.getRole().name();
+		this.roles = user.getAuthorities().stream()
+				.map(authority ->  authority.getAuthority())
+				.collect(Collectors.toList());
 	}
 
 	public String getAccessToken() { return token; }
@@ -34,7 +37,7 @@ public class JWTResponse {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 
-	public String getRole() { return role; }
-	public void setRole(String role) { this.role = role; }
+	public List<String> getRoles() { return roles; }
+	public void setRoles(List<String> roles) { this.roles = roles; }
 
 }
