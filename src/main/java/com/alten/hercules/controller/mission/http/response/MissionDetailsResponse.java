@@ -15,7 +15,6 @@ public class MissionDetailsResponse {
 
 	private String city;
 	private Map<String, Object> consultant = new HashMap<String, Object>();
-	private Integer consultantStartXp;
 	private String country;
 	private Map<String, Object> customer = new HashMap<String, Object>();
 	private Long id;
@@ -41,9 +40,6 @@ public class MissionDetailsResponse {
 	
 	public Map<String, Object> getConsultant() { return consultant; }
 	public void setConsultant(Map<String, Object> consultant) { this.consultant = consultant; }
-
-	public Integer getConsultantStartXp() { return consultantStartXp; }
-	public void setConsultantStartXp(Integer consultantStartXp) { this.consultantStartXp = consultantStartXp; }
 
 	public String getCountry() { return country; }
 	public void setCountry(String country) { this.country = country; }
