@@ -15,16 +15,21 @@ public class ManagerResponse {
 		super();
 	}
 
-	public ManagerResponse(Long id, String lastname, String firstname, LocalDate releaseDate) {
+	
+	
+	public ManagerResponse(Long id, String email, String lastname, String firstname, LocalDate releaseDate) {
 		super();
 		this.id = id;
+		this.email = email;
 		this.lastname = lastname;
 		this.firstname = firstname;
 		this.releaseDate = releaseDate;
 	}
-	
+
+
+
 	public ManagerResponse(Manager m) {
-		this(m.getId(), m.getLastname(), m.getFirstname(), m.getReleaseDate());
+		this(m.getId(), m.getEmail(), m.getLastname(), m.getFirstname(), m.getReleaseDate());
 	}
 
 	public Long getId() {
