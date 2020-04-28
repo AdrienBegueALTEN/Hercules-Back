@@ -1,6 +1,6 @@
 package com.alten.hercules.model.mission;
 
-public enum EState {
+public enum ESheetStatus {
 	VALID,
 	ONGOING,
 	WAITING

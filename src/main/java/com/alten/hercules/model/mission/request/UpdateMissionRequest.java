@@ -3,7 +3,7 @@ package com.alten.hercules.model.mission.request;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
-import com.alten.hercules.model.mission.EState;
+import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.EType;
 
 public class UpdateMissionRequest {
@@ -29,7 +29,7 @@ public class UpdateMissionRequest {
 	
 	private int consultantExperience;
 	
-	private EState state;
+	private ESheetStatus state;
 	
 	private int teamSize;
 
@@ -62,8 +62,8 @@ public class UpdateMissionRequest {
 	public Integer getConsultantExperience() { return consultantExperience; }
 	public void setConsultantExperience(int consultantExperience) { this.consultantExperience = consultantExperience; }
 
-	public EState getState() { return state; }
-	public void setState(EState state) { this.state = state; }
+	public ESheetStatus getState() { return state; }
+	public void setState(ESheetStatus state) { this.state = state; }
 
 	public Integer getTeamSize() { return teamSize; }
 	public void setTeamSize(int teamSize) { this.teamSize = teamSize; }

@@ -14,7 +14,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.alten.hercules.model.mission.Mission;
+import com.alten.hercules.model.mission.OldMission;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -39,13 +39,13 @@ public class Project {
 	@JsonIgnore
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "mission_id", nullable = false)
-	private Mission mission;
+	private OldMission mission;
 
 	public Project() {
 		super();
 	}
 
-	public Project(@Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate, Mission mission) {
+	public Project(@Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate, OldMission mission) {
 		super();
 		this.description = description;
 		this.beginDate = beginDate;
@@ -85,11 +85,11 @@ public class Project {
 		this.endDate = endDate;
 	}
 
-	public Mission getMission() {
+	public OldMission getMission() {
 		return mission;
 	}
 
-	public void setMission(Mission mission) {
+	public void setMission(OldMission mission) {
 		this.mission = mission;
 	}
 }
