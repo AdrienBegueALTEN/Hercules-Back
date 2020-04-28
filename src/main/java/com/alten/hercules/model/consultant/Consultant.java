@@ -1,7 +1,8 @@
 package com.alten.hercules.model.consultant;
 
 
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -41,7 +42,7 @@ public class Consultant {
 	private int experience;
 	
 	@Column(nullable = true)
-	private LocalDate releaseDate = null;
+	private Date releaseDate = null;
 	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -79,8 +80,12 @@ public class Consultant {
 	public int getExperience() { return experience; }
 	public void setExperience(int experience) { this.experience = experience; }
 	
-	public LocalDate getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+	public String getReadableReleaseDate() { 
+		return (releaseDate == null) ? null :
+			new SimpleDateFormat("dd/MM/yyyy").format(releaseDate);
+	}
+	public Date getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 
 	public Manager getManager() { return manager; }
 	public void setManager(Manager manager) { this.manager = manager; }

@@ -1,4 +1,4 @@
-package com.alten.hercules.model.mission.request;
+package com.alten.hercules.controller.mission.http.request;
 
 import javax.validation.constraints.NotNull;
 

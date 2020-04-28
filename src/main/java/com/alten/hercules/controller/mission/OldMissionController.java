@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
+import com.alten.hercules.controller.mission.http.request.UpdateMissionRequest;
 import com.alten.hercules.dal.OldMissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.mission.OldMission;
-import com.alten.hercules.model.mission.request.AddMissionRequest;
-import com.alten.hercules.model.mission.request.UpdateMissionRequest;
 import com.alten.hercules.model.response.MsgResponse;
 
 @RestController

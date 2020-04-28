@@ -13,9 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import org.hibernate.validator.constraints.Length;
+
+import com.alten.hercules.controller.mission.http.request.UpdateMissionRequest;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.mission.request.UpdateMissionRequest;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

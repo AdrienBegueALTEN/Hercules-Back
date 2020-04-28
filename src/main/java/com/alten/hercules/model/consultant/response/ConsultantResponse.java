@@ -1,7 +1,7 @@
 package com.alten.hercules.model.consultant.response;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.alten.hercules.model.consultant.Consultant;
@@ -18,7 +18,7 @@ public class ConsultantResponse {
 	
 	private int experience;
 	
-	private LocalDate releaseDate;
+	private Date releaseDate;
 	
 	private Long manager;
 	
@@ -51,8 +51,8 @@ public class ConsultantResponse {
 	public int getExperience() { return experience; }
 	public void setExperience(int experience) { this.experience = experience; }
 
-	public LocalDate getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+	public Date getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 
 	public Long getManager() { return manager; }
 	public void setManager(Long manager) { this.manager = manager; }

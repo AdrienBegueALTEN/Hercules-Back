@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
+import com.alten.hercules.controller.mission.http.response.MissionDetailsResponse;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
-import com.alten.hercules.model.mission.request.AddMissionRequest;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -31,12 +32,12 @@ public class MissionController {
 	@Autowired private MissionDAL dal;
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> finById(@PathVariable Long id) {
+	public ResponseEntity<?> findById(@PathVariable Long id) {
 		Optional<Mission> optMission = dal.findById(id);
 		if (optMission.isEmpty())
 			return ResponseEntity.notFound().build();
 		
-		return ResponseEntity.ok(optMission.get());
+		return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
