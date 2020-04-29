@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.consultant.http.request.AddConsultantRequest;
@@ -36,14 +37,10 @@ public class ConsultantController {
 	private ConsultantDAL dal;
 
 	@GetMapping("")
-	public ResponseEntity<Object> findAllEnabledConsultant() {
-		return ResponseEntity.ok(dal.findAllEnabled());
-	}
-
-	@GetMapping("/all")
-	public ResponseEntity<Object> getAllConsultant() {
-
-		return ResponseEntity.ok(dal.findAll());
+	public ResponseEntity<Object> getAll(@RequestParam boolean enabled) {
+		return enabled ?
+				ResponseEntity.ok(dal.findAllEnabled()) :
+				ResponseEntity.ok(dal.findAll());
 	}
 
 	@GetMapping("/{id}")
