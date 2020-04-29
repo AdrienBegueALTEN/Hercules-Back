@@ -22,7 +22,7 @@ public class Manager extends AppUser {
 	
 	private boolean isAdmin = false;
 	
-    @OneToMany
+    @OneToMany(mappedBy="manager")
     private Set<Consultant> consultants = new HashSet<>();
 	
 	public Manager() { super(); }

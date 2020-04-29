@@ -38,7 +38,7 @@ public class Mission {
 	@JoinColumn(nullable = false)
 	private Customer customer;
 	
-	@OneToMany
+	@OneToMany(mappedBy="id.mission")
 	private Set<MissionSheet> versions = new HashSet<>();
 	
 	@Column(nullable = true)

@@ -1,14 +1,11 @@
 package com.alten.hercules.model.diploma;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -30,15 +27,13 @@ public class Diploma {
 	@JoinColumn(name = "diploma_name_id", nullable = false)
 	private DiplomaName diplomaName;
 
+	public Diploma() {}
+	
 	public Diploma(int graduationYear, DiplomaLocation diplomaLocation, DiplomaName diplomaName) {
 		super();
 		this.graduationYear = graduationYear;
 		this.diplomaLocation = diplomaLocation;
 		this.diplomaName = diplomaName;
-	}
-	
-	public Diploma() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public Long getId() { return id; }

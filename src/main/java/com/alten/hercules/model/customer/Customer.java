@@ -29,7 +29,7 @@ public class Customer {
 	
 	private byte[] logo = null;
 	
-	@OneToMany
+	@OneToMany(mappedBy="customer")
 	private Set<Mission> missions;
 	
 	public Customer() {}

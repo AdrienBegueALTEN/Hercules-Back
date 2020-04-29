@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 @Embeddable
 public class MissionSheetId implements Serializable {
 	
-	@ManyToOne()
+	@ManyToOne
 	private Mission mission;
 	private Date date;
 	

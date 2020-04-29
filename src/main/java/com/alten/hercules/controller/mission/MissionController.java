@@ -55,8 +55,6 @@ public class MissionController {
 		MissionSheet v0 = new MissionSheet(mission);
 		dal.save(mission);
 		dal.saveSheet(v0);
-		mission.addVersion(v0);
-		dal.save(mission);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(mission.getId());
 	}
