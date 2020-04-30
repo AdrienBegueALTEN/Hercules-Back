@@ -1,13 +1,9 @@
 package com.alten.hercules.controller.consultant.http.request;
 
-import java.util.Set;
-
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.UserConst;
-import com.alten.hercules.model.consultant.Consultant;
 
 public class AddConsultantRequest {
 	
@@ -21,21 +17,14 @@ public class AddConsultantRequest {
 	@NotNull
 	private String lastname;
 	
-	@Min(value = 0)
-	private int experience;
-	
 	@NotNull
 	private Long manager;
 	
-	private Set<Long> diplomas;
-	
-	public AddConsultantRequest(String email, String firstname, String lastname, int experience, Long manager, Set<Long> diplomas) {
+	public AddConsultantRequest(String email, String firstname, String lastname, Long manager) {
 		this.email = email;
 		this.firstname = firstname;
 		this.lastname = lastname;
-		this.experience = experience;
 		this.manager = manager;
-		this.diplomas = diplomas;
 	}
 	
 	public String getEmail() { return email; }
@@ -47,14 +36,7 @@ public class AddConsultantRequest {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 
-	public int getExperience() { return experience; }
-	public void setExperience(int experience) { this.experience = experience; }
-
 	public Long getManager() { return manager; }
 	public void setManager(Long idManager) { this.manager = idManager; }
-
-	public Set<Long> getDiplomas() { return diplomas; }
-	public void setDiplomas(Set<Long> diplomas) { this.diplomas = diplomas; }
-
 
 }

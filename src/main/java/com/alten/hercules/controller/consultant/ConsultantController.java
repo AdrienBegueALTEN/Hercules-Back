@@ -1,14 +1,13 @@
 package com.alten.hercules.controller.consultant;
 
-import java.util.HashSet;
+import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +23,12 @@ import com.alten.hercules.controller.consultant.http.request.AddConsultantReques
 import com.alten.hercules.controller.consultant.http.request.UpdateConsultantRequest;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
-import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.consultant.EConsultantFieldName;
+import com.alten.hercules.model.exception.InvalidRessourceFormatException;
+import com.alten.hercules.model.exception.InvalidFieldNameException;
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
+import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.Manager;
 
 @RestController
@@ -45,90 +48,121 @@ public class ConsultantController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getById(@PathVariable Long id) {
-
-		if (!this.dal.findById(id).isPresent())
-			return ResponseEntity.notFound().build();
-		return ResponseEntity.ok(this.dal.findById(id).get());
-	}
-
-	@PostMapping("")
-	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest request) {
-
-		Optional<Consultant> optConsultant = dal.findByEmail(request.getEmail());
-		if (optConsultant.isPresent())
-			return ResponseEntity.accepted().body(optConsultant.get().getId());
-
-		if (dal.userExistsByEmail(request.getEmail()))
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-
 		try {
-			Manager manager = dal.findManagerById(request.getManager())
-					.orElseThrow(() -> new RessourceNotFoundException());
-
-			Set<Diploma> diplomas = new HashSet<Diploma>();
-			if (request.getDiplomas() != null)
-				for (Long diploma : request.getDiplomas())
-					diplomas.add(dal.findDiplomaById(diploma).orElseThrow(() -> new RessourceNotFoundException()));
-
-			Consultant consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(),
-					request.getExperience(), manager, diplomas);
-			dal.save(consultant);
-			return ResponseEntity.created(null).body(consultant.getId());
+			Consultant consultant = dal.findById(id)
+					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
+			return ResponseEntity.ok(consultant);
 		} catch (RessourceNotFoundException e) {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
 		}
 	}
 
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PostMapping("")
+	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
+		Optional<Consultant> optConsultant = dal.findByEmail(req.getEmail());
+		if (optConsultant.isPresent())
+			return ResponseEntity
+					.accepted()
+					.body(optConsultant.get().getId());
+		try {
+			if (!dal.emailIsAvailable(req.getEmail()))
+				throw new UnavailableEmailException();
+			Manager manager = dal.findEnabledManager(req.getManager())
+					.orElseThrow(() -> new RessourceNotFoundException("manager"));
+			Consultant consultant = new Consultant(req.getEmail(), req.getFirstname(), req.getLastname(), manager);
+			dal.save(consultant);
+			return ResponseEntity
+					.status(HttpStatus.CREATED)
+					.body(consultant.getId());
+		} catch (UnavailableEmailException e) {
+			return ResponseEntity
+					.status(HttpStatus.CONFLICT)
+					.body(e.getMessage());
+		} catch (RessourceNotFoundException e) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
+		}
+	}
+
+	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
-		Optional<Consultant> optConsultant = dal.findById(id);
-		if (!optConsultant.isPresent())
-			return ResponseEntity.notFound().build();
-
-		Consultant consultant = optConsultant.get();
-		if (!consultant.getMissions().isEmpty())
-			return new ResponseEntity<>(HttpStatus.CONFLICT);
-
-		dal.delete(consultant);
-		return ResponseEntity.ok().build();
+		try {
+			Consultant consultant = dal.findById(id)
+				.orElseThrow(() -> new RessourceNotFoundException("consultant"));
+			if (!consultant.getMissions().isEmpty())
+				return ResponseEntity
+						.status(HttpStatus.CONFLICT)
+						.build();
+			dal.delete(consultant);
+			return ResponseEntity
+					.ok()
+					.build();
+		} catch (RessourceNotFoundException e) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
+		}
 	}
 
+	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateConsultantRequest req) {
-		Optional<Consultant> optConsultant = dal.findById(req.getId());
-		if (!optConsultant.isPresent())
-			return ResponseEntity.notFound().build();
-		Consultant consultant = optConsultant.get();
-
-		if (req.getEmail() != null) {
-			if (dal.userExistsByEmail(req.getEmail()))
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			consultant.setEmail(req.getEmail());
+		try {
+			Consultant consultant = dal.findById(req.getId())
+					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
+			EConsultantFieldName fieldName;
+			try { fieldName = EConsultantFieldName.valueOf(req.getFieldName()); }
+			catch (IllegalArgumentException e) { throw new InvalidFieldNameException(); }
+			switch(fieldName) {
+				case firstname :
+					consultant.setFirstname((String)req.getValue());
+					break;
+				case lastname :
+					consultant.setLastname((String)req.getValue());
+					break;
+				case email :
+					String email = (String)req.getValue();
+					if (!dal.emailIsAvailable(email))
+						throw new UnavailableEmailException();
+					consultant.setEmail(email);
+					break;
+				case xp:
+					consultant.setExperience((Integer)req.getValue());
+					break;
+				case manager :
+					int id = (Integer)req.getValue();
+					Manager manager = dal.findEnabledManager(Long.valueOf(id))
+						.orElseThrow(() -> new RessourceNotFoundException("manager"));
+					consultant.setManager(manager);
+					break;
+				case releaseDate:
+					consultant.setReleaseDate((Date)req.getValue());
+					break;
+				default: throw new InvalidFieldNameException();
+			}
+			dal.save(consultant);
+			return ResponseEntity.ok().build();
+		} catch (InvalidFieldNameException | InvalidValueException | InvalidRessourceFormatException e) { 
+			return ResponseEntity
+					.badRequest()
+					.body(e.getMessage());
+		} catch (UnavailableEmailException e) {
+			return ResponseEntity
+					.status(HttpStatus.CONFLICT)
+					.body(e.getMessage());
+		} catch (RessourceNotFoundException e) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
+		} catch (ClassCastException e) {
+			return ResponseEntity
+					.badRequest()
+					.body("Invalid value type");
 		}
-
-		if (req.getExperience() != null)
-			consultant.setExperience(req.getExperience());
-
-		if (req.getFirstname() != null) {
-			consultant.setFirstname(req.getFirstname());
-		}
-
-		if (req.getLastname() != null)
-			consultant.setLastname(req.getLastname());
-
-		if (req.getReleaseDate() != null)
-			consultant.setReleaseDate(req.getReleaseDate());
-
-		if (req.getManager() != null) {
-			Optional<Manager> optManager = dal.findManagerById(req.getManager());
-			if (!optManager.isPresent())
-				return ResponseEntity.notFound().build();
-			Manager m = optManager.get();
-			consultant.setManager(m);
-		}
-
-		this.dal.save(consultant);
-
-		return ResponseEntity.ok().build();
 	}
 }

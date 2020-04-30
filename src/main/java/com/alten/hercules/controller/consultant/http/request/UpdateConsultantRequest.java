@@ -1,86 +1,76 @@
 package com.alten.hercules.controller.consultant.http.request;
 
-
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.Set;
-
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
-import org.hibernate.type.descriptor.sql.DateTypeDescriptor;
+import com.alten.hercules.model.consultant.EConsultantFieldName;
 
-import com.alten.hercules.consts.UserConst;
-
+/**
+ * 
+ * Represent the content of a consultant update request.
+ *
+ * @author Adrien Bègue
+ *
+ */
 public class UpdateConsultantRequest {
 
-	@NotNull
+    /**
+     * Consultant identifier in database.
+     * 
+     * @see UpdateConsultantRequest#getId()
+     * @see UpdateConsultantRequest#setId(Long)
+     * 
+     */
+	@NotNull(message="'id' must be provided")
 	private Long id;
 
-	@Pattern(regexp = UserConst.EMAIL_PATTERN, message = UserConst.EMAIL_PATTERN_MSG)
-	private String email;
+    /**
+     * Name of the database field to be changed.
+     * 
+     * @see UpdateConsultantRequest#getFieldName()
+     * @see UpdateConsultantRequest#setFieldName(String)
+     * @see EConsultantFieldName
+     * 
+     */
+	@NotBlank(message="'fieldname' must be provided")
+	private String fieldName;
 
-	private String firstname;
+    /**
+     * New value of the database field.
+     * 
+     * @see UpdateConsultantRequest#getValue()
+     * @see UpdateConsultantRequest#setValue(Object)
+     * 
+     */
+	private Object value;
 
-	private String lastname;
-
-	@Min(value = 0)
-	private Integer experience;
-
-	private Long manager;
-
-	private Date releaseDate;
-
-
-
-
-	public UpdateConsultantRequest() {
-		super();
-	}
-	public UpdateConsultantRequest(@NotNull Long id,
-			@Pattern(regexp = "[a-zA-Z]+\\.[a-zA-Z]+[2-9]?@alten\\.com", message = "Format : prenom.nom@alten.com") String email,
-			String firstname, String lastname, @Min(0) Integer experience, Long manager, Date releaseDate) {
-		super();
+    /**
+     * Empty constructor.
+     * 
+     */
+	public UpdateConsultantRequest() {}
+	
+    /**
+     * Constructor.
+     * 
+     * @see UpdateConsultantRequest#id
+     * @see UpdateConsultantRequest#fieldName
+     * @see UpdateConsultantRequest#value
+     * 
+     */
+	public UpdateConsultantRequest(Long id, String fieldName, Object value) {
 		this.id = id;
-		this.email = email;
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.experience = experience;
-		this.manager = manager;
-		this.releaseDate = releaseDate;
+		this.fieldName = fieldName;
+		this.value = value;
 	}
 
+	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id; }
 
+	public String getFieldName() { return fieldName; }
+	public void setFieldName(String fieldName) { this.fieldName = fieldName; }
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-
-	public Date getReleaseDate() {
-		return releaseDate;
-	}
-	public void setReleaseDate(Date releaseDate) {
-		this.releaseDate = releaseDate;
-	}
-	public String getEmail() { return email; }
-	public void setEmail(String email) { this.email = email; }
-
-	public String getFirstname() { return firstname; }
-	public void setFirstname(String firstname) { this.firstname = firstname; }
-
-	public String getLastname() { return lastname; }
-	public void setLastname(String lastname) { this.lastname = lastname; }
-
-	public Integer getExperience() { return experience; }
-	public void setExperience(Integer experience) { this.experience = experience; }
-
-	public Long getManager() { return manager; }
-	public void setManager(Long idManager) { this.manager = idManager; }
-
+	public Object getValue() { return value; }
+	public void setValue(Object value) { this.value = value; }
+	
 }
