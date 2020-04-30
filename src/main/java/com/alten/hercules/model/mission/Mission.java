@@ -49,20 +49,6 @@ public class Mission {
 	@Enumerated(EnumType.STRING)
 	private ESheetStatus sheetStatus;
 	
-	@Column(nullable = true)
-	private String city;
-	
-	@Column(nullable = true)
-	private String country;
-	
-	@Min(0)
-	@Column(nullable = true)
-	private Integer consultantStartExp;
-	
-	@Min(1)
-	@Column(nullable = true)
-	private Integer teamSize;
-	
 	public Mission() {}
 	
 	public Mission(Consultant consultant, Customer customer) {
@@ -89,18 +75,6 @@ public class Mission {
 
 	public ESheetStatus getSheetStatus() { return sheetStatus; }
 	public void setSheetStatus(ESheetStatus sheetStatus) { this.sheetStatus = sheetStatus; }
-
-	public String getCity() { return city; }
-	public void setCity(String city) { this.city = city; }
-
-	public String getCountry() { return country; }
-	public void setCountry(String country) { this.country = country; }
-
-	public Integer getConsultantStartExp() { return consultantStartExp; }
-	public void setConsultantStartExp(int consultantStartExp) { this.consultantStartExp = consultantStartExp; }
-
-	public Integer getTeamSize() { return teamSize; }
-	public void setTeamSize(int teamSize) { this.teamSize = teamSize; }
 	
 	@JsonGetter("consultant")
     private Long getConsultantId() {
