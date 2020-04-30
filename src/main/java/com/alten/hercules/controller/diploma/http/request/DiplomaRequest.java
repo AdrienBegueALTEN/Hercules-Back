@@ -11,11 +11,12 @@ public class DiplomaRequest {
 	private String school;
 	private String diplomaName;
 	private String levelName;
+	private Long consultantId;
 	
 	
 	
 	public DiplomaRequest(Long id, int graduationYear, String graduationCity,
-			String school,String diplomaName, String levelName) {
+			String school,String diplomaName, String levelName, Long consultantId) {
 		super();
 		this.id = id;
 		this.graduationYear = graduationYear;
@@ -23,16 +24,18 @@ public class DiplomaRequest {
 		this.school = school;
 		this.diplomaName = diplomaName;
 		this.levelName = levelName;
+		this.consultantId = consultantId;
 	}
 
 	public DiplomaRequest(int graduationYear, String graduationCity,
-			 String diplomaName, String levelName, String school) {
+			 String diplomaName, String levelName, String school, Long consultantId) {
 		super();
 		this.graduationYear = graduationYear;
 		this.graduationCity = graduationCity;
 		this.diplomaName = diplomaName;
 		this.levelName = levelName;
 		this.school = school;
+		this.consultantId = consultantId;
 	}
 	
 	public DiplomaRequest() {
@@ -82,14 +85,15 @@ public class DiplomaRequest {
 		this.school = school;
 	}
 
-	public static void main(String[] args) {
-		/*final GsonBuilder builder = new GsonBuilder();
-	    final Gson gson = builder.create();
-	    
-	    System.out.println(gson.toJson(new DiplomaRequest(2020,"stq","ingé info","ingé3")));
-	    
-	    {"graduationYear":2020,"graduationCity":"stq","diplomaName":"ingé info","levelName":"ingé3"}*/
+	public Long getConsultantId() {
+		return consultantId;
 	}
+
+	public void setConsultantId(Long consultantId) {
+		this.consultantId = consultantId;
+	}
+
+	
 	
 
 }

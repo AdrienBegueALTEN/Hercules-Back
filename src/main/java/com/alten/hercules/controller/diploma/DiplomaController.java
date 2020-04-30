@@ -48,12 +48,7 @@ public class DiplomaController {
 	private LevelDAO levelDAO;
 	
 	/**
-	 * Save a new diploma in the database. Checks first if :
-	 * <ul>
-	 * 	<li>the level exists. If not then the level is created.</li>
-	 *  <li>the diploma name exists. If not then the name is created.</li>
-	 * 	<li>the location of diploma exists. If not then the location is created.</li>
-	 * </ul>
+	 * Save a new diploma in the database. 
 	 * 
 	 * 
 	 * @param diplomaRequest
@@ -86,6 +81,9 @@ public class DiplomaController {
 		
 		Diploma diploma = new Diploma(diplomaRequest.getGraduationYear(),diplomaLocation, diplomaName);
 		diploma = this.diplomaDAO.save(diploma);
+		
+		if(diplomaRequest.getConsultantId()!=null)
+			this.diplomaDAO.insertConsultantDiplomas(diplomaRequest.getConsultantId(), diploma.getId());
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(diploma.getId());
 	}

@@ -26,4 +26,9 @@ public interface DiplomaDAO extends JpaRepository<Diploma, Long>{
 	@Modifying
 	public void deleteConsultantDiplomas(Long consultantId, Long diplomaId);
 	
+	@Query(value="INSERT INTO consultant_diplomas(consultant_id, diplomas_id) VALUES(?1,?2)", nativeQuery = true)
+	@Transactional
+	@Modifying
+	public void insertConsultantDiplomas(Long consultantId, Long diplomaId);
+	
 }
