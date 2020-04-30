@@ -3,10 +3,13 @@ package com.alten.hercules.controller.diploma;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.diploma.http.request.DeleteDiplomaRequest;
 import com.alten.hercules.controller.diploma.http.request.DiplomaRequest;
 import com.alten.hercules.dao.diploma.DiplomaDAO;
 import com.alten.hercules.dao.diploma.DiplomaLocationDAO;
@@ -182,6 +186,20 @@ public class DiplomaController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
 		return new ResponseEntity<>(this.diplomaDAO.findById(id).get(), HttpStatus.OK);
+	}
+	
+	@DeleteMapping
+	public ResponseEntity<?> deleteDiplomaFromConsultant(@Valid @RequestBody DeleteDiplomaRequest req){
+		Optional<Diploma> optDiploma = diplomaDAO.findById(req.getDiplomaId());
+		if(!optDiploma.isPresent())
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		Diploma d = optDiploma.get();
+		
+		this.diplomaDAO.deleteConsultantDiplomas(req.getConsultantId(), d.getId());
+		
+		this.diplomaDAO.delete(d);
+		
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 
