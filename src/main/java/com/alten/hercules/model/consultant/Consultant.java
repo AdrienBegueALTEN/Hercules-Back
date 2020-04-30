@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.alten.hercules.StrUtils;
 import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.exception.InvalidRessourceFormatException;
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
 import com.alten.hercules.model.user.response.ManagerResponse;
@@ -39,7 +43,7 @@ public class Consultant {
 	@Column(nullable = false)
 	private String lastname;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "integer default 0")
 	private int experience;
 	
 	@Column(nullable = true)
@@ -57,29 +61,49 @@ public class Consultant {
 	
 	public Consultant() { super(); }
 	
-	public Consultant(String email, String firstname, String lastname, int experience, Manager manager, Set<Diploma> diplomas) {
-		this.email = email;
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.experience = experience;
-		this.manager = manager;
-		this.diplomas = diplomas;
+	public Consultant(String email, String firstname, String lastname, Manager manager) {
+		setEmail(email);
+		setFirstname(firstname);
+		setLastname(lastname);
+		setManager(manager);
 	}
 
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
 
 	public String getEmail() { return email; }
-	public void setEmail(String email) { this.email = email; }
+	public void setEmail(String email) throws InvalidValueException, InvalidRessourceFormatException { 
+		if (email == null)
+			throw new InvalidValueException("consultant.mail");
+		if (!Pattern.matches(StrUtils.EMAIL_PATTERN, email))
+			throw new InvalidRessourceFormatException("consultant.email");
+		this.email = email;
+	}
 
 	public String getFirstname() { return firstname; }
-	public void setFirstname(String firstname) { this.firstname = firstname; }
+	public void setFirstname(String firstname) throws InvalidValueException, InvalidRessourceFormatException {
+		if (firstname == null)
+			throw new InvalidValueException("consultant.firstname");
+		if (!Pattern.matches(StrUtils.NAME_PATTERN, firstname))
+			throw new InvalidRessourceFormatException("consultant.firstname");
+		this.firstname = StrUtils.formaliseFirstname(firstname);
+	}
 
 	public String getLastname() { return lastname; }
-	public void setLastname(String lastname) { this.lastname = lastname; }
+	public void setLastname(String lastname) throws InvalidValueException, InvalidRessourceFormatException {
+		if (lastname == null)
+			throw new InvalidValueException("consultant.lastname");
+		if (!Pattern.matches(StrUtils.NAME_PATTERN, lastname))
+			throw new InvalidRessourceFormatException("consultant.lastname");
+		this.lastname = lastname;
+	}
 
 	public int getExperience() { return experience; }
-	public void setExperience(int experience) { this.experience = experience; }
+	public void setExperience(Integer experience) throws InvalidValueException { 
+		if (experience == null || experience < 0)
+			throw new InvalidValueException("consultant.experience");
+		this.experience = experience;
+	}
 	
 	public String getReadableReleaseDate() { 
 		return (releaseDate == null) ? null :

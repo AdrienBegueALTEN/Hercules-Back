@@ -1,7 +1,9 @@
 package com.alten.hercules.model.exception;
 
-public class RessourceNotFoundException extends Exception {
+import java.io.IOException;
 
-	private static final long serialVersionUID = 1L;
-
+public class RessourceNotFoundException extends IOException {
+	public RessourceNotFoundException(String ressource) {
+		super("Ressource '" + ressource + "' not found.");
+	}
 }

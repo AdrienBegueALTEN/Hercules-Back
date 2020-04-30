@@ -44,14 +44,14 @@ public class ConsultantDAL {
 		return consultantDAO.findByEmail(email);
 	}
 	
-	public boolean userExistsByEmail(String email) {
-		return userDAO.existsByEmail(email);
+	public boolean emailIsAvailable(String email) {
+		return !(userDAO.existsByEmail(email) || consultantDAO.existsByEmail(email));
 	}
 
 	public void save(Consultant consultant) { consultantDAO.save(consultant); }
 	
-	public Optional<Manager> findManagerById(Long id) {
-		return managerDAO.findById(id);
+	public Optional<Manager> findEnabledManager(Long id) {
+		return managerDAO.findByIdAndReleaseDateIsNull(id);
 	}
 	
 	public Optional<Diploma> findDiplomaById(Long id) {
