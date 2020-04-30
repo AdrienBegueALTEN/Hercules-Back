@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,6 +59,7 @@ public class ConsultantController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("")
 	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
 		Optional<Consultant> optConsultant = dal.findByEmail(req.getEmail());
@@ -86,6 +88,7 @@ public class ConsultantController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
 		try {
@@ -106,6 +109,7 @@ public class ConsultantController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateConsultantRequest req) {
 		try {
@@ -114,7 +118,6 @@ public class ConsultantController {
 			EConsultantFieldName fieldName;
 			try { fieldName = EConsultantFieldName.valueOf(req.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldNameException(); }
-			
 			switch(fieldName) {
 				case firstname :
 					consultant.setFirstname((String)req.getValue());
