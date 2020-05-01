@@ -57,7 +57,7 @@ public class MissionDetailsResponse {
 		});
 		this.consultant.put("diplomas", diplomas);
 		this.consultant.put("email", consultant.getEmail());
-		this.consultant.put("xp", consultant.getExperience());
+		this.consultant.put("experience", consultant.getExperience());
 		this.consultant.put("firstname", consultant.getFirstname());
 		this.consultant.put("id", consultant.getId());
 		this.consultant.put("lastname", consultant.getLastname());

@@ -11,7 +11,7 @@ public enum EConsultantFieldName {
 	lastname("lastname"),
 	manager("manager"),
 	releaseDate("releaseDate"),
-	xp("xp");
+	experience("experience");
 			
 	private String name;
 	   

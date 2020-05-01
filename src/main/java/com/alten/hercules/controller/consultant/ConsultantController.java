@@ -111,7 +111,7 @@ public class ConsultantController {
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
-	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateConsultantRequest req) {
+	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateConsultantRequest req) { 
 		try {
 			Consultant consultant = dal.findById(req.getId())
 					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
@@ -131,7 +131,7 @@ public class ConsultantController {
 						throw new UnavailableEmailException();
 					consultant.setEmail(email);
 					break;
-				case xp:
+				case experience:
 					consultant.setExperience((Integer)req.getValue());
 					break;
 				case manager :
