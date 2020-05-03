@@ -1,6 +1,8 @@
 package com.alten.hercules.controller.user;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.user.http.request.manager.AddManagerRequest;
@@ -24,6 +27,7 @@ import com.alten.hercules.controller.user.http.request.manager.UpdateManagerRequ
 import com.alten.hercules.dal.AuthenticationDAL;
 import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.Manager;
+import com.alten.hercules.model.user.response.ManagerResponse;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -40,6 +44,19 @@ public class ManagerController {
 			return ResponseEntity.notFound().build();
 		
 		return ResponseEntity.ok(manager.get());
+	}
+	
+	@GetMapping
+	public ResponseEntity<Object> getAll(@RequestParam boolean basic) {
+		List<Manager> managers = dal.findAllManagers();
+		if(basic){
+			List<ManagerResponse> managersResp = new ArrayList<>();
+			for(Manager m: managers)
+				managersResp.add(new ManagerResponse(m));
+			return ResponseEntity.ok(managersResp); 
+		}
+		else 
+			return ResponseEntity.ok(managers);
 	}
 	
 	@PreAuthorize("hasAuthority('ADMIN')")

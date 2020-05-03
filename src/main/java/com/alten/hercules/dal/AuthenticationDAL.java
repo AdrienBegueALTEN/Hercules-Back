@@ -1,5 +1,6 @@
 package com.alten.hercules.dal;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,10 @@ public class AuthenticationDAL {
 
 	public void deleteManager(Manager manager) {
 		managerDAO.delete(manager);
+	}
+	
+	public List<Manager> findAllManagers(){
+		return this.managerDAO.findAll();
 	}
 
 }
