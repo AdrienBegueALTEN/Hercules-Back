@@ -1,6 +1,7 @@
 package com.alten.hercules.controller.consultant;
 
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 import javax.validation.Valid;
 
@@ -141,7 +142,7 @@ public class ConsultantController {
 					consultant.setManager(manager);
 					break;
 				case releaseDate:
-					consultant.setReleaseDate((Date)req.getValue());
+					consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
 					break;
 				default: throw new InvalidFieldNameException();
 			}
@@ -159,7 +160,7 @@ public class ConsultantController {
 			return ResponseEntity
 					.status(HttpStatus.NOT_FOUND)
 					.body(e.getMessage());
-		} catch (ClassCastException e) {
+		} catch (ClassCastException | ParseException e) {
 			return ResponseEntity
 					.badRequest()
 					.body("Invalid value type");
