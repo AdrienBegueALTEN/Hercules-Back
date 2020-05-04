@@ -1,5 +1,6 @@
 package com.alten.hercules.controller.mission;
 
+import java.util.Calendar;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -21,6 +22,8 @@ import com.alten.hercules.controller.mission.http.response.MissionDetailsRespons
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.exception.AlreadyExistingVersionException;
+import com.alten.hercules.model.exception.RessourceNotFoundException;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 
@@ -57,5 +60,32 @@ public class MissionController {
 		dal.saveSheet(v0);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(mission.getId());
+	}
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PostMapping("/new-version/{id}")
+	public ResponseEntity<?> newVersion(@PathVariable Long id) {
+		try {
+			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id)
+					.orElseThrow(() -> new RessourceNotFoundException("mission sheet"));
+			
+			Calendar todayCalendar = Calendar.getInstance();
+			Calendar lastVersionCalendar = Calendar.getInstance();
+			lastVersionCalendar.setTime(mostRecentVersion.getDate());
+
+			if (todayCalendar.get(Calendar.DAY_OF_YEAR) == lastVersionCalendar.get(Calendar.DAY_OF_YEAR) && todayCalendar.get(Calendar.YEAR) == lastVersionCalendar.get(Calendar.YEAR))
+					throw new AlreadyExistingVersionException();
+			
+			dal.saveSheet(new MissionSheet(mostRecentVersion));
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+		} catch (RessourceNotFoundException e) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
+		} catch (AlreadyExistingVersionException e) {
+			return ResponseEntity
+					.status(HttpStatus.CONFLICT)
+					.body(e.getMessage());
+		}
 	}
 }

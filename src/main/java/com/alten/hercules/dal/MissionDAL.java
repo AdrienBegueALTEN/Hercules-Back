@@ -42,4 +42,8 @@ public class MissionDAL {
 		sheetDAO.save(sheet);
 	}
 
+	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
+		return sheetDAO.findMostRecentVersion(missionId);
+	}
+
 }

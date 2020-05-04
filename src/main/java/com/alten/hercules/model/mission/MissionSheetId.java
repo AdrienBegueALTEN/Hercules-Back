@@ -15,10 +15,14 @@ public class MissionSheetId implements Serializable {
 	
 	public MissionSheetId() {}
 	
-	public MissionSheetId(Mission mission, Date versionDate) {
+	public MissionSheetId(Mission mission) {
 		this.mission = mission;
-		this.versionDate = versionDate;
+		this.versionDate = new Date();
 	}
 
+	public Mission getMission() { return mission; }
+	public void setMission(Mission mission) { this.mission = mission; }
+	
+	public void setVersionDate(Date versionDate) { this.versionDate = versionDate; }
 	public Date getVersionDate() { return versionDate; }
 }

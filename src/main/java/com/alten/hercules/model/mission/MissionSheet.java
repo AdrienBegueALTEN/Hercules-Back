@@ -53,7 +53,19 @@ public class MissionSheet {
 	public MissionSheet() {}
 	
 	public MissionSheet(Mission mission) {
-		this.id = new MissionSheetId(mission, new Date());
+		this.id = new MissionSheetId(mission);
+	}
+	
+	public MissionSheet(MissionSheet sheet) {
+		setId(new MissionSheetId(sheet.getId().getMission()));
+		setTitle(sheet.getTitle());
+		setDescription(sheet.getDescription());
+		setComment(sheet.getComment());
+		setCity(sheet.getCity());
+		setCountry(sheet.getCountry());
+		setConsultantStartXp(sheet.getConsultantStartXp());
+		setContractType(sheet.getContractType());
+		setTeamSize(sheet.getTeamSize());
 	}
 
 	public MissionSheetId getId() { return id; }
@@ -84,6 +96,6 @@ public class MissionSheet {
 	public void setTeamSize(int teamSize) { this.teamSize = teamSize; }
 	
 	@JsonGetter("date")
-    private Date getVersionDate() { return id.getVersionDate(); }
+    public Date getDate() { return id.getVersionDate(); }
 
 }
