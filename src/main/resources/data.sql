@@ -29,11 +29,12 @@ INSERT INTO CONSULTANT_DIPLOMAS(consultant_id,diplomas_id) VALUES(2,3) ON CONFLI
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('TESLA', 'Automobile') ON CONFLICT DO NOTHING;
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('ALTEN', 'Consulting technologique') ON CONFLICT DO NOTHING;
 
-/*INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (1,1,'WAITING',NOW(),1) ON CONFLICT DO NOTHING;
-INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (1,2,'WAITING',NOW(),1) ON CONFLICT DO NOTHING;
-INSERT INTO MISSION(consultant_id, customer_id, state, last_update, reference) VALUES (2,2,'WAITING',NOW(),3) ON CONFLICT DO NOTHING;
+INSERT INTO MISSION(consultant_id, customer_id, sheet_status) VALUES (1,1,'WAITING') ON CONFLICT DO NOTHING;
 
-INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 1',1) ON CONFLICT DO NOTHING;
+INSERT INTO MISSION_SHEET(mission_id, date, city, comment, country, consultant_start_xp, team_size, title, type) VALUES (1, '2020-03-02', 'Strasbourg', 'Commentaire pour la v1', 'France', 7, 4, 'Titre v1', 'CDS') ON CONFLICT DO NOTHING;
+INSERT INTO MISSION_SHEET(mission_id, date, city, comment, country, consultant_start_xp, team_size, title, type) VALUES (1, now(), 'Schiltigheim', 'Commentaire pour la v2', 'France', 3, 1, 'Titre v2', 'AT') ON CONFLICT DO NOTHING;
+
+/*INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 2 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 3 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 2',2) ON CONFLICT DO NOTHING;

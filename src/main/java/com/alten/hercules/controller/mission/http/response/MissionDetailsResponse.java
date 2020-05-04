@@ -7,7 +7,6 @@ import java.util.Set;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.mission.ESheetStatus;
-import com.alten.hercules.model.mission.EType;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 
@@ -18,7 +17,6 @@ public class MissionDetailsResponse {
 	private Map<String, Object> customer = new HashMap<String, Object>();
 	private Set<MissionSheet> versions;
 	private ESheetStatus sheetStatus;
-	private EType type;
 	
 	public MissionDetailsResponse(Mission mission) {
 		this.id = mission.getId();
@@ -26,7 +24,6 @@ public class MissionDetailsResponse {
 		fillCustomer(mission.getCustomer());
 		this.versions = mission.getVersions();
 		this.sheetStatus = mission.getSheetStatus();
-		this.type = mission.getType();
 	}
 	
 	public Map<String, Object> getConsultant() { return consultant; }
@@ -40,9 +37,6 @@ public class MissionDetailsResponse {
 
 	public ESheetStatus getSheetStatus() { return sheetStatus; }
 	public void setSheetStatus(ESheetStatus sheetStatus) { this.sheetStatus = sheetStatus; }
-
-	public EType getType() { return type; }
-	public void setType(EType type) { this.type = type; }
 	
 	public Set<MissionSheet> getVersions() { return versions; }
 	public void setVersions(Set<MissionSheet> versions) { this.versions = versions; }

@@ -6,6 +6,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.constraints.Length;
@@ -37,11 +39,15 @@ public class MissionSheet {
 	
 	@Min(0)
 	@Column(nullable = true)
-	private Integer consultantStartExp;
+	private Integer consultantStartXp;
 	
 	@Min(1)
 	@Column(nullable = true)
 	private Integer teamSize;
+	
+	@Column(nullable = true)
+	@Enumerated(EnumType.STRING)
+	private EType type;
 	
 	public MissionSheet() {}
 	
@@ -67,8 +73,11 @@ public class MissionSheet {
 	public String getCountry() { return country; }
 	public void setCountry(String country) { this.country = country; }
 
-	public Integer getConsultantStartExp() { return consultantStartExp; }
-	public void setConsultantStartExp(int consultantStartExp) { this.consultantStartExp = consultantStartExp; }
+	public Integer getConsultantStartXp() { return consultantStartXp; }
+	public void setConsultantStartXp(int consultantStartExp) { this.consultantStartXp = consultantStartExp; }
+	
+	public EType getType() { return type; }
+	public void setType(EType type) { this.type = type; }
 
 	public Integer getTeamSize() { return teamSize; }
 	public void setTeamSize(int teamSize) { this.teamSize = teamSize; }

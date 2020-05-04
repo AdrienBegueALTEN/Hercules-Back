@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Min;
+import javax.persistence.OrderBy;
 
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
@@ -39,11 +39,8 @@ public class Mission {
 	private Customer customer;
 	
 	@OneToMany(mappedBy="id.mission")
+	@OrderBy("date DESC")
 	private Set<MissionSheet> versions = new HashSet<>();
-	
-	@Column(nullable = true)
-	@Enumerated(EnumType.STRING)
-	private EType type;
 	
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -69,9 +66,6 @@ public class Mission {
 	public Set<MissionSheet> getVersions() { return versions; }
 	public void setVersions(Set<MissionSheet> versions) { this.versions = versions; }
 	public void addVersion(MissionSheet version) { this.versions.add(version); }
-
-	public EType getType() { return type; }
-	public void setType(EType type) { this.type = type; }
 
 	public ESheetStatus getSheetStatus() { return sheetStatus; }
 	public void setSheetStatus(ESheetStatus sheetStatus) { this.sheetStatus = sheetStatus; }
