@@ -136,10 +136,14 @@ public class ConsultantController {
 					consultant.setExperience((Integer)req.getValue());
 					break;
 				case manager :
-					int id = (Integer)req.getValue();
-					Manager manager = dal.findEnabledManager(Long.valueOf(id))
-						.orElseThrow(() -> new RessourceNotFoundException("manager"));
-					consultant.setManager(manager);
+					if(req.getValue() instanceof Integer || req.getValue() instanceof Long) {
+						int id = (Integer)req.getValue();
+						Manager manager = dal.findEnabledManager(Long.valueOf(id))
+							.orElseThrow(() -> new RessourceNotFoundException("manager"));
+						consultant.setManager(manager);
+					}
+					else
+						throw new InvalidValueException("manager id");
 					break;
 				case releaseDate:
 					consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
