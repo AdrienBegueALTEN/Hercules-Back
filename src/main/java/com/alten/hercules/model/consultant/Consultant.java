@@ -1,8 +1,9 @@
 package com.alten.hercules.model.consultant;
 
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,11 +24,12 @@ import com.alten.hercules.model.exception.InvalidRessourceFormatException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
-import com.alten.hercules.model.user.response.ManagerResponse;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Consultant {
 	
 	@Id
@@ -105,10 +107,6 @@ public class Consultant {
 		this.experience = experience;
 	}
 	
-	public String getReadableReleaseDate() { 
-		return (releaseDate == null) ? null :
-			new SimpleDateFormat("dd/MM/yyyy").format(releaseDate);
-	}
 	public Date getReleaseDate() { return releaseDate; }
 	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 
@@ -132,10 +130,14 @@ public class Consultant {
 	}
 	
 	@JsonGetter("manager")
-    private ManagerResponse getManagerId() {
-		
-        if (this.manager != null)
-        	return new ManagerResponse(this.manager);
-        return null;
+    public Map<String, Object> getManagerResponse() {
+		Map<String, Object> manager = new HashMap<>();
+		manager.put("id", this.manager.getId());
+		manager.put("email", this.manager.getEmail());
+		manager.put("firstname", this.manager.getFirstname());
+		manager.put("lastname", this.manager.getLastname());
+		if (this.manager.getReleaseDate() != null)
+			manager.put("releaseDate", this.manager.getReleaseDate());
+        return manager;
     }
 }

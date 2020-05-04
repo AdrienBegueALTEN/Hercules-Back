@@ -1,6 +1,6 @@
 package com.alten.hercules.controller.user.http.request.recruitementOfficer;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -21,9 +21,9 @@ public class UpdateRecruitementOfficerRequest {
 	
 	private String lastname;
 	
-	private LocalDate releaseDate;
+	private Date releaseDate;
 	
-	public UpdateRecruitementOfficerRequest(Long id, String email, String password, String firstname, String lastname, LocalDate releaseDate) {
+	public UpdateRecruitementOfficerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
@@ -47,7 +47,7 @@ public class UpdateRecruitementOfficerRequest {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 	
-	public LocalDate getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate;}
+	public Date getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate;}
 
 }

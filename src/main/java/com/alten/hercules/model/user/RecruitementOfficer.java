@@ -10,7 +10,10 @@ import javax.persistence.Transient;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Entity
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RecruitementOfficer extends AppUser {
 	@Transient
 	private static final long serialVersionUID = 1L;

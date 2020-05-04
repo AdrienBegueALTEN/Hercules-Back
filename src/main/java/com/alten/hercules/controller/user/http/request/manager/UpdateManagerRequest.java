@@ -1,6 +1,6 @@
 package com.alten.hercules.controller.user.http.request.manager;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -23,9 +23,9 @@ public class UpdateManagerRequest {
 	private String lastname;
 	
 	@JsonFormat(pattern="dd/MM/yyy")
-	private LocalDate releaseDate;
+	private Date releaseDate;
 	
-	public UpdateManagerRequest(Long id, String email, String password, String firstname, String lastname, LocalDate releaseDate, boolean isAdmin) {
+	public UpdateManagerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate, boolean isAdmin) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
@@ -52,8 +52,8 @@ public class UpdateManagerRequest {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 	
-	public LocalDate getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+	public Date getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 	
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }

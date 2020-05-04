@@ -27,7 +27,6 @@ import com.alten.hercules.controller.user.http.request.manager.UpdateManagerRequ
 import com.alten.hercules.dal.AuthenticationDAL;
 import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.Manager;
-import com.alten.hercules.model.user.response.ManagerResponse;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -49,14 +48,7 @@ public class ManagerController {
 	@GetMapping
 	public ResponseEntity<Object> getAll(@RequestParam boolean basic) {
 		List<Manager> managers = dal.findAllManagers();
-		if(basic){
-			List<ManagerResponse> managersResp = new ArrayList<>();
-			for(Manager m: managers)
-				managersResp.add(new ManagerResponse(m));
-			return ResponseEntity.ok(managersResp); 
-		}
-		else 
-			return ResponseEntity.ok(managers);
+		return ResponseEntity.ok(managers);
 	}
 	
 	@PreAuthorize("hasAuthority('ADMIN')")

@@ -14,8 +14,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alten.hercules.model.consultant.Consultant;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Manager extends AppUser {
 	@Transient
 	private static final long serialVersionUID = 1L;
@@ -33,7 +35,7 @@ public class Manager extends AppUser {
 	
 	public Manager(String email, String password, String firstname, String lastname, boolean isAdmin) {
 		super(email, password, firstname, lastname);
-		this.setAdmin(isAdmin);
+		setAdmin(isAdmin);
 	}
 
 	@Override

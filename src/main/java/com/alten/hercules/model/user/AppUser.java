@@ -1,6 +1,6 @@
 package com.alten.hercules.model.user;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -15,9 +15,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Inheritance
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class AppUser implements UserDetails {
 	@Transient
 	private static final long serialVersionUID = 1L;
@@ -40,16 +42,16 @@ public abstract class AppUser implements UserDetails {
 	private String lastname;
 	
 	@Column(nullable = true)
-	private LocalDate releaseDate;
+	private Date releaseDate;
 	
 	public AppUser() {}
 	
 	public AppUser(String email, String password, String firstname, String lastname) {
-		this.email = email;
-		this.password = new BCryptPasswordEncoder().encode(password);
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.releaseDate = null;
+		setEmail(email);
+		setPassword(password);
+		setFirstname(firstname);
+		setLastname(lastname);
+		setReleaseDate(null);
 	}
 	
 	public Long getId() { return id; }
@@ -67,8 +69,8 @@ public abstract class AppUser implements UserDetails {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 
-	public LocalDate getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+	public Date getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 
 	@Override
 	public String getUsername() { return email; }
