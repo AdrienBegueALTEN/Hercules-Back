@@ -39,7 +39,7 @@ public class Mission {
 	private Customer customer;
 	
 	@OneToMany(mappedBy="id.mission")
-	@OrderBy("date DESC")
+	@OrderBy("version_date DESC")
 	private Set<MissionSheet> versions = new HashSet<>();
 	
 	@Column(nullable = false)

@@ -39,7 +39,7 @@ public class OldMission {
 	
 	@Column(nullable = true)
 	@Enumerated(EnumType.STRING)
-	private EType type;
+	private EContractType type;
 	
 	@Column(nullable = true)
 	private String city;
@@ -85,7 +85,7 @@ public class OldMission {
 	}
 
 	public OldMission(long id, Date lastUpdate, String title, @Length(max = 1000) String description,
-			EType type, String city, String country, @Length(max = 250) String comment, String consultantRole,
+			EContractType type, String city, String country, @Length(max = 250) String comment, String consultantRole,
 			int consultantExperience, ESheetStatus state, int teamSize, Long reference, Consultant consultant,
 			Customer customer) {
 		super();
@@ -106,7 +106,7 @@ public class OldMission {
 		this.customer = customer;
 	}
 
-	public OldMission(Date lastUpdate, String title, @Length(max = 1000) String description, EType type,
+	public OldMission(Date lastUpdate, String title, @Length(max = 1000) String description, EContractType type,
 			String city, String country, @Length(max = 250) String comment, String consultantRole,
 			int consultantExperience, ESheetStatus state, int teamSize, Long reference, Consultant consultant,
 			Customer customer) {
@@ -188,11 +188,11 @@ public class OldMission {
 		this.description = description;
 	}
 
-	public EType getType() {
+	public EContractType getType() {
 		return type;
 	}
 
-	public void setType(EType type) {
+	public void setType(EContractType type) {
 		this.type = type;
 	}
 

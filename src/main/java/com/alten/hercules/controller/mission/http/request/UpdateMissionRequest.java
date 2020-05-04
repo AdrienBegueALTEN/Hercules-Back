@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import com.alten.hercules.model.mission.ESheetStatus;
-import com.alten.hercules.model.mission.EType;
+import com.alten.hercules.model.mission.EContractType;
 
 public class UpdateMissionRequest {
 	
@@ -16,7 +16,7 @@ public class UpdateMissionRequest {
 	@Length(max = 1000)
 	private String description;
 	
-	private EType type;
+	private EContractType type;
 	
 	private String city;
 	
@@ -44,8 +44,8 @@ public class UpdateMissionRequest {
 	public String getDescription() { return description; }
 	public void setDescription(String description) { this.description = description; }
 
-	public EType getType() { return type; }
-	public void setType(EType type) { this.type = type; }
+	public EContractType getType() { return type; }
+	public void setType(EContractType type) { this.type = type; }
 
 	public String getCity() { return city; }
 	public void setCity(String city) { this.city = city; }

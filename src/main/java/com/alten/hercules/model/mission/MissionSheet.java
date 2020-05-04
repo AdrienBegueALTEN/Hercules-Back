@@ -1,6 +1,5 @@
 package com.alten.hercules.model.mission;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -47,7 +46,7 @@ public class MissionSheet {
 	
 	@Column(nullable = true)
 	@Enumerated(EnumType.STRING)
-	private EType type;
+	private EContractType contractType;
 	
 	public MissionSheet() {}
 	
@@ -76,13 +75,13 @@ public class MissionSheet {
 	public Integer getConsultantStartXp() { return consultantStartXp; }
 	public void setConsultantStartXp(int consultantStartExp) { this.consultantStartXp = consultantStartExp; }
 	
-	public EType getType() { return type; }
-	public void setType(EType type) { this.type = type; }
+	public EContractType getContractType() { return contractType; }
+	public void setContractType(EContractType type) { this.contractType = type; }
 
 	public Integer getTeamSize() { return teamSize; }
 	public void setTeamSize(int teamSize) { this.teamSize = teamSize; }
 	
 	@JsonGetter("date")
-    private String getDate() { return new SimpleDateFormat("dd/MM/yyyy").format(id.getDate()); }
+    private Date getVersionDate() { return id.getVersionDate(); }
 
 }

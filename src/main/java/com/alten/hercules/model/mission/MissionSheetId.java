@@ -11,14 +11,14 @@ public class MissionSheetId implements Serializable {
 	
 	@ManyToOne
 	private Mission mission;
-	private Date date;
+	private Date versionDate;
 	
 	public MissionSheetId() {}
 	
-	public MissionSheetId(Mission mission, Date date) {
+	public MissionSheetId(Mission mission, Date versionDate) {
 		this.mission = mission;
-		this.date = date;
+		this.versionDate = versionDate;
 	}
 
-	public Date getDate() { return date; }
+	public Date getVersionDate() { return versionDate; }
 }
