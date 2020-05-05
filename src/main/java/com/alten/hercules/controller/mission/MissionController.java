@@ -1,5 +1,6 @@
 package com.alten.hercules.controller.mission;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
-import com.alten.hercules.controller.mission.http.response.BasicMissionResponse;
 import com.alten.hercules.controller.mission.http.response.MissionDetailsResponse;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
@@ -59,7 +59,7 @@ public class MissionController {
 		}
 	}
 	
-	@GetMapping("")
+	/*@GetMapping("")
 	public ResponseEntity<?> getAll(@RequestParam boolean details)
 	{
 		return details ?
@@ -90,7 +90,7 @@ public class MissionController {
 		return ResponseEntity.ok(missions);
 		
 		
-	}
+	}*/
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
