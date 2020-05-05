@@ -1,17 +1,23 @@
 package com.alten.hercules.model.mission;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
+import com.alten.hercules.model.project.Project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -20,7 +26,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class MissionSheet {
 	
 	@JsonIgnore
-	@EmbeddedId MissionSheetId id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@JsonIgnore
+	@ManyToOne
+	private Mission mission;
+
+	@Column(nullable = true)
+	private Date versionDate;
 	
 	@Column(nullable = true)
 	private String title = null;
@@ -50,14 +65,18 @@ public class MissionSheet {
 	@Enumerated(EnumType.STRING)
 	private EContractType contractType;
 	
+	@OneToMany
+	private Set<Project> projects = new HashSet<>();
+	
 	public MissionSheet() {}
 	
 	public MissionSheet(Mission mission) {
-		this.id = new MissionSheetId(mission);
+		this.mission = mission;
 	}
 	
-	public MissionSheet(MissionSheet sheet) {
-		setId(new MissionSheetId(sheet.getId().getMission()));
+	public MissionSheet(MissionSheet sheet, Date versionDate) {
+		setMission(sheet.mission);
+		setVersionDate(versionDate);
 		setTitle(sheet.getTitle());
 		setDescription(sheet.getDescription());
 		setComment(sheet.getComment());
@@ -66,10 +85,17 @@ public class MissionSheet {
 		setConsultantStartXp(sheet.getConsultantStartXp());
 		setContractType(sheet.getContractType());
 		setTeamSize(sheet.getTeamSize());
+		setProjects(sheet.getProjects());
 	}
+	
+	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id;}
 
-	public MissionSheetId getId() { return id; }
-	public void setId(MissionSheetId id) { this.id = id; }
+	public Mission getMission() { return mission; }
+	public void setMission(Mission mission) { this.mission = mission; }
+
+	public Date getVersionDate() { return versionDate; }
+	public void setVersionDate(Date versionDate) {this.versionDate = versionDate; }
 
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
@@ -87,15 +113,14 @@ public class MissionSheet {
 	public void setCountry(String country) { this.country = country; }
 
 	public Integer getConsultantStartXp() { return consultantStartXp; }
-	public void setConsultantStartXp(int consultantStartExp) { this.consultantStartXp = consultantStartExp; }
+	public void setConsultantStartXp(Integer consultantStartXp) { this.consultantStartXp = consultantStartXp; }
 	
 	public EContractType getContractType() { return contractType; }
 	public void setContractType(EContractType type) { this.contractType = type; }
 
 	public Integer getTeamSize() { return teamSize; }
-	public void setTeamSize(int teamSize) { this.teamSize = teamSize; }
+	public void setTeamSize(Integer teamSize) { this.teamSize = teamSize; }
 	
-	@JsonGetter("date")
-    public Date getDate() { return id.getVersionDate(); }
-
+	public Set<Project> getProjects() { return projects; }
+	public void setProjects(Set<Project> projects) { this.projects = projects; }
 }

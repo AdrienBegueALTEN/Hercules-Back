@@ -2,8 +2,6 @@ package com.alten.hercules.controller.project;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.dal.ProjectDAL;
-import com.alten.hercules.dao.project.ProjectDAO;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.project.request.ProjectRequest;
 import com.alten.hercules.model.response.MsgResponse;
@@ -24,11 +20,11 @@ import com.alten.hercules.model.response.MsgResponse;
 @RequestMapping("/hercules/projects")
 public class ProjectController {
 	
-	@Autowired
+	/*@Autowired
 	ProjectDAO projectDAO;
 	
 	@Autowired
-	ProjectDAL projectDAL;
+	//ProjectDAL projectDAL;
 	
 	@GetMapping
 	public List<Project> getAll() {
@@ -63,6 +59,6 @@ public class ProjectController {
 		this.projectDAO.save(project);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
+	}*/
 
 }

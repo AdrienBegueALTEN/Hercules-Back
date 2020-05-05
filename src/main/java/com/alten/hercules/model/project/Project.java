@@ -5,20 +5,14 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-
 import org.hibernate.validator.constraints.Length;
-
-import com.alten.hercules.model.mission.OldMission;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Project {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -35,22 +29,16 @@ public class Project {
 	
 	@Column(nullable = true)
 	private Date lastUpdate;
-	
-	@JsonIgnore
-	@OneToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name = "mission_id", nullable = false)
-	private OldMission mission;
 
 	public Project() {
 		super();
 	}
 
-	public Project(@Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate, OldMission mission) {
+	public Project(@Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate) {
 		super();
 		this.description = description;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
-		this.mission = mission;
 	}
 
 	public Long getId() {
@@ -83,13 +71,5 @@ public class Project {
 
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
-	}
-
-	public OldMission getMission() {
-		return mission;
-	}
-
-	public void setMission(OldMission mission) {
-		this.mission = mission;
 	}
 }

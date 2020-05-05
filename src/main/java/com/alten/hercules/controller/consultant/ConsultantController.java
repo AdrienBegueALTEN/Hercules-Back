@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.consultant.http.request.AddConsultantRequest;
-import com.alten.hercules.controller.consultant.http.request.UpdateConsultantRequest;
+import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
-import com.alten.hercules.model.consultant.EConsultantFieldName;
+import com.alten.hercules.model.consultant.EConsultantFieldname;
 import com.alten.hercules.model.exception.InvalidRessourceFormatException;
 import com.alten.hercules.model.exception.InvalidFieldNameException;
 import com.alten.hercules.model.exception.InvalidValueException;
@@ -112,12 +112,12 @@ public class ConsultantController {
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
-	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateConsultantRequest req) { 
+	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
 		try {
 			Consultant consultant = dal.findById(req.getId())
 					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
-			EConsultantFieldName fieldName;
-			try { fieldName = EConsultantFieldName.valueOf(req.getFieldName()); }
+			EConsultantFieldname fieldName;
+			try { fieldName = EConsultantFieldname.valueOf(req.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldNameException(); }
 			switch(fieldName) {
 				case firstname :
@@ -146,7 +146,11 @@ public class ConsultantController {
 						throw new InvalidValueException("manager id");
 					break;
 				case releaseDate:
-					consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
+					try {
+						consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
+					} catch (ParseException e) {
+						throw new InvalidValueException("consultant.releaseDate");
+					}
 					break;
 				default: throw new InvalidFieldNameException();
 			}
@@ -164,7 +168,7 @@ public class ConsultantController {
 			return ResponseEntity
 					.status(HttpStatus.NOT_FOUND)
 					.body(e.getMessage());
-		} catch (ClassCastException | ParseException e) {
+		} catch (ClassCastException e) {
 			return ResponseEntity
 					.badRequest()
 					.body("Invalid value type");

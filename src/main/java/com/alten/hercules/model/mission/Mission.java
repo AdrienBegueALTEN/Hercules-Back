@@ -38,7 +38,7 @@ public class Mission {
 	@JoinColumn(nullable = false)
 	private Customer customer;
 	
-	@OneToMany(mappedBy="id.mission")
+	@OneToMany(mappedBy="mission")
 	@OrderBy("version_date DESC")
 	private Set<MissionSheet> versions = new HashSet<>();
 	
@@ -51,7 +51,7 @@ public class Mission {
 	public Mission(Consultant consultant, Customer customer) {
 		this.consultant = consultant;
 		this.customer = customer;
-		this.sheetStatus = ESheetStatus.WAITING;
+		this.sheetStatus = ESheetStatus.ON_WAITING;
 	}
 	
 	public Long getId() { return id; }

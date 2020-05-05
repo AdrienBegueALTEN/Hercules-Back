@@ -1,24 +1,24 @@
-package com.alten.hercules.controller.consultant.http.request;
+package com.alten.hercules.controller.http.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.alten.hercules.model.consultant.EConsultantFieldName;
+import com.alten.hercules.model.consultant.EConsultantFieldname;
 
 /**
  * 
- * Represent the content of a consultant update request.
+ * Represent the content of an entity update request.
  *
  * @author Adrien Bègue
  *
  */
-public class UpdateConsultantRequest {
+public class UpdateEntityRequest {
 
     /**
-     * Consultant identifier in database.
+     * Entity identifier in database.
      * 
-     * @see UpdateConsultantRequest#getId()
-     * @see UpdateConsultantRequest#setId(Long)
+     * @see UpdateEntityRequest#getId()
+     * @see UpdateEntityRequest#setId(Long)
      * 
      */
 	@NotNull(message="'id' must be provided")
@@ -27,9 +27,9 @@ public class UpdateConsultantRequest {
     /**
      * Name of the database field to be changed.
      * 
-     * @see UpdateConsultantRequest#getFieldName()
-     * @see UpdateConsultantRequest#setFieldName(String)
-     * @see EConsultantFieldName
+     * @see UpdateEntityRequest#getFieldName()
+     * @see UpdateEntityRequest#setFieldName(String)
+     * @see EConsultantFieldname
      * 
      */
 	@NotBlank(message="'fieldname' must be provided")
@@ -38,8 +38,8 @@ public class UpdateConsultantRequest {
     /**
      * New value of the database field.
      * 
-     * @see UpdateConsultantRequest#getValue()
-     * @see UpdateConsultantRequest#setValue(Object)
+     * @see UpdateEntityRequest#getValue()
+     * @see UpdateEntityRequest#setValue(Object)
      * 
      */
 	private Object value;
@@ -48,17 +48,17 @@ public class UpdateConsultantRequest {
      * Empty constructor.
      * 
      */
-	public UpdateConsultantRequest() {}
+	public UpdateEntityRequest() {}
 	
     /**
      * Constructor.
      * 
-     * @see UpdateConsultantRequest#id
-     * @see UpdateConsultantRequest#fieldName
-     * @see UpdateConsultantRequest#value
+     * @see UpdateEntityRequest#id
+     * @see UpdateEntityRequest#fieldName
+     * @see UpdateEntityRequest#value
      * 
      */
-	public UpdateConsultantRequest(Long id, String fieldName, Object value) {
+	public UpdateEntityRequest(Long id, String fieldName, Object value) {
 		this.id = id;
 		this.fieldName = fieldName;
 		this.value = value;

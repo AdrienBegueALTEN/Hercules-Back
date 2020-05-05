@@ -4,7 +4,7 @@ package com.alten.hercules.model.consultant;
  * Field names enumeration of the Consultant entity
  * 
  */
-public enum EConsultantFieldName {
+public enum EConsultantFieldname {
 	diplomas("diplomas"),
 	email("email"),
 	firstname("firstname"),
@@ -15,9 +15,8 @@ public enum EConsultantFieldName {
 			
 	private String name;
 	   
-	EConsultantFieldName(String name) { this.name = name; }
+	EConsultantFieldname(String name) { this.name = name; }
 	
 	@Override
 	public String toString(){ return name; }
-	
 }
