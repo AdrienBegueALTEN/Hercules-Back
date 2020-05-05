@@ -1,10 +1,12 @@
 package com.alten.hercules.dal;
 
+
+
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.alten.hercules.dao.consultant.ConsultantDAO;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.dao.mission.MissionDAO;
@@ -45,5 +47,11 @@ public class MissionDAL {
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
 		return sheetDAO.findMostRecentVersion(missionId);
 	}
+	
+	public List<Mission> findAll() {
+		return missionDAO.findAll();
+	}
+	
+	
 
 }
