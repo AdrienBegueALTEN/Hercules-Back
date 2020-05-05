@@ -3,7 +3,9 @@ package com.alten.hercules.model.mission;
 public enum EMissionFieldname {
 	city("city"),
 	comment("comment"),
+	consultantRole("consultantRole"),
 	consultantStartXp("consultantStartXp"),
+	contractType("contractType"),
 	country("country"),
 	description("description"),
 	sheetStatus("sheetStatus"),

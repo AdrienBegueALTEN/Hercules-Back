@@ -26,11 +26,12 @@ import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.AlreadyExistingVersionException;
-import com.alten.hercules.model.exception.InvalidFieldNameException;
-import com.alten.hercules.model.exception.InvalidRessourceFormatException;
+import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
+import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
 import com.alten.hercules.model.exception.UnvalidatedMissionSheetException;
+import com.alten.hercules.model.mission.EContractType;
 import com.alten.hercules.model.mission.EMissionFieldname;
 import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
@@ -89,18 +90,8 @@ public class MissionController {
 			
 			dal.saveSheet(new MissionSheet(mostRecentVersion, new Date()));
 			return ResponseEntity.status(HttpStatus.CREATED).build();
-		} catch (RessourceNotFoundException e) {
-			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
-		} catch (AlreadyExistingVersionException e) {
-			return ResponseEntity
-					.status(HttpStatus.CONFLICT)
-					.body(e.getMessage());
-		} catch (UnvalidatedMissionSheetException e) {
-			return ResponseEntity
-					.badRequest()
-					.body(e.getMessage());
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
 		}
 	}
 	
@@ -113,7 +104,7 @@ public class MissionController {
 			
 			EMissionFieldname fieldname;
 			try { fieldname = EMissionFieldname.valueOf(req.getFieldName()); }
-			catch (IllegalArgumentException e) { throw new InvalidFieldNameException(); }
+			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
 			switch(fieldname) {
 				case city :
 					mostRecentVersion.setCity((String)req.getValue());
@@ -121,8 +112,19 @@ public class MissionController {
 				case comment :
 					mostRecentVersion.setComment((String)req.getValue());
 					break;
+				case consultantRole :
+					mostRecentVersion.setConsultantRole((String)req.getValue());
+					break;
 				case consultantStartXp :
 					mostRecentVersion.setConsultantStartXp((Integer)req.getValue());
+					break;
+				case contractType :
+					try { 
+						EContractType contractType = EContractType.valueOf((String)req.getValue());
+						mostRecentVersion.setContractType(contractType);
+					} catch (IllegalArgumentException e) {
+						throw new InvalidValueException();
+					}
 					break;
 				case country :
 					mostRecentVersion.setCountry((String)req.getValue());
@@ -132,6 +134,19 @@ public class MissionController {
 					break;
 				case sheetStatus :
 
+					try {
+						
+						if (!ESheetStatus.VALIDATED.equals(ESheetStatus.valueOf((String)req.getValue())));
+					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
+					/*Mission mission = dal.findById(req.getId()).get();
+					switch (status) {
+						case ON_GOING :
+							if (mission)
+							break;
+						case VALIDATED :
+							break;
+						default :
+					}*/
 					break;
 				case teamSize :
 					mostRecentVersion.setTeamSize((Integer)req.getValue());
@@ -139,22 +154,14 @@ public class MissionController {
 				case title :
 					mostRecentVersion.setTitle((String)req.getValue());
 					break;
-				default: throw new InvalidFieldNameException();
+				default: throw new InvalidFieldnameException();
 			}
 			dal.saveSheet(mostRecentVersion);
 			return ResponseEntity.ok().build();
-		} catch (InvalidFieldNameException | InvalidValueException | InvalidRessourceFormatException e) { 
-			return ResponseEntity
-					.badRequest()
-					.body(e.getMessage());
-		} catch (RessourceNotFoundException e) {
-			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
-		} catch (ClassCastException e) {
-			return ResponseEntity
-					.badRequest()
-					.body("Invalid value type");
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
+		} catch (ClassCastException | NullPointerException e) {
+			return new InvalidValueException().buildResponse();
 		}
 	}
 	

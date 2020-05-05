@@ -1,7 +1,9 @@
 package com.alten.hercules.model.exception;
 
-public class AlreadyExistingVersionException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class AlreadyExistingVersionException extends ResponseEntityException {
 	public AlreadyExistingVersionException() {
-		super("Today's version already exists");
+		super("Today's version already exists", HttpStatus.CONFLICT);
 	}
 }

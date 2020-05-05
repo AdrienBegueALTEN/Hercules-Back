@@ -1,9 +1,9 @@
 package com.alten.hercules.model.exception;
 
-import java.io.IOException;
+import org.springframework.http.HttpStatus;
 
-public class UnavailableEmailException extends IOException {
+public class UnavailableEmailException extends ResponseEntityException {
 	public UnavailableEmailException() {
-		super("Unavailable email adress.");
+		super("Unavailable email adress.", HttpStatus.CONFLICT);
 	}
 }

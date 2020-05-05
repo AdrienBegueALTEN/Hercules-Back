@@ -25,9 +25,10 @@ import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.consultant.EConsultantFieldname;
-import com.alten.hercules.model.exception.InvalidRessourceFormatException;
-import com.alten.hercules.model.exception.InvalidFieldNameException;
+import com.alten.hercules.model.exception.EntityDeletionException;
+import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
+import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
 import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.Manager;
@@ -41,14 +42,14 @@ public class ConsultantController {
 	private ConsultantDAL dal;
 
 	@GetMapping("")
-	public ResponseEntity<Object> getAll(@RequestParam boolean enabled) {
+	public ResponseEntity<?> getAll(@RequestParam boolean enabled) {
 		return enabled ?
 				ResponseEntity.ok(dal.findAllEnabled()) :
 				ResponseEntity.ok(dal.findAll());
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Object> getById(@PathVariable Long id) {
+	public ResponseEntity<?> getById(@PathVariable Long id) {
 		try {
 			Consultant consultant = dal.findById(id)
 					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
@@ -62,7 +63,7 @@ public class ConsultantController {
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("")
-	public ResponseEntity<Object> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
+	public ResponseEntity<?> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
 		Optional<Consultant> optConsultant = dal.findByEmail(req.getEmail());
 		if (optConsultant.isPresent())
 			return ResponseEntity
@@ -78,14 +79,8 @@ public class ConsultantController {
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
 					.body(consultant.getId());
-		} catch (UnavailableEmailException e) {
-			return ResponseEntity
-					.status(HttpStatus.CONFLICT)
-					.body(e.getMessage());
-		} catch (RessourceNotFoundException e) {
-			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
 		}
 	}
 
@@ -96,17 +91,13 @@ public class ConsultantController {
 			Consultant consultant = dal.findById(id)
 				.orElseThrow(() -> new RessourceNotFoundException("consultant"));
 			if (!consultant.getMissions().isEmpty())
-				return ResponseEntity
-						.status(HttpStatus.CONFLICT)
-						.build();
+				throw new EntityDeletionException("The consultant is linked to one or more missions.");
 			dal.delete(consultant);
 			return ResponseEntity
 					.ok()
 					.build();
-		} catch (RessourceNotFoundException e) {
-			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
 		}
 	}
 
@@ -118,7 +109,7 @@ public class ConsultantController {
 					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
 			EConsultantFieldname fieldName;
 			try { fieldName = EConsultantFieldname.valueOf(req.getFieldName()); }
-			catch (IllegalArgumentException e) { throw new InvalidFieldNameException(); }
+			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
 			switch(fieldName) {
 				case firstname :
 					consultant.setFirstname((String)req.getValue());
@@ -143,35 +134,23 @@ public class ConsultantController {
 						consultant.setManager(manager);
 					}
 					else
-						throw new InvalidValueException("manager id");
+						throw new InvalidValueException();
 					break;
 				case releaseDate:
 					try {
 						consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
 					} catch (ParseException e) {
-						throw new InvalidValueException("consultant.releaseDate");
+						throw new InvalidValueException();
 					}
 					break;
-				default: throw new InvalidFieldNameException();
+				default: throw new InvalidFieldnameException();
 			}
 			dal.save(consultant);
 			return ResponseEntity.ok().build();
-		} catch (InvalidFieldNameException | InvalidValueException | InvalidRessourceFormatException e) { 
-			return ResponseEntity
-					.badRequest()
-					.body(e.getMessage());
-		} catch (UnavailableEmailException e) {
-			return ResponseEntity
-					.status(HttpStatus.CONFLICT)
-					.body(e.getMessage());
-		} catch (RessourceNotFoundException e) {
-			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
-		} catch (ClassCastException e) {
-			return ResponseEntity
-					.badRequest()
-					.body("Invalid value type");
+		} catch (ResponseEntityException e) { 
+			return e.buildResponse();
+		} catch (ClassCastException | NullPointerException e) {
+			return new InvalidValueException().buildResponse();
 		}
 	}
 }

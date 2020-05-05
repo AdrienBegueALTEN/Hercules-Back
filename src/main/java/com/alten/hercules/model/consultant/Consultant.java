@@ -1,6 +1,5 @@
 package com.alten.hercules.model.consultant;
 
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,6 @@ import javax.persistence.OneToMany;
 
 import com.alten.hercules.StrUtils;
 import com.alten.hercules.model.diploma.Diploma;
-import com.alten.hercules.model.exception.InvalidRessourceFormatException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
@@ -63,7 +61,7 @@ public class Consultant {
 	
 	public Consultant() { super(); }
 	
-	public Consultant(String email, String firstname, String lastname, Manager manager) {
+	public Consultant(String email, String firstname, String lastname, Manager manager) throws InvalidValueException {
 		setEmail(email);
 		setFirstname(firstname);
 		setLastname(lastname);
@@ -74,36 +72,29 @@ public class Consultant {
 	public void setId(Long id) { this.id = id; }
 
 	public String getEmail() { return email; }
-	public void setEmail(String email) throws InvalidValueException, InvalidRessourceFormatException { 
-		if (email == null)
-			throw new InvalidValueException("consultant.mail");
+	public void setEmail(String email) throws InvalidValueException { 
 		if (!Pattern.matches(StrUtils.EMAIL_PATTERN, email))
-			throw new InvalidRessourceFormatException("consultant.email");
+			throw new InvalidValueException();
 		this.email = email;
 	}
 
 	public String getFirstname() { return firstname; }
-	public void setFirstname(String firstname) throws InvalidValueException, InvalidRessourceFormatException {
-		if (firstname == null)
-			throw new InvalidValueException("consultant.firstname");
+	public void setFirstname(String firstname) throws InvalidValueException {
 		if (!Pattern.matches(StrUtils.NAME_PATTERN, firstname))
-			throw new InvalidRessourceFormatException("consultant.firstname");
+			throw new InvalidValueException();
 		this.firstname = StrUtils.formaliseFirstname(firstname);
 	}
 
 	public String getLastname() { return lastname; }
-	public void setLastname(String lastname) throws InvalidValueException, InvalidRessourceFormatException {
-		if (lastname == null)
-			throw new InvalidValueException("consultant.lastname");
+	public void setLastname(String lastname) throws InvalidValueException {
 		if (!Pattern.matches(StrUtils.NAME_PATTERN, lastname))
-			throw new InvalidRessourceFormatException("consultant.lastname");
+			throw new InvalidValueException();
 		this.lastname = lastname;
 	}
 
 	public int getExperience() { return experience; }
 	public void setExperience(Integer experience) throws InvalidValueException { 
-		if (experience == null || experience < 0)
-			throw new InvalidValueException("consultant.experience");
+		if (experience < 0) throw new InvalidValueException();
 		this.experience = experience;
 	}
 	

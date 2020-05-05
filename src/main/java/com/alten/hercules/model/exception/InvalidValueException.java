@@ -1,7 +1,9 @@
 package com.alten.hercules.model.exception;
 
-public class InvalidValueException extends RuntimeException {
-	public InvalidValueException(String ressource) {
-		super("Invalid value for '" + ressource + "'.");
+import org.springframework.http.HttpStatus;
+
+public class InvalidValueException extends ResponseEntityException {
+	public InvalidValueException() {
+		super("Invalid value.", HttpStatus.BAD_REQUEST);
 	}
 }

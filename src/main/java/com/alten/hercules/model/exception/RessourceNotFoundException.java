@@ -1,9 +1,9 @@
 package com.alten.hercules.model.exception;
 
-import java.io.IOException;
+import org.springframework.http.HttpStatus;
 
-public class RessourceNotFoundException extends IOException {
+public class RessourceNotFoundException extends ResponseEntityException {
 	public RessourceNotFoundException(String ressource) {
-		super("Ressource '" + ressource + "' not found.");
+		super("Ressource '" + ressource + "' not found.", HttpStatus.NOT_FOUND);
 	}
 }
