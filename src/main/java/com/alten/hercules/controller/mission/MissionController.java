@@ -19,10 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
+import com.alten.hercules.controller.mission.http.response.BasicMissionResponse;
 import com.alten.hercules.controller.mission.http.response.MissionDetailsResponse;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
@@ -59,10 +60,36 @@ public class MissionController {
 	}
 	
 	@GetMapping("")
-	public List<MissionDetailsResponse> getAll() {
-		return dal.findAll().stream()
-				.map(mission -> new MissionDetailsResponse(mission))
-				.collect(Collectors.toList());
+	public ResponseEntity<?> getAll(@RequestParam boolean details)
+	{
+		return details ?
+				ResponseEntity.ok(getAllExtended()):
+					ResponseEntity.ok(getAllReduced());
+			
+	}
+	
+	
+	
+
+	public ResponseEntity<?> getAllExtended() {
+		List<MissionDetailsResponse> missions = new ArrayList<>();
+		dal.findAll().forEach((mission) -> {
+			missions.add(new MissionDetailsResponse(mission)); });
+		return ResponseEntity.ok(missions);
+		
+		
+	}
+	
+
+	public ResponseEntity<?> getAllReduced() {
+		List<BasicMissionResponse> missions = new ArrayList<>();
+		
+		dal.findAll().forEach((mission) -> {
+			missions.add(new BasicMissionResponse(mission)); });
+		
+		return ResponseEntity.ok(missions);
+		
+		
 	}
 
 	@PreAuthorize("hasAuthority('MANAGER')")

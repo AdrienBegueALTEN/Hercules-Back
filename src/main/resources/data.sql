@@ -30,9 +30,14 @@ INSERT INTO CUSTOMER(name, activity_sector) VALUES('TESLA', 'Automobile') ON CON
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('ALTEN', 'Consulting technologique') ON CONFLICT DO NOTHING;
 
 INSERT INTO MISSION(consultant_id, customer_id, sheet_status) VALUES (1,1,'VALIDATED') ON CONFLICT DO NOTHING;
+INSERT INTO MISSION(consultant_id, customer_id, sheet_status) VALUES (2,2,'VALIDATED') ON CONFLICT DO NOTHING;
+
 
 INSERT INTO MISSION_SHEET(mission_id, version_date, city, comment, country, consultant_start_xp, team_size, title, contract_type) VALUES (1, '2020-03-02', 'Strasbourg', 'Commentaire pour la v1', 'France', 7, 4, 'Titre v1', 'services_center') ON CONFLICT DO NOTHING;
 INSERT INTO MISSION_SHEET(mission_id, version_date, city, comment, country, consultant_start_xp, team_size, title, contract_type) VALUES (1, '2020-03-10', 'Schiltigheim', 'Commentaire pour la v2', 'France', 3, 1, 'Titre v2', 'technical_assistance') ON CONFLICT DO NOTHING;
+INSERT INTO MISSION_SHEET(mission_id, version_date, city, comment, country, consultant_start_xp, team_size, title, contract_type) VALUES (2, '2020-04-10', 'Schiltigheim', 'Commentaire pour la v2', 'France', 3, 1, 'Titre v2', 'technical_assistance') ON CONFLICT DO NOTHING;
+
+
 
 /*INSERT INTO PROJECT(description,mission_id) VALUES ('projet 1 de mission 1',1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description,mission_id) VALUES ('projet 2 de mission 1',1) ON CONFLICT DO NOTHING;
