@@ -8,7 +8,6 @@ public enum EMissionFieldname {
 	contractType("contractType"),
 	country("country"),
 	description("description"),
-	sheetStatus("sheetStatus"),
 	teamSize("teamSize"),
 	title("title");
 	

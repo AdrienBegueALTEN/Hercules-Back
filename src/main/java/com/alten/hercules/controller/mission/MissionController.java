@@ -1,11 +1,10 @@
 package com.alten.hercules.controller.mission;
 
-import java.util.ArrayList;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -49,45 +48,41 @@ public class MissionController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> findById(@PathVariable Long id) {
-		Optional<Mission> optMission = dal.findById(id);
-		if (optMission.isEmpty())
-			return ResponseEntity.notFound().build();
-		
-		return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));
+		try {
+			Optional<Mission> optMission = dal.findById(id);
+			if (optMission.isEmpty())
+				throw new RessourceNotFoundException("Mission");
+			return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));
+		} catch (RessourceNotFoundException e) {
+			return e.buildResponse();
+		}
 	}
-	
 	
 	@GetMapping("")
 	public List<MissionDetailsResponse> getAll() {
-		
-		List<MissionDetailsResponse> missions = new ArrayList<>();
-		
-		dal.findAll().forEach((mission) -> {
-			missions.add(new MissionDetailsResponse(mission)); });
-		
-		return missions;
-					
-		
+		return dal.findAll().stream()
+				.map(mission -> new MissionDetailsResponse(mission))
+				.collect(Collectors.toList());
 	}
 
-	
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
 	public ResponseEntity<?> addMission(@Valid @RequestBody AddMissionRequest req) {
-		Optional<Consultant> optConsultant = dal.findConsultantById(req.getConsultant());
-		if (optConsultant.isEmpty())
-			ResponseEntity.status(HttpStatus.NOT_FOUND).body("Consultant");
-		
-		Optional<Customer> optCustomer = dal.findCustomerById(req.getCustomer());
-		if (optCustomer.isEmpty())
-			ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer");
-
-		Mission mission = new Mission(optConsultant.get(), optCustomer.get());
-		MissionSheet v0 = new MissionSheet(mission);
-		dal.save(mission);
-		dal.saveSheet(v0);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(mission.getId());
+		try {
+			Optional<Consultant> optConsultant = dal.findConsultantById(req.getConsultant());
+			if (optConsultant.isEmpty())
+				throw new RessourceNotFoundException("Consultant");
+			Optional<Customer> optCustomer = dal.findCustomerById(req.getCustomer());
+			if (optCustomer.isEmpty())
+				throw new RessourceNotFoundException("Customer");
+			Mission mission = new Mission(optConsultant.get(), optCustomer.get());
+			MissionSheet v0 = new MissionSheet(mission);
+			dal.save(mission);
+			dal.saveSheet(v0);
+			return ResponseEntity.status(HttpStatus.CREATED).body(mission.getId());
+		} catch (RessourceNotFoundException e) {
+			return e.buildResponse();
+		}
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
@@ -140,31 +135,13 @@ public class MissionController {
 					try { 
 						EContractType contractType = EContractType.valueOf((String)req.getValue());
 						mostRecentVersion.setContractType(contractType);
-					} catch (IllegalArgumentException e) {
-						throw new InvalidValueException();
-					}
+					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
 					break;
 				case country :
 					mostRecentVersion.setCountry((String)req.getValue());
 					break;
 				case description :
 					mostRecentVersion.setDescription((String)req.getValue());
-					break;
-				case sheetStatus :
-
-					try {
-						
-						if (!ESheetStatus.VALIDATED.equals(ESheetStatus.valueOf((String)req.getValue())));
-					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
-					/*Mission mission = dal.findById(req.getId()).get();
-					switch (status) {
-						case ON_GOING :
-							if (mission)
-							break;
-						case VALIDATED :
-							break;
-						default :
-					}*/
 					break;
 				case teamSize :
 					mostRecentVersion.setTeamSize((Integer)req.getValue());
