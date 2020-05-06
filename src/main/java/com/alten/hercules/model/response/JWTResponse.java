@@ -1,43 +1,31 @@
 package com.alten.hercules.model.response;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.security.core.Authentication;
 import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.security.jwt.JwtUtils;
 
 public class JWTResponse {
 	
-	private String token;
-	private Long id;
-	private String firstname;
-	private String lastname;
-	private List<String> roles;
-	
-	public JWTResponse(Authentication authentication) {
-		this.token = JwtUtils.generateJWT(authentication);
-		AppUser user = (AppUser) authentication.getPrincipal();
-		this.id = user.getId();
-		this.firstname = user.getFirstname();
-		this.lastname = user.getLastname();
-		this.roles = user.getAuthorities().stream()
-				.map(authority ->  authority.getAuthority())
-				.collect(Collectors.toList());
+	private String accessToken;
+	private Map<String, Object> user;
+
+	public JWTResponse(AppUser user) {
+		accessToken = JwtUtils.generateJwt(user);
+		this.user = new HashMap<String, Object>();
+		this.user.put("id", user.getId());
+		this.user.put("firstname", user.getFirstname());
+		this.user.put("lastname", user.getLastname());
+		this.user.put("roles", user.getAuthorities().stream()
+				.map(authority -> authority.getAuthority())
+				.collect(Collectors.toList()));
 	}
 
-	public String getAccessToken() { return token; }
-	public void setAccessToken(String accessToken) { this.token = accessToken; }
+	public String getAccessToken() { return accessToken; }
+	public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
 	
-	public Long getId() { return id; }
-	public void setId(Long id) { this.id = id; }
-
-	public String getFirstname() { return firstname; }
-	public void setFirstname(String firstname) { this.firstname = firstname; }
-
-	public String getLastname() { return lastname; }
-	public void setLastname(String lastname) { this.lastname = lastname; }
-
-	public List<String> getRoles() { return roles; }
-	public void setRoles(List<String> roles) { this.roles = roles; }
-
+	public Map<String, Object> getUser() { return user; }
+	public void setUser(Map<String, Object> user) { this.user = user; }
+	
 }
