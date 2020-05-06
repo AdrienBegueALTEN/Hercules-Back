@@ -178,6 +178,13 @@ public class MissionController {
 					break;
 				default: throw new InvalidFieldnameException();
 			}
+			
+			Mission mission = dal.findById(req.getId()).get();
+			if (mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)) {
+				mission.setSheetStatus(ESheetStatus.ON_GOING);
+				dal.save(mission);
+			}
+			
 			dal.saveSheet(mostRecentVersion);
 			return ResponseEntity.ok().build();
 		} catch (ResponseEntityException e) {

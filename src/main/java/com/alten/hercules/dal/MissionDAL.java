@@ -1,7 +1,5 @@
 package com.alten.hercules.dal;
 
-
-
 import java.util.List;
 import java.util.Optional;
 
