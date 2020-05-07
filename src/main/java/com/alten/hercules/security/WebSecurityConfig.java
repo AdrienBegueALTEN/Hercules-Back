@@ -11,10 +11,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.alten.hercules.security.jwt.AuthEntryPointJwt;
-import com.alten.hercules.security.jwt.AuthTokenFilter;
+import com.alten.hercules.security.jwt.UserTokenFilter;
+import com.alten.hercules.security.jwt.filter.AnonymousTokenFilter;
 import com.alten.hercules.service.AppUserDetailsService;
 
 @Configuration
@@ -22,8 +24,7 @@ import com.alten.hercules.service.AppUserDetailsService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	AppUserDetailsService service;
+	@Autowired AppUserDetailsService service;
 	
 	@Bean
 	public AppUserDetailsService appUserDetailsService() {
@@ -34,8 +35,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private AuthEntryPointJwt unauthorizedHandler;
 
 	@Bean
-	public AuthTokenFilter authTokenFilter() {
-		return new AuthTokenFilter();
+	public AnonymousTokenFilter anonymousTokenFilter() {
+		return new AnonymousTokenFilter();
+	}
+	
+	@Bean
+	public UserTokenFilter userTokenFilter() {
+		return new UserTokenFilter();
 	}
 
 	@Override
@@ -53,13 +59,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()
 			.authorizeRequests()
-			.antMatchers("/hercules/auth/signin").permitAll()
-			.anyRequest().authenticated()
-			.and()
-			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-			.and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-		http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+				.antMatchers("/hercules/auth/signin").permitAll()
+				.antMatchers("/hercules/missions/from-token").anonymous()
+				.anyRequest().authenticated()
+			.and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+			.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.addFilterBefore(anonymousTokenFilter(), AnonymousAuthenticationFilter.class);
+		http.addFilterBefore(userTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 }

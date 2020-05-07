@@ -23,7 +23,7 @@ import com.alten.hercules.controller.user.http.request.recruitementOfficer.Updat
 import com.alten.hercules.dao.user.RecruitementOfficerDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.response.MsgResponse;
-import com.alten.hercules.model.user.RecruitementOfficer;
+import com.alten.hercules.model.user.RecruitmentOfficer;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -40,7 +40,7 @@ public class RecruitementOfficerController {
 		if (userDAO.existsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
 		
-		RecruitementOfficer recruitementOfficer = request.buildUser();
+		RecruitmentOfficer recruitementOfficer = request.buildUser();
 		recruitementOfficerDAO.save(recruitementOfficer);
 		URI location = URI.create(String.format("/recruitementOfficer/%s", recruitementOfficer.getId()));
 		
@@ -49,12 +49,12 @@ public class RecruitementOfficerController {
 	 
 	@PutMapping("")
 	public ResponseEntity<?> updateRecruitementOfficer(@Valid @RequestBody UpdateRecruitementOfficerRequest request) {
-		Optional<RecruitementOfficer> optRecruitementOfficer = recruitementOfficerDAO.findById(request.getId());
+		Optional<RecruitmentOfficer> optRecruitementOfficer = recruitementOfficerDAO.findById(request.getId());
 		
 		if (!optRecruitementOfficer.isPresent())
 			return ResponseEntity.notFound().build();
 			
-		RecruitementOfficer recruitementOfficer = optRecruitementOfficer.get();
+		RecruitmentOfficer recruitementOfficer = optRecruitementOfficer.get();
 		
 		if (request.getEmail() != null) {
 			if (userDAO.existsByEmail(request.getEmail()))
@@ -81,7 +81,7 @@ public class RecruitementOfficerController {
 	 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteRecruitementOfficer(@PathVariable Long id) {
-		Optional<RecruitementOfficer> optRecruitementOfficer = recruitementOfficerDAO.findById(id);
+		Optional<RecruitmentOfficer> optRecruitementOfficer = recruitementOfficerDAO.findById(id);
 			
 		if (!optRecruitementOfficer.isPresent())
 			return ResponseEntity.notFound().build();

@@ -43,4 +43,9 @@ public class AuthenticationDAL {
 		return missionDao.findById(id);
 	}
 
+	public void changeMissionSecret(Mission mission) {
+		mission.changeSecret();
+		missionDao.save(mission);
+	}
+
 }

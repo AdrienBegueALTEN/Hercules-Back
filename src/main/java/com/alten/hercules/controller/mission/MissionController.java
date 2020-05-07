@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,9 +49,22 @@ public class MissionController {
 	@Autowired private MissionDAL dal;
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> findById(@PathVariable Long id) {
+	public ResponseEntity<?> getOne(@PathVariable Long id) {
 		try {
 			Optional<Mission> optMission = dal.findById(id);
+			if (optMission.isEmpty())
+				throw new RessourceNotFoundException("Mission");
+			return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));
+		} catch (RessourceNotFoundException e) {
+			return e.buildResponse();
+		}
+	}
+	
+	@GetMapping("/from-token")
+	public ResponseEntity<?> getOneFromToken() {
+		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		try {
+			Optional<Mission> optMission = dal.findById(missionId);
 			if (optMission.isEmpty())
 				throw new RessourceNotFoundException("Mission");
 			return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));

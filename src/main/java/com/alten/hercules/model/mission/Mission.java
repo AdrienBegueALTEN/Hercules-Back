@@ -46,12 +46,16 @@ public class Mission {
 	@Enumerated(EnumType.STRING)
 	private ESheetStatus sheetStatus;
 	
+	@JsonIgnore
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private Integer secret;
+	
 	public Mission() {}
 	
 	public Mission(Consultant consultant, Customer customer) {
-		this.consultant = consultant;
-		this.customer = customer;
-		this.sheetStatus = ESheetStatus.ON_WAITING;
+		setConsultant(consultant);
+		setCustomer(customer);
+		setSheetStatus(ESheetStatus.ON_WAITING);
 	}
 	
 	public Long getId() { return id; }
@@ -69,6 +73,11 @@ public class Mission {
 
 	public ESheetStatus getSheetStatus() { return sheetStatus; }
 	public void setSheetStatus(ESheetStatus sheetStatus) { this.sheetStatus = sheetStatus; }
+	
+	public int getSecret() { return secret; }
+	public void changeSecret() {
+		this.secret = (int)Math.floor(Math.random() * Math.floor(Integer.MAX_VALUE));
+	}
 	
 	@JsonGetter("consultant")
     private Long getConsultantId() {

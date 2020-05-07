@@ -47,6 +47,7 @@ public class AuthController {
 		try {
 			Mission mission = dal.findMissionById(missionId)
 					.orElseThrow(() -> new RessourceNotFoundException("mission"));
+			dal.changeMissionSecret(mission);
 			return ResponseEntity.ok(JwtUtils.generateJwt(mission));
 		} catch (RessourceNotFoundException e) {
 			return e.buildResponse();

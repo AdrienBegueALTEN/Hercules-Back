@@ -1,11 +1,15 @@
 package com.alten.hercules.security.jwt;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.AppUser;
@@ -15,18 +19,17 @@ import io.jsonwebtoken.*;
 public class JwtUtils {
 	
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-	private static final long USER_EXP = TimeUnit.DAYS.toMillis(1);
-	private static final long MISSION_EXP = TimeUnit.DAYS.toMillis(30);
-	private static final String SIGNATURE_KEY = "EAD8FA553516B3281E16D4F696A4C278C14E31F5A7E49";
-	private static final String ANONYMOUS_KEY = "anonymous";
+	private static final long USER_EXPIRATION = TimeUnit.HOURS.toMillis(12);
+	private static final long ANONYMOUS_EXPIRATION = TimeUnit.DAYS.toMillis(30);
+	private static final String USER_SIGNATURE = "E2DA29B2567D55BF33A313FA7964C";
+	private static final String ANONYMOUS_SIGNATURE = "7D56AACF33887F684376CA646A8E5";
 
 	public static String generateJwt(AppUser user) {
 		return Jwts.builder()
 				.setSubject(Long.toString(user.getId()))
 				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + USER_EXP))
-				.claim(ANONYMOUS_KEY, false)
-				.signWith(SignatureAlgorithm.HS512, SIGNATURE_KEY)
+				.setExpiration(new Date((new Date()).getTime() + USER_EXPIRATION))
+				.signWith(SignatureAlgorithm.HS512, USER_SIGNATURE)
 				.compact();
 	}
 	
@@ -34,20 +37,26 @@ public class JwtUtils {
 		return Jwts.builder()
 				.setSubject(Long.toString(mission.getId()))
 				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + MISSION_EXP))
-				.claim(ANONYMOUS_KEY, true)
-				.signWith(SignatureAlgorithm.HS512, SIGNATURE_KEY)
+				.setExpiration(new Date((new Date()).getTime() + ANONYMOUS_EXPIRATION))
+				.claim("secret", mission.getSecret())
+				.signWith(SignatureAlgorithm.HS512, ANONYMOUS_SIGNATURE)
 				.compact();
 	}
-
-	public static Long getSubjectFromJwt(String token) {
-		return Long.parseLong(Jwts.parser().setSigningKey(SIGNATURE_KEY).parseClaimsJws(token).getBody().getSubject());
+	
+	private static String getSignature(boolean anonymous) {
+		return anonymous ? ANONYMOUS_SIGNATURE : USER_SIGNATURE;
 	}
 
-	public static EJwtValidation validateJwt(String token) {
+	public static Optional<Claims> parseJwt(HttpServletRequest request, boolean anonymous) {
 		try {
-			Boolean anonymous = (Boolean)Jwts.parser().setSigningKey(SIGNATURE_KEY).parseClaimsJws(token).getBody().get(ANONYMOUS_KEY);
-			return anonymous ? EJwtValidation.ANONYMOUS : EJwtValidation.USER;
+			String headerAuth = request.getHeader("Authorization");
+			if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+				String token = headerAuth.substring(7, headerAuth.length());
+				return Optional.of(Jwts.parser()
+							.setSigningKey(getSignature(anonymous))
+							.parseClaimsJws(token)
+							.getBody());
+			}
 		} catch (SignatureException e) {
 			logger.error("Invalid JWT signature: {}", e.getMessage());
 		} catch (MalformedJwtException e) {
@@ -58,9 +67,7 @@ public class JwtUtils {
 			logger.error("JWT token is unsupported: {}", e.getMessage());
 		} catch (IllegalArgumentException e) {
 			logger.error("JWT claims string is empty: {}", e.getMessage());
-		} catch (ClassCastException e) {
-			logger.error("JWT claims malformed: {}", e.getMessage());
 		}
-		return EJwtValidation.INVALID;
+		return Optional.ofNullable(null);
 	}
 }

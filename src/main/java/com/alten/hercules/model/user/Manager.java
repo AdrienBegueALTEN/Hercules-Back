@@ -3,14 +3,11 @@ package com.alten.hercules.model.user;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alten.hercules.model.consultant.Consultant;
@@ -19,8 +16,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Manager extends AppUser {
-	@Transient
-	private static final long serialVersionUID = 1L;
 	
 	private boolean isAdmin = false;
 	
@@ -37,20 +32,18 @@ public class Manager extends AppUser {
 		super(email, password, firstname, lastname);
 		setAdmin(isAdmin);
 	}
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(ERole.MANAGER.name()));
-		if (isAdmin) authorities.add(new SimpleGrantedAuthority(ERole.ADMIN.name()));
-		
-		return authorities;
-	}
-
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
 	
 	public Set<Consultant> getConsultants() { return consultants; }
 	public void setConsultants(Set<Consultant> consultants) { this.consultants = consultants; }
+
+	@Override
+	public Collection<SimpleGrantedAuthority> getAuthorities() {
+		Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(EAuthorities.MANAGER.name()));
+		if (isAdmin) authorities.add(new SimpleGrantedAuthority(EAuthorities.ADMIN.name()));
+		return authorities;
+	}
 
 }

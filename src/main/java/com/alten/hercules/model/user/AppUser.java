@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
-import javax.persistence.Transient;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Inheritance
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class AppUser implements UserDetails {
-	@Transient
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

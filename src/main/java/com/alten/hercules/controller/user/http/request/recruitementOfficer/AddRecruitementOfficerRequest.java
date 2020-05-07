@@ -1,7 +1,7 @@
 package com.alten.hercules.controller.user.http.request.recruitementOfficer;
 
 import com.alten.hercules.controller.user.http.request.AddUserRequest;
-import com.alten.hercules.model.user.RecruitementOfficer;
+import com.alten.hercules.model.user.RecruitmentOfficer;
 
 public class AddRecruitementOfficerRequest extends AddUserRequest {
 	
@@ -10,8 +10,8 @@ public class AddRecruitementOfficerRequest extends AddUserRequest {
 	}
 
 	@Override
-	public RecruitementOfficer buildUser() {
-		return new RecruitementOfficer(email, password, firstname, lastname);
+	public RecruitmentOfficer buildUser() {
+		return new RecruitmentOfficer(email, password, firstname, lastname);
 	}
 
 }
