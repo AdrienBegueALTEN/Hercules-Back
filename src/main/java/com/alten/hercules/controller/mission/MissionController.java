@@ -1,6 +1,5 @@
 package com.alten.hercules.controller.mission;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -61,33 +60,21 @@ public class MissionController {
 	}
 	
 	@GetMapping("")
-	public ResponseEntity<?> getAll(@RequestParam boolean details)
-	{
-		return details ?
-				getAllExtended():
-					getAllReduced();
-			
+	public ResponseEntity<?> getAll(@RequestParam boolean details) {
+		return ResponseEntity.ok(details ? getAllExtended() : getAllReduced());
 	}
 	
-	public ResponseEntity<?> getAllReduced() {
-		List<BasicMissionResponse> missions = new ArrayList<>();
-		
-		dal.findAll().forEach((mission) -> {
-			missions.add(new BasicMissionResponse(mission)); });
-		
-		return ResponseEntity.ok(missions);
-		
-		
+	private List<BasicMissionResponse> getAllReduced() {
+		return dal.findAll().stream()
+				.map((mission) -> new BasicMissionResponse(mission))
+				.collect(Collectors.toList());
 	}
 	
-		public ResponseEntity<?> getAllExtended() {
-			List<MissionDetailsResponse> missions = new ArrayList<>();
-			dal.findAll().forEach((mission) -> {
-				missions.add(new MissionDetailsResponse(mission)); });
-			return ResponseEntity.ok(missions);
-			
-			
-		}
+	private List<MissionDetailsResponse> getAllExtended() {
+		return dal.findAll().stream()
+			.map((mission) -> new MissionDetailsResponse(mission))
+			.collect(Collectors.toList());
+	}
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
@@ -110,7 +97,7 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@PostMapping("/new-version/{id}")
+	@GetMapping("/new-version/{id}")
 	public ResponseEntity<?> newVersion(@PathVariable Long id) {
 		try {
 			Mission mission = dal.findById(id)
