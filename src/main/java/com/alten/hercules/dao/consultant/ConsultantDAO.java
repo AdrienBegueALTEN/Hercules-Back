@@ -1,8 +1,10 @@
 package com.alten.hercules.dao.consultant;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.alten.hercules.model.consultant.Consultant;
@@ -14,5 +16,7 @@ public interface ConsultantDAO extends JpaRepository<Consultant,Integer> {
 	public Iterable<Consultant> findByReleaseDateIsNull();
 	public Optional<Consultant> findById(Long id);
 	public Optional<Consultant> findByEmail(String email);
+	@Query(value="select * from consultant where release_date < (now() + interval '-5 year')", nativeQuery = true)
+	public List<Consultant> findReleasedConsultantFiveyears();
 	
 }
