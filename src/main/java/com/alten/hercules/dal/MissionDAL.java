@@ -49,6 +49,11 @@ public class MissionDAL {
 	public List<Mission> findAll() {
 		return missionDAO.findAll();
 	}
+
+	public void changeMissionSecret(Mission mission) {
+		mission.changeSecret();
+		missionDAO.save(mission);
+	}
 	
 	
 

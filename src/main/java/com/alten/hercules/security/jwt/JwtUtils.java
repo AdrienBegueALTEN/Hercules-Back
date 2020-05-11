@@ -18,7 +18,6 @@ import io.jsonwebtoken.*;
 @Component
 public class JwtUtils {
 	
-	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 	private static final long USER_EXPIRATION = TimeUnit.HOURS.toMillis(12);
 	private static final long ANONYMOUS_EXPIRATION = TimeUnit.DAYS.toMillis(30);
 	private static final String USER_SIGNATURE = "E2DA29B2567D55BF33A313FA7964C";
@@ -57,16 +56,8 @@ public class JwtUtils {
 							.parseClaimsJws(token)
 							.getBody());
 			}
-		} catch (SignatureException e) {
-			logger.error("Invalid JWT signature: {}", e.getMessage());
-		} catch (MalformedJwtException e) {
-			logger.error("Invalid JWT token: {}", e.getMessage());
-		} catch (ExpiredJwtException e) {
-			logger.error("JWT token is expired: {}", e.getMessage());
-		} catch (UnsupportedJwtException e) {
-			logger.error("JWT token is unsupported: {}", e.getMessage());
-		} catch (IllegalArgumentException e) {
-			logger.error("JWT claims string is empty: {}", e.getMessage());
+		} catch (Exception e) {
+			return Optional.ofNullable(null);
 		}
 		return Optional.ofNullable(null);
 	}

@@ -56,6 +56,7 @@ public class Mission {
 		setConsultant(consultant);
 		setCustomer(customer);
 		setSheetStatus(ESheetStatus.ON_WAITING);
+		changeSecret();
 	}
 	
 	public Long getId() { return id; }
