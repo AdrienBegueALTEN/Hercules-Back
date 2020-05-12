@@ -18,6 +18,9 @@ public class Project {
 	private Long id;
 	
 	@Column(nullable = true)
+	private String title;
+	
+	@Column(nullable = true)
 	@Length(max=1000)
 	private String description;
 	
@@ -34,11 +37,20 @@ public class Project {
 		super();
 	}
 
-	public Project(@Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate) {
+	public Project(String title, @Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate) {
 		super();
+		this.title = title;
 		this.description = description;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public Long getId() {
