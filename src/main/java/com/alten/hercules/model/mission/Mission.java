@@ -89,4 +89,9 @@ public class Mission {
     private Long getCustomerId() {
         return customer.getId();
     }
+
+	@JsonGetter("lastVersion")
+	public MissionSheet getLastVersion() {
+		return (MissionSheet) versions.toArray()[0];
+	}
 }

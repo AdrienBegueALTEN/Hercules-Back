@@ -6,7 +6,7 @@ import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public class BasicMissionDetailsResponse {
+public class RefinedMissionResponse {
 
 	@JsonIgnoreProperties(value = {"diplomas", "email", "experience", "id", "manager", "missions"})
 	private Consultant consultant;
@@ -15,18 +15,13 @@ public class BasicMissionDetailsResponse {
 	@JsonIgnoreProperties(value = {"comment", "versionDate"})
 	private MissionSheet lastVersion;
 	
-	public BasicMissionDetailsResponse(Mission mission) {
+	public RefinedMissionResponse(Mission mission) {
 		this.consultant = mission.getConsultant();
 		this.customer = mission.getCustomer();
-		this.lastVersion = (MissionSheet)mission.getVersions().toArray()[0];
+		this.lastVersion = mission.getLastVersion();
 	}
 	
 	public Consultant getConsultant() { return consultant; }
-	public void setConsultant(Consultant consultant) { this.consultant = consultant; }
-	
 	public Customer getCustomer() { return customer; }
-	public void setCustomer(Customer customer) { this.customer = customer; }
-	
 	public MissionSheet getLastVersion() { return lastVersion; }
-	public void setlastVersion(MissionSheet lastVersion) { this.lastVersion = lastVersion; }
 }

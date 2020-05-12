@@ -24,9 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
-import com.alten.hercules.controller.mission.http.response.BasicMissionDetailsResponse;
-import com.alten.hercules.controller.mission.http.response.BasicMissionResponse;
-import com.alten.hercules.controller.mission.http.response.MissionDetailsResponse;
+import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
+import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
@@ -64,29 +63,28 @@ public class MissionController {
 		try {
 			Mission mission = dal.findById(id).orElseThrow(() -> new RessourceNotFoundException("Mission"));
 			return ResponseEntity.ok(complete ? 
-					new MissionDetailsResponse(mission) :
-					new BasicMissionDetailsResponse(mission));
+					new CompleteMissionResponse(mission, true, true) :
+					new RefinedMissionResponse(mission));
 		} catch (RessourceNotFoundException e) {
 			return e.buildResponse();
 		}
 	}
 	
 	@GetMapping("")
-	public ResponseEntity<?> getAll(@RequestParam boolean details) {
-		return ResponseEntity.ok(details ? getAllExtended() : getAllReduced());
+	public ResponseEntity<?> getAll(@RequestParam Optional<Long> manager) {
+		List<CompleteMissionResponse> body;
+		if (manager.isEmpty()) {
+			body = dal.findAllValidated().stream()
+					.map(mission -> new CompleteMissionResponse(mission, false, false))
+					.collect(Collectors.toList());
+		} else {
+			body = dal.findAllByManager(manager.get()).stream()
+					.map(mission -> new CompleteMissionResponse(mission, false, true))
+					.collect(Collectors.toList());
+		}
+		return ResponseEntity.ok(body);
 	}
-	
-	private List<BasicMissionResponse> getAllReduced() {
-		return dal.findAll().stream()
-				.map((mission) -> new BasicMissionResponse(mission))
-				.collect(Collectors.toList());
-	}
-	
-	private List<MissionDetailsResponse> getAllExtended() {
-		return dal.findAll().stream()
-			.map((mission) -> new MissionDetailsResponse(mission))
-			.collect(Collectors.toList());
-	}
+
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
