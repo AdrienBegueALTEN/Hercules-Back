@@ -37,7 +37,7 @@ public class ConsultantResponse {
 					Map<String, Object> mappedDiploma = new HashMap<String, Object>();
 					mappedDiploma.put("id", diploma.getId());
 					mappedDiploma.put("city", diploma.getDiplomaLocation().getCity());
-					mappedDiploma.put("etablishment", diploma.getDiplomaLocation().getCity());
+					mappedDiploma.put("establishment", diploma.getDiplomaLocation().getSchool());
 					mappedDiploma.put("entitled", diploma.getDiplomaName().getName());
 					mappedDiploma.put("level", diploma.getDiplomaName().getLevel().getName());
 					mappedDiploma.put("year", diploma.getGraduationYear());
