@@ -42,7 +42,7 @@ public class RecruitementOfficerController {
 		
 		RecruitmentOfficer recruitementOfficer = request.buildUser();
 		recruitementOfficerDAO.save(recruitementOfficer);
-		URI location = URI.create(String.format("/recruitementOfficer/%s", recruitementOfficer.getId()));
+		URI location = URI.create(String.format("/recruitment-officer/%s", recruitementOfficer.getId()));
 		
 		return ResponseEntity.created(location).build();
 	}
