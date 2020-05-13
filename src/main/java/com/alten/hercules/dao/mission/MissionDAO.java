@@ -13,7 +13,7 @@ import com.alten.hercules.model.mission.Mission;
 public interface MissionDAO extends JpaRepository<Mission, Long> {
 	
 	static final String SQL_FIND_ALL = "SELECT * FROM mission WHERE "
-			+ "consultant_id IN (SELECT id FROM consultant WHERE manager_id=?1) "
+			+ "consultant_id IN (SELECT id FROM consultant WHERE manager_id=?1 OR sheet_status='VALIDATED') "
 			+ "ORDER BY CASE sheet_status "
 			+ "WHEN 'ON_WAITING' THEN 1 "
 			+ "WHEN 'ON_GOING' THEN 2 "

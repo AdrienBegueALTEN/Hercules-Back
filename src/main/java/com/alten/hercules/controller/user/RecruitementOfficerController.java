@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,8 +35,13 @@ public class RecruitementOfficerController {
 	@Autowired RecruitementOfficerDAO recruitementOfficerDAO;
 	@Autowired UserDAO userDAO;
 	
+	@GetMapping("")
+	public ResponseEntity<?> getAll() {
+		return ResponseEntity.ok(recruitementOfficerDAO.findAll());
+	}
+	
 	@PostMapping("")
-	public ResponseEntity<Object> addRecruitementOfficer(@Valid @RequestBody AddRecruitementOfficerRequest request) {
+	public ResponseEntity<?> addRecruitementOfficer(@Valid @RequestBody AddRecruitementOfficerRequest request) {
 
 		if (userDAO.existsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
