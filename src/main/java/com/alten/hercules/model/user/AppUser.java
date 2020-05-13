@@ -69,18 +69,23 @@ public abstract class AppUser implements UserDetails {
 	public Date getReleaseDate() { return releaseDate; }
 	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 
+	@JsonIgnore
 	@Override
 	public String getUsername() { return email; }
-
+	
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() { return true; }
 
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() { return true; }
 
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() { return true; }
 
+	@JsonIgnore
 	@Override
 	public boolean isEnabled() { return releaseDate == null; }
 	
