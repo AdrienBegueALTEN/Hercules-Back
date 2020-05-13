@@ -28,7 +28,7 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 @RestController
 @CrossOrigin(origins="*")
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/hercules/recruitementOfficer")
+@RequestMapping("/hercules/recruitment-officer")
 public class RecruitementOfficerController {
 	
 	@Autowired RecruitementOfficerDAO recruitementOfficerDAO;
