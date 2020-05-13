@@ -14,9 +14,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.alten.hercules.model.user.EAuthorities;
 import com.alten.hercules.security.jwt.AuthEntryPointJwt;
-import com.alten.hercules.security.jwt.UserTokenFilter;
 import com.alten.hercules.security.jwt.filter.AnonymousTokenFilter;
+import com.alten.hercules.security.jwt.filter.UserTokenFilter;
 import com.alten.hercules.service.AppUserDetailsService;
 
 @Configuration
@@ -57,14 +58,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable()
+		http.csrf().disable().cors().and()
 			.authorizeRequests()
 				.antMatchers("/hercules/auth/signin").permitAll()
-				.antMatchers("/hercules/missions/from-token").anonymous()
+				.antMatchers("/hercules/missions/from-token").hasAuthority(EAuthorities.ANONYMOUS.name())
 				.anyRequest().authenticated()
 			.and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
 			.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.addFilterBefore(anonymousTokenFilter(), AnonymousAuthenticationFilter.class);
-		http.addFilterBefore(userTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterAt(anonymousTokenFilter(), AnonymousAuthenticationFilter.class);
+		http.addFilterAt(userTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 }

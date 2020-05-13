@@ -18,14 +18,17 @@ public class Project {
 	private Long id;
 	
 	@Column(nullable = true)
+	private String title;
+	
+	@Column(nullable = true)
 	@Length(max=1000)
 	private String description;
 	
 	@Column(nullable = true)
-	private LocalDate beginDate;
+	private Date beginDate;
 	
 	@Column(nullable = true)
-	private LocalDate endDate;
+	private Date endDate;
 	
 	@Column(nullable = true)
 	private Date lastUpdate;
@@ -34,11 +37,20 @@ public class Project {
 		super();
 	}
 
-	public Project(@Length(max = 1000) String description, LocalDate beginDate, LocalDate endDate) {
+	public Project(String title, @Length(max = 1000) String description, Date beginDate, Date endDate) {
 		super();
+		this.title = title;
 		this.description = description;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public Long getId() {
@@ -57,19 +69,19 @@ public class Project {
 		this.description = description;
 	}
 
-	public LocalDate getBeginDate() {
+	public Date getBeginDate() {
 		return beginDate;
 	}
 
-	public void setBeginDate(LocalDate beginDate) {
+	public void setBeginDate(Date beginDate) {
 		this.beginDate = beginDate;
 	}
 
-	public LocalDate getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
 }

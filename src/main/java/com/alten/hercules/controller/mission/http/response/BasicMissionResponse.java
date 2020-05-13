@@ -13,9 +13,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 public class BasicMissionResponse {
 
-
 	private Long id;
-	@JsonIgnoreProperties(value = {"missions", "diplomas"})
+	@JsonIgnoreProperties(value = {"missions"})
 	private Consultant consultant;
 	@JsonIgnoreProperties(value = {"missions"})
 	private Customer customer;
@@ -31,18 +30,10 @@ public class BasicMissionResponse {
 	}
 	
 	public Consultant getConsultant() { return consultant; }
-	public void setConsultant(Consultant consultant) { this.consultant = consultant; }
-	
 	public Customer getCustomer() { return customer; }
-	public void setCustomer(Customer customer) { this.customer = customer; }
-
 	public Long getId() { return id; }
-	public void setId(Long id) { this.id = id; }
-
 	public ESheetStatus getSheetStatus() { return sheetStatus; }
-	public void setSheetStatus(ESheetStatus sheetStatus) { this.sheetStatus = sheetStatus; }
-	
 	public Set<MissionSheet> getVersions() { return versions; }
-	public void setVersions(Set<MissionSheet> versions) { this.versions = versions; }
+
 }
 

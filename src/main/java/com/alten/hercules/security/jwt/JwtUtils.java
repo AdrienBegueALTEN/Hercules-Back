@@ -6,8 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -18,11 +16,12 @@ import io.jsonwebtoken.*;
 @Component
 public class JwtUtils {
 	
-	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 	private static final long USER_EXPIRATION = TimeUnit.HOURS.toMillis(12);
 	private static final long ANONYMOUS_EXPIRATION = TimeUnit.DAYS.toMillis(30);
 	private static final String USER_SIGNATURE = "E2DA29B2567D55BF33A313FA7964C";
 	private static final String ANONYMOUS_SIGNATURE = "7D56AACF33887F684376CA646A8E5";
+	private static final String AUTHORIZATION_HEADER = "Authorization";
+	private static final String TOKEN_PREFIX = "Bearer ";
 
 	public static String generateJwt(AppUser user) {
 		return Jwts.builder()
@@ -49,25 +48,15 @@ public class JwtUtils {
 
 	public static Optional<Claims> parseJwt(HttpServletRequest request, boolean anonymous) {
 		try {
-			String headerAuth = request.getHeader("Authorization");
-			if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+			String headerAuth = request.getHeader(AUTHORIZATION_HEADER);
+			if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(TOKEN_PREFIX)) {
 				String token = headerAuth.substring(7, headerAuth.length());
 				return Optional.of(Jwts.parser()
 							.setSigningKey(getSignature(anonymous))
 							.parseClaimsJws(token)
 							.getBody());
 			}
-		} catch (SignatureException e) {
-			logger.error("Invalid JWT signature: {}", e.getMessage());
-		} catch (MalformedJwtException e) {
-			logger.error("Invalid JWT token: {}", e.getMessage());
-		} catch (ExpiredJwtException e) {
-			logger.error("JWT token is expired: {}", e.getMessage());
-		} catch (UnsupportedJwtException e) {
-			logger.error("JWT token is unsupported: {}", e.getMessage());
-		} catch (IllegalArgumentException e) {
-			logger.error("JWT claims string is empty: {}", e.getMessage());
-		}
+		} catch (Exception ignored) {}
 		return Optional.ofNullable(null);
 	}
 }

@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
-import com.alten.hercules.controller.mission.http.response.BasicMissionResponse;
-import com.alten.hercules.controller.mission.http.response.MissionDetailsResponse;
+import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
+import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
@@ -49,46 +49,42 @@ public class MissionController {
 	@Autowired private MissionDAL dal;
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getOne(@PathVariable Long id) {
-		try {
-			Optional<Mission> optMission = dal.findById(id);
-			if (optMission.isEmpty())
-				throw new RessourceNotFoundException("Mission");
-			return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));
-		} catch (RessourceNotFoundException e) {
-			return e.buildResponse();
-		}
+	public ResponseEntity<?> getMission(@PathVariable Long id) {
+		return getMissionDetails(id, true);
 	}
 	
 	@GetMapping("/from-token")
-	public ResponseEntity<?> getOneFromToken() {
-		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+	public ResponseEntity<?> getMissionFromToken() {
+		Long id = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		return getMissionDetails(id, false);
+	}
+	
+	private ResponseEntity<?> getMissionDetails(Long id, boolean complete) {
 		try {
-			Optional<Mission> optMission = dal.findById(missionId);
-			if (optMission.isEmpty())
-				throw new RessourceNotFoundException("Mission");
-			return ResponseEntity.ok(new MissionDetailsResponse(optMission.get()));
+			Mission mission = dal.findById(id).orElseThrow(() -> new RessourceNotFoundException("Mission"));
+			return ResponseEntity.ok(complete ? 
+					new CompleteMissionResponse(mission, true, true) :
+					new RefinedMissionResponse(mission));
 		} catch (RessourceNotFoundException e) {
 			return e.buildResponse();
 		}
 	}
 	
 	@GetMapping("")
-	public ResponseEntity<?> getAll(@RequestParam boolean details) {
-		return ResponseEntity.ok(details ? getAllExtended() : getAllReduced());
+	public ResponseEntity<?> getAll(@RequestParam Optional<Long> manager) {
+		List<CompleteMissionResponse> body;
+		if (manager.isEmpty()) {
+			body = dal.findAllValidated().stream()
+					.map(mission -> new CompleteMissionResponse(mission, false, false))
+					.collect(Collectors.toList());
+		} else {
+			body = dal.findAllByManager(manager.get()).stream()
+					.map(mission -> new CompleteMissionResponse(mission, false, true))
+					.collect(Collectors.toList());
+		}
+		return ResponseEntity.ok(body);
 	}
-	
-	private List<BasicMissionResponse> getAllReduced() {
-		return dal.findAll().stream()
-				.map((mission) -> new BasicMissionResponse(mission))
-				.collect(Collectors.toList());
-	}
-	
-	private List<MissionDetailsResponse> getAllExtended() {
-		return dal.findAll().stream()
-			.map((mission) -> new MissionDetailsResponse(mission))
-			.collect(Collectors.toList());
-	}
+
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
@@ -115,18 +111,19 @@ public class MissionController {
 	public ResponseEntity<?> newVersion(@PathVariable Long id) {
 		try {
 			Mission mission = dal.findById(id)
-					.orElseThrow(() -> new RessourceNotFoundException("mission"));
+					.orElseThrow(() -> new RessourceNotFoundException("Mission"));
 			
 			if (!mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
 				throw new UnvalidatedMissionSheetException();
 			
 			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id)
-					.orElseThrow(() -> new RessourceNotFoundException("mission sheet"));
+					.orElseThrow(() -> new RessourceNotFoundException("Sheet"));
 			
 			if (isToday(mostRecentVersion.getVersionDate()))
 				throw new AlreadyExistingVersionException();
 			
 			dal.saveSheet(new MissionSheet(mostRecentVersion, new Date()));
+			dal.changeMissionSecret(mission);
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -135,49 +132,63 @@ public class MissionController {
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
-	public ResponseEntity<?> updateMission(@Valid @RequestBody UpdateEntityRequest req) { 
+	public ResponseEntity<?> putMission(@Valid @RequestBody UpdateEntityRequest req) {
+		return updateMission(req.getId(), req.getFieldName(), req.getValue());
+	}
+	
+	@PutMapping("/from-token")
+	public ResponseEntity<?> putMissionFromToken(@RequestBody UpdateEntityRequest req) {
+		Long id = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		if (req.getFieldName() == null)
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.build();
+		return updateMission(id, req.getFieldName(), req.getValue());
+	}
+	
+	private ResponseEntity<?> updateMission(Long id, String key, Object value) {
 		try {
-			MissionSheet mostRecentVersion = dal.findMostRecentVersion(req.getId())
-					.orElseThrow(() -> new RessourceNotFoundException("mission sheet"));
+			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id)
+					.orElseThrow(() -> new RessourceNotFoundException("Sheet"));
 			
 			EMissionFieldname fieldname;
-			try { fieldname = EMissionFieldname.valueOf(req.getFieldName()); }
+			try { fieldname = EMissionFieldname.valueOf(key); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
 			switch(fieldname) {
 				case city :
-					mostRecentVersion.setCity((String)req.getValue());
+					mostRecentVersion.setCity((String)value);
 					break;
 				case comment :
-					mostRecentVersion.setComment((String)req.getValue());
+					mostRecentVersion.setComment((String)value);
 					break;
 				case consultantRole :
-					mostRecentVersion.setConsultantRole((String)req.getValue());
+					mostRecentVersion.setConsultantRole((String)value);
 					break;
 				case consultantStartXp :
-					mostRecentVersion.setConsultantStartXp((Integer)req.getValue());
+					mostRecentVersion.setConsultantStartXp((Integer)value);
 					break;
 				case contractType :
 					try { 
-						EContractType contractType = EContractType.valueOf((String)req.getValue());
+						EContractType contractType = EContractType.valueOf((String)value);
 						mostRecentVersion.setContractType(contractType);
 					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
 					break;
 				case country :
-					mostRecentVersion.setCountry((String)req.getValue());
+					mostRecentVersion.setCountry((String)value);
 					break;
 				case description :
-					mostRecentVersion.setDescription((String)req.getValue());
+					mostRecentVersion.setDescription((String)value);
 					break;
 				case teamSize :
-					mostRecentVersion.setTeamSize((Integer)req.getValue());
+					mostRecentVersion.setTeamSize((Integer)value);
 					break;
 				case title :
-					mostRecentVersion.setTitle((String)req.getValue());
+					mostRecentVersion.setTitle((String)value);
 					break;
 				default: throw new InvalidFieldnameException();
 			}
 			
-			Mission mission = dal.findById(req.getId()).get();
+			Mission mission = dal.findById(id).get();
 			if (mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)) {
 				mission.setSheetStatus(ESheetStatus.ON_GOING);
 				dal.save(mission);

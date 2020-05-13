@@ -3,21 +3,17 @@ package com.alten.hercules.security.jwt.filter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.EAuthorities;
@@ -25,14 +21,12 @@ import com.alten.hercules.security.jwt.JwtUtils;
 
 import io.jsonwebtoken.Claims;
 
-public class AnonymousTokenFilter extends OncePerRequestFilter {
-	
+public class AnonymousTokenFilter extends HttpFilter {
+
 	@Autowired private MissionDAO missionDao;
 
-	private static final Logger logger = LoggerFactory.getLogger(AnonymousTokenFilter.class);
-
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		try {
 			Claims claims = JwtUtils.parseJwt(request, true).orElseThrow();
 			Long missionId = Long.parseLong(claims.getSubject());
@@ -45,9 +39,7 @@ public class AnonymousTokenFilter extends OncePerRequestFilter {
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
-		} catch (Exception e) {
-			logger.error("Cannot set user authentication: {}", e);
-		}
+		} catch (Exception ignored) {}
 		filterChain.doFilter(request, response);
 	}
 }

@@ -11,6 +11,7 @@ import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.mission.MissionSheetDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 
@@ -46,8 +47,17 @@ public class MissionDAL {
 		return sheetDAO.findMostRecentVersion(missionId);
 	}
 	
-	public List<Mission> findAll() {
-		return missionDAO.findAll();
+	public List<Mission> findAllByManager(Long managerId) {
+		return missionDAO.findAllByManager(managerId);
+	}
+	
+	public List<Mission> findAllValidated() {
+		return missionDAO.findAllBySheetStatus(ESheetStatus.VALIDATED);
+	}
+
+	public void changeMissionSecret(Mission mission) {
+		mission.changeSecret();
+		missionDAO.save(mission);
 	}
 	
 	

@@ -56,6 +56,7 @@ public class Mission {
 		setConsultant(consultant);
 		setCustomer(customer);
 		setSheetStatus(ESheetStatus.ON_WAITING);
+		changeSecret();
 	}
 	
 	public Long getId() { return id; }
@@ -88,4 +89,9 @@ public class Mission {
     private Long getCustomerId() {
         return customer.getId();
     }
+
+	@JsonGetter("lastVersion")
+	public MissionSheet getLastVersion() {
+		return (MissionSheet) versions.toArray()[0];
+	}
 }

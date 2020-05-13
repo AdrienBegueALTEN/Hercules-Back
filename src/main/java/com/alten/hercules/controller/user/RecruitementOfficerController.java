@@ -28,7 +28,7 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 @RestController
 @CrossOrigin(origins="*")
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/hercules/recruitementOfficer")
+@RequestMapping("/hercules/recruitment-officer")
 public class RecruitementOfficerController {
 	
 	@Autowired RecruitementOfficerDAO recruitementOfficerDAO;
@@ -42,7 +42,7 @@ public class RecruitementOfficerController {
 		
 		RecruitmentOfficer recruitementOfficer = request.buildUser();
 		recruitementOfficerDAO.save(recruitementOfficer);
-		URI location = URI.create(String.format("/recruitementOfficer/%s", recruitementOfficer.getId()));
+		URI location = URI.create(String.format("/recruitment-officer/%s", recruitementOfficer.getId()));
 		
 		return ResponseEntity.created(location).build();
 	}
