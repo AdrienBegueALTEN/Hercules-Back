@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alten.hercules.model.consultant.Consultant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
@@ -32,12 +33,15 @@ public class Manager extends AppUser {
 		super(email, password, firstname, lastname);
 		setAdmin(isAdmin);
 	}
+	
+	@JsonIgnore
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
 	
 	public Set<Consultant> getConsultants() { return consultants; }
 	public void setConsultants(Set<Consultant> consultants) { this.consultants = consultants; }
 
+	@JsonIgnore
 	@Override
 	public Collection<SimpleGrantedAuthority> getAuthorities() {
 		Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();

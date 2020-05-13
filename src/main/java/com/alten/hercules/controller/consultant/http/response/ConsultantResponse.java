@@ -1,28 +1,28 @@
 package com.alten.hercules.controller.consultant.http.response;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.alten.hercules.model.consultant.Consultant;
+import com.alten.hercules.model.user.Manager;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ConsultantResponse {
-	
-	private Long id;
 
+	private Long id;
 	private String email;
-	
 	private String firstname;
-	
 	private String lastname;
-	
 	private int experience;
-	
 	private Date releaseDate;
-	
-	private Long manager;
-	
-	private List<Long> diplomas;
+	@JsonIgnoreProperties(value = {"consultants", "email"})
+	private Manager manager;
+	private List<Map<String, Object>> diplomas;
 	
 	public ConsultantResponse(Consultant consultant) {
 		this.id = consultant.getId();
@@ -31,35 +31,27 @@ public class ConsultantResponse {
 		this.lastname = consultant.getLastname();
 		this.experience = consultant.getExperience();
 		this.releaseDate = consultant.getReleaseDate();
-		this.manager = consultant.getManager().getId();
-		this.diplomas = new ArrayList<>();
-		consultant.getDiplomas().forEach((diploma) -> { this.diplomas.add(diploma.getId());});
+		this.manager = consultant.getManager();
+		this.diplomas = consultant.getDiplomas().stream()
+				.map(diploma -> {
+					Map<String, Object> mappedDiploma = new HashMap<String, Object>();
+					mappedDiploma.put("id", diploma.getId());
+					mappedDiploma.put("city", diploma.getDiplomaLocation().getCity());
+					mappedDiploma.put("etablishment", diploma.getDiplomaLocation().getCity());
+					mappedDiploma.put("entitled", diploma.getDiplomaName().getName());
+					mappedDiploma.put("level", diploma.getDiplomaName().getLevel().getName());
+					mappedDiploma.put("year", diploma.getGraduationYear());
+					return mappedDiploma;
+					})
+				.collect(Collectors.toList());
 	}
-
+	
 	public Long getId() { return id; }
-	public void setId(Long id) { this.id = id; }
-
 	public String getEmail() { return email; }
-	public void setEmail(String email) { this.email = email; }
-
 	public String getFirstname() { return firstname; }
-	public void setFirstname(String firstname) { this.firstname = firstname; }
-
 	public String getLastname() { return lastname; }
-	public void setLastname(String lastname) { this.lastname = lastname; }
-
 	public int getExperience() { return experience; }
-	public void setExperience(int experience) { this.experience = experience; }
-
 	public Date getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
-
-	public Long getManager() { return manager; }
-	public void setManager(Long manager) { this.manager = manager; }
-
-	public List<Long> getDiplomas() { return diplomas; }
-	public void setDiplomas(List<Long> diplomas) { this.diplomas = diplomas; }
-
-
-
+	public Manager getManager() { return manager; }
+	public List<Map<String, Object>> getDiplomas() { return diplomas; }
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.consultant.http.request.AddConsultantRequest;
+import com.alten.hercules.controller.consultant.http.response.ConsultantResponse;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
@@ -53,7 +54,7 @@ public class ConsultantController {
 		try {
 			Consultant consultant = dal.findById(id)
 					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
-			return ResponseEntity.ok(consultant);
+			return ResponseEntity.ok(new ConsultantResponse(consultant));
 		} catch (RessourceNotFoundException e) {
 			return ResponseEntity
 					.status(HttpStatus.NOT_FOUND)

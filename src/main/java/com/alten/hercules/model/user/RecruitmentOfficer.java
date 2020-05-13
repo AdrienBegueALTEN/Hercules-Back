@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
@@ -18,6 +19,7 @@ public class RecruitmentOfficer extends AppUser {
 		super(email, password, firstname, lastname);
 	}
 
+	@JsonIgnore
 	@Override
 	public Collection<SimpleGrantedAuthority> getAuthorities() {
 		Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
