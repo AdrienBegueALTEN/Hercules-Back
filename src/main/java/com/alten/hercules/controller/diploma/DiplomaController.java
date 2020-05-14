@@ -21,14 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.diploma.http.request.DeleteDiplomaRequest;
 import com.alten.hercules.controller.diploma.http.request.DiplomaRequest;
 import com.alten.hercules.dao.diploma.DiplomaDAO;
-import com.alten.hercules.dao.diploma.DiplomaLocationDAO;
-import com.alten.hercules.dao.diploma.DiplomaNameDAO;
-import com.alten.hercules.dao.diploma.LevelDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.diploma.Diploma;
-import com.alten.hercules.model.diploma.DiplomaLocation;
-import com.alten.hercules.model.diploma.DiplomaName;
-import com.alten.hercules.model.diploma.Level;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -37,15 +31,6 @@ public class DiplomaController {
 	
 	@Autowired
 	private DiplomaDAO diplomaDAO;
-	
-	@Autowired
-	private DiplomaLocationDAO diplomaLocationDAO;
-	
-	@Autowired
-	private DiplomaNameDAO diplomaNameDAO;
-	
-	@Autowired
-	private LevelDAO levelDAO;
 	
 	/**
 	 * Save a new diploma in the database. 
@@ -60,7 +45,7 @@ public class DiplomaController {
 	@PostMapping
 	public ResponseEntity<?> addDiploma(@RequestBody DiplomaRequest diplomaRequest) {
 		
-		String name = (diplomaRequest.getDiplomaName()==null)?"":diplomaRequest.getDiplomaName();
+		/*String name = (diplomaRequest.getDiplomaName()==null)?"":diplomaRequest.getDiplomaName();
 		String city = (diplomaRequest.getGraduationCity()==null)?"":diplomaRequest.getGraduationCity();
 		String levelName = (diplomaRequest.getLevelName()==null)?"":diplomaRequest.getLevelName();
 		String school = (diplomaRequest.getSchool()==null)?"":diplomaRequest.getSchool();
@@ -85,7 +70,8 @@ public class DiplomaController {
 		if(diplomaRequest.getConsultantId()!=null)
 			this.diplomaDAO.insertConsultantDiplomas(diplomaRequest.getConsultantId(), diploma.getId());
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(diploma.getId());
+		return ResponseEntity.status(HttpStatus.CREATED).body(diploma.getId());*/
+		return null;
 	}
 	
 	/**
@@ -114,7 +100,7 @@ public class DiplomaController {
 	 */
 	@PutMapping
 	public ResponseEntity<?> updateDiploma(@RequestBody DiplomaRequest diplomaRequest) {
-		if(diplomaRequest.getId()==null) {
+		/*if(diplomaRequest.getId()==null) {
 			return ResponseEntity.noContent().build();
 		}
 		
@@ -161,13 +147,8 @@ public class DiplomaController {
 		}
 					
 		
-		return new ResponseEntity<>(HttpStatus.OK);
-		
-	}
-	
-	@GetMapping
-	public List<Diploma> getAll(){
-		return this.diplomaDAO.findAll();
+		return new ResponseEntity<>(HttpStatus.OK);*/
+		return null;
 	}
 	
 	/**

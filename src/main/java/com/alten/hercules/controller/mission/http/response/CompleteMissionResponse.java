@@ -2,7 +2,7 @@ package com.alten.hercules.controller.mission.http.response;
 
 import java.util.Set;
 
-import com.alten.hercules.model.consultant.Consultant;
+import com.alten.hercules.controller.consultant.http.response.ConsultantResponse;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class CompleteMissionResponse {
 
 	@JsonIgnoreProperties(value = {"missions"})
-	private Consultant consultant;
+	private ConsultantResponse consultant;
 	@JsonIgnoreProperties(value = {"missions"})
 	private Customer customer;
 	private Long id;
@@ -24,14 +24,14 @@ public class CompleteMissionResponse {
 	
 	public CompleteMissionResponse(Mission mission, boolean allVersions, boolean sheetStatus) {
 		this.id = mission.getId();
-		this.consultant = mission.getConsultant();
+		this.consultant = new ConsultantResponse(mission.getConsultant());
 		this.customer = mission.getCustomer();
 		if (allVersions) this.versions = mission.getVersions();
 		else this.lastVersion = mission.getLastVersion();
 		if (sheetStatus) this.sheetStatus = mission.getSheetStatus();
 	}
 	
-	public Consultant getConsultant() { return consultant; }
+	public ConsultantResponse getConsultant() { return consultant; }
 	public Customer getCustomer() { return customer; }
 	public Long getId() { return id; }
 	public MissionSheet getLastVersion() {return lastVersion; }
