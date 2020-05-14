@@ -131,4 +131,12 @@ public class Consultant {
 			manager.put("releaseDate", this.manager.getReleaseDate());
         return manager;
     }
+
+	public void addDiploma(Diploma diploma) {
+		diplomas.add(diploma);
+	}
+	
+	public void removeDiplome(Diploma diploma) {
+		diplomas.remove(diploma);
+	}
 }

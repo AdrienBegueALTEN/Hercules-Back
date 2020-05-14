@@ -1,6 +1,6 @@
-INSERT INTO DIPLOMA(entitled, etablishment, level, year) VALUES('Ingénieur informatique imagerie', 'UTBM Belfort', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA(entitled, etablishment, level, year) VALUES('Ingénieur informatique', 'Polytech Nancy', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA(entitled, etablishment, level, year) VALUES('Master Ingénierie Système & Logiciel', 'UFR ST Besançon', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur informatique imagerie', 'UTBM Belfort', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur informatique', 'Polytech Nancy', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Master Ingénierie Système & Logiciel', 'UFR ST Besançon', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
 
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'Admin', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', true) ON CONFLICT DO NOTHING;
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'manager.manager@alten.com', 'Manager', 'Manager', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', false) ON CONFLICT DO NOTHING;

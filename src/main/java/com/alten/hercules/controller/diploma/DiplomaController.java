@@ -1,28 +1,21 @@
 package com.alten.hercules.controller.diploma;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.controller.diploma.http.request.DeleteDiplomaRequest;
-import com.alten.hercules.controller.diploma.http.request.DiplomaRequest;
-import com.alten.hercules.dao.diploma.DiplomaDAO;
+import com.alten.hercules.controller.diploma.http.request.AddDiplomaRequest;
+import com.alten.hercules.dal.DiplomaDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.exception.RessourceNotFoundException;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -30,48 +23,19 @@ import com.alten.hercules.model.diploma.Diploma;
 public class DiplomaController {
 	
 	@Autowired
-	private DiplomaDAO diplomaDAO;
+	private DiplomaDAL dal;
 	
-	/**
-	 * Save a new diploma in the database. 
-	 * 
-	 * 
-	 * @param diplomaRequest
-	 * @return
-	 * NO CONTENT if request is not complete<br>
-	 * CONFLICT if diploma can be already found<br>
-	 * OK if created
-	 */
 	@PostMapping
-	public ResponseEntity<?> addDiploma(@RequestBody DiplomaRequest diplomaRequest) {
-		
-		/*String name = (diplomaRequest.getDiplomaName()==null)?"":diplomaRequest.getDiplomaName();
-		String city = (diplomaRequest.getGraduationCity()==null)?"":diplomaRequest.getGraduationCity();
-		String levelName = (diplomaRequest.getLevelName()==null)?"":diplomaRequest.getLevelName();
-		String school = (diplomaRequest.getSchool()==null)?"":diplomaRequest.getSchool();
-		int year = diplomaRequest.getGraduationYear();
-		
-		if(year < 1900)
-			return new ResponseEntity(HttpStatus.BAD_REQUEST);
-		
-		
-		Level level = new Level(levelName);
-		level = this.levelDAO.save(level);
-		
-		DiplomaName diplomaName = new DiplomaName(name, level);
-		diplomaName = this.diplomaNameDAO.save(diplomaName);
-		
-		DiplomaLocation diplomaLocation = new DiplomaLocation(city, school);
-		diplomaLocation = this.diplomaLocationDAO.save(diplomaLocation);
-		
-		Diploma diploma = new Diploma(diplomaRequest.getGraduationYear(),diplomaLocation, diplomaName);
-		diploma = this.diplomaDAO.save(diploma);
-		
-		if(diplomaRequest.getConsultantId()!=null)
-			this.diplomaDAO.insertConsultantDiplomas(diplomaRequest.getConsultantId(), diploma.getId());
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(diploma.getId());*/
-		return null;
+	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
+		try {
+			Consultant consultant = dal.findConsultantById(request.getConsultant())
+					.orElseThrow(() -> new RessourceNotFoundException("Consultant"));
+			Diploma diploma = request.buildDiploma();
+			dal.save(diploma);
+			consultant.addDiploma(diploma);
+			dal.saveConsultant(consultant);
+			return ResponseEntity.ok(diploma.getId());
+		} catch (RessourceNotFoundException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -99,7 +63,7 @@ public class DiplomaController {
 	 * OK after entities are updated
 	 */
 	@PutMapping
-	public ResponseEntity<?> updateDiploma(@RequestBody DiplomaRequest diplomaRequest) {
+	public ResponseEntity<?> updateDiploma(@RequestBody AddDiplomaRequest diplomaRequest) {
 		/*if(diplomaRequest.getId()==null) {
 			return ResponseEntity.noContent().build();
 		}
@@ -159,7 +123,7 @@ public class DiplomaController {
 	 * NOT FOUND if none is found with the given id<br>
 	 * OK if found
 	 */
-	@GetMapping("/{id}")
+	/*@GetMapping("/{id}")
 	public ResponseEntity<?> getByid(@PathVariable Long id) {
 		if(!this.diplomaDAO.findById(id).isPresent())
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -179,7 +143,7 @@ public class DiplomaController {
 		this.diplomaDAO.delete(d);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
+	}*/
 	
 
 }
