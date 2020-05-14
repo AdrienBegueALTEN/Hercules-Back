@@ -3,6 +3,7 @@ package com.alten.hercules.controller.project;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -19,11 +20,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
+import com.alten.hercules.controller.project.http.request.ProjectRequest;
+import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.dao.project.ProjectDAO;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
+import com.alten.hercules.model.mission.Mission;
+import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.response.MsgResponse;
@@ -36,6 +41,8 @@ public class ProjectController {
 	@Autowired
 	ProjectDAO projectDAO;
 	
+	@Autowired
+	MissionDAL missionDAL;
 	
 	@GetMapping("{id}")
 	public ResponseEntity<?> get(@PathVariable Long id) {
@@ -45,10 +52,25 @@ public class ProjectController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> addProject(){
-		Project project = new Project();
-		this.projectDAO.save(project);
-		return ResponseEntity.ok(project);
+	public ResponseEntity<?> addProject(@Valid @RequestBody ProjectRequest req ){
+		try {
+			MissionSheet ms = this.missionDAL.findMostRecentVersion(req.getMissionId())
+					.orElseThrow(() -> new RessourceNotFoundException("project"));
+			if(ms.getProjects().size()<5) {
+				Project project = new Project();
+				this.projectDAO.save(project);
+				ms.getProjects().add(project);
+				this.missionDAL.saveSheet(ms);
+				return ResponseEntity.ok(project);
+			}
+			else {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+		} catch (RessourceNotFoundException e) {
+			// TODO Auto-generated catch block
+			return e.buildResponse();
+		}
+		
 	}
 	
 	@PutMapping
@@ -91,8 +113,6 @@ public class ProjectController {
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
 		}
-		
-		
 	}
 
 }
