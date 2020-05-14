@@ -1,18 +1,6 @@
-INSERT INTO LEVEL(name) VALUES('Ingénieur') ON CONFLICT DO NOTHING;
-INSERT INTO LEVEL(name) VALUES('Ingénieur') ON CONFLICT DO NOTHING;
-INSERT INTO LEVEL(name) VALUES('Master') ON CONFLICT DO NOTHING;
-
-INSERT INTO DIPLOMA_NAME(name,level_id) VALUES('Ingénieur informatique imagerie',1) ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA_NAME(name,level_id) VALUES('Ingénieur informatique',2) ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA_NAME(name,level_id) VALUES('Master informatique',3) ON CONFLICT DO NOTHING;
-
-INSERT INTO DIPLOMA_LOCATION(city,school) VALUES('Belfort','UTBM') ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA_LOCATION(city,school) VALUES('Nancy','Polytech Nancy') ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA_LOCATION(city,school) VALUES('Besançon','UFR Besançon') ON CONFLICT DO NOTHING;
-
-INSERT INTO DIPLOMA(graduation_year,diploma_location_id,diploma_name_id) VALUES(2020,1,1) ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA(graduation_year,diploma_location_id,diploma_name_id) VALUES(2020,2,2)  ON CONFLICT DO NOTHING;
-INSERT INTO DIPLOMA(graduation_year,diploma_location_id,diploma_name_id) VALUES(2020,3,3)  ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, etablishment, level, year) VALUES('Ingénieur informatique imagerie', 'UTBM Belfort', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, etablishment, level, year) VALUES('Ingénieur informatique', 'Polytech Nancy', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, etablishment, level, year) VALUES('Master Ingénierie Système & Logiciel', 'UFR ST Besançon', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
 
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'Admin', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', true) ON CONFLICT DO NOTHING;
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'manager.manager@alten.com', 'Manager', 'Manager', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', false) ON CONFLICT DO NOTHING;
