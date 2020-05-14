@@ -61,7 +61,8 @@ public class MissionController {
 	
 	private ResponseEntity<?> getMissionDetails(Long id, boolean complete) {
 		try {
-			Mission mission = dal.findById(id).orElseThrow(() -> new RessourceNotFoundException("Mission"));
+			Mission mission = dal.findById(id)
+					.orElseThrow(() -> new RessourceNotFoundException("Mission"));
 			return ResponseEntity.ok(complete ? 
 					new CompleteMissionResponse(mission, true, true) :
 					new RefinedMissionResponse(mission));
@@ -90,13 +91,11 @@ public class MissionController {
 	@PostMapping
 	public ResponseEntity<?> addMission(@Valid @RequestBody AddMissionRequest req) {
 		try {
-			Optional<Consultant> optConsultant = dal.findConsultantById(req.getConsultant());
-			if (optConsultant.isEmpty())
-				throw new RessourceNotFoundException("Consultant");
-			Optional<Customer> optCustomer = dal.findCustomerById(req.getCustomer());
-			if (optCustomer.isEmpty())
-				throw new RessourceNotFoundException("Customer");
-			Mission mission = new Mission(optConsultant.get(), optCustomer.get());
+			Consultant consultant = dal.findConsultantById(req.getConsultant())
+					.orElseThrow(() -> new RessourceNotFoundException("Consultant"));
+			Customer customer = dal.findCustomerById(req.getCustomer())
+					.orElseThrow(() -> new RessourceNotFoundException("Customer"));
+			Mission mission = new Mission(consultant, customer);
 			MissionSheet v0 = new MissionSheet(mission);
 			dal.save(mission);
 			dal.saveSheet(v0);

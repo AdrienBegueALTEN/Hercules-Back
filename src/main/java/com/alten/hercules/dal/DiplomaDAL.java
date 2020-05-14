@@ -31,4 +31,8 @@ public class DiplomaDAL {
 	public Consultant saveConsultant(Consultant consultant) {
 		return consultantDAO.save(consultant);
 	}
+
+	public Optional<Diploma> findById(Long id) {
+		return diplomaDAO.findById(id);
+	}
 }
