@@ -13,7 +13,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -53,10 +52,10 @@ public class Consultant {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Manager manager;
 	
-	@ManyToMany
+	@OneToMany(fetch = FetchType.LAZY)
 	private Set<Diploma> diplomas;
 	
-	@OneToMany(mappedBy="consultant")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="consultant")
 	private Set<Mission> missions;
 	
 	public Consultant() { super(); }
@@ -131,4 +130,12 @@ public class Consultant {
 			manager.put("releaseDate", this.manager.getReleaseDate());
         return manager;
     }
+
+	public void addDiploma(Diploma diploma) {
+		diplomas.add(diploma);
+	}
+	
+	public void removeDiploma(Diploma diploma) {
+		diplomas.remove(diploma);
+	}
 }
