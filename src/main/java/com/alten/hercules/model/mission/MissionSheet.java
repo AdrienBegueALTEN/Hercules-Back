@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.validation.constraints.Min;
 
 import com.alten.hercules.model.exception.InvalidValueException;
@@ -54,6 +55,7 @@ public class MissionSheet {
 	@ManyToOne
 	private Mission mission;
 	
+	@OrderBy("title")
 	@OneToMany
 	private Set<Project> projects = new HashSet<>();
 	
