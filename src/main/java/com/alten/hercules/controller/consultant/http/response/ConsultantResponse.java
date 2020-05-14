@@ -9,19 +9,12 @@ import com.alten.hercules.model.consultant.Consultant;
 public class ConsultantResponse {
 	
 	private Long id;
-
 	private String email;
-	
 	private String firstname;
-	
 	private String lastname;
-	
 	private int experience;
-	
 	private Date releaseDate;
-	
 	private Long manager;
-	
 	private List<Long> diplomas;
 	
 	public ConsultantResponse(Consultant consultant) {
