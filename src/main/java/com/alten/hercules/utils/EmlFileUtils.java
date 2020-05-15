@@ -73,7 +73,7 @@ public class EmlFileUtils {
 				"_" +
 				mission.getConsultant().getLastname() +
 				"_" +
-				mission.getCustomer().getName()).toLowerCase();
+				customer).toLowerCase();
 		return genereateEmlFile(from, to, subject, body, fileName);
 	}
 	
