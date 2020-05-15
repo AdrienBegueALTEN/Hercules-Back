@@ -55,7 +55,7 @@ public class MissionSheet {
 	@ManyToOne
 	private Mission mission;
 	
-	@OrderBy("title")
+	@OrderBy("beginDate")
 	@OneToMany
 	private Set<Project> projects = new HashSet<>();
 	
