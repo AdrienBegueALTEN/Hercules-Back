@@ -1,4 +1,4 @@
-package com.alten.hercules;
+package com.alten.hercules.utils;
 
 public final class StrUtils {
 	

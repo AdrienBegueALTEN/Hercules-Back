@@ -1,5 +1,10 @@
 package com.alten.hercules.controller.mission;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +14,10 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,12 +42,13 @@ import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
-import com.alten.hercules.model.exception.UnvalidatedMissionSheetException;
+import com.alten.hercules.model.exception.InvalidSheetStatusException;
 import com.alten.hercules.model.mission.EContractType;
 import com.alten.hercules.model.mission.EMissionFieldname;
 import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
+import com.alten.hercules.utils.EmlFileUtils;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -113,7 +122,7 @@ public class MissionController {
 					.orElseThrow(() -> new RessourceNotFoundException("Mission"));
 			
 			if (!mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
-				throw new UnvalidatedMissionSheetException();
+				throw new InvalidSheetStatusException();
 			
 			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id)
 					.orElseThrow(() -> new RessourceNotFoundException("Sheet"));
@@ -200,6 +209,43 @@ public class MissionController {
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
 		}
+	}
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@GetMapping("generate-email/{id}")
+	public ResponseEntity<?> getAnonymousTokenForMission(@PathVariable Long id) {
+		File file = null;
+		ResponseEntity<?> response = null;
+		try {
+			Mission mission = dal.findById(id)
+					.orElseThrow(() -> new RessourceNotFoundException("Mission"));
+			if (mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
+				throw new InvalidSheetStatusException();
+			file = EmlFileUtils.genereateEmlFile(mission).orElseThrow();
+			response = buildEmlFileResponse(file);
+		} catch (ResponseEntityException e) {
+			response = e.buildResponse();
+		} catch (IOException e) {
+			response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		} finally {
+			if (file != null) file.delete();
+		}
+		return response;		
+	}
+	
+	private ResponseEntity<ByteArrayResource> buildEmlFileResponse(File file) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+		Path path = Paths.get(file.getAbsolutePath());
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(file.length())
+	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+	            .body(resource);
 	}
 	
 	private boolean isToday(Date date) {

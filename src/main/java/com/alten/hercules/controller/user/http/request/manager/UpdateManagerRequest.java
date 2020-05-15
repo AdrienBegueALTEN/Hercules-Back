@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import com.alten.hercules.consts.UserConst;
+import com.alten.hercules.consts.AppConst;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class UpdateManagerRequest {
@@ -13,7 +13,7 @@ public class UpdateManagerRequest {
 	@NotNull
 	private Long id;
 	
-	@Pattern(regexp = UserConst.EMAIL_PATTERN, message = UserConst.EMAIL_PATTERN_MSG)
+	@Pattern(regexp = AppConst.EMAIL_PATTERN)
 	private String email;
 	
 	private String password;

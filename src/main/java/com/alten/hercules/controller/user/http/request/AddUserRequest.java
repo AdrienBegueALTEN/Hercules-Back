@@ -3,13 +3,13 @@ package com.alten.hercules.controller.user.http.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import com.alten.hercules.consts.UserConst;
+import com.alten.hercules.consts.AppConst;
 import com.alten.hercules.model.user.AppUser;
 
 public abstract class AddUserRequest {
 
 	@NotNull
-	@Pattern(regexp = UserConst.EMAIL_PATTERN, message = UserConst.EMAIL_PATTERN_MSG)
+	@Pattern(regexp = AppConst.EMAIL_PATTERN)
 	protected String email;
 	
 	@NotNull

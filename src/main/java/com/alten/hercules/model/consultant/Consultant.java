@@ -16,11 +16,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.alten.hercules.StrUtils;
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
+import com.alten.hercules.utils.StrUtils;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
