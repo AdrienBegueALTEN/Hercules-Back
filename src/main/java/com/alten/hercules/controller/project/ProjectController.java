@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.project.http.request.ProjectRequest;
+import com.alten.hercules.controller.project.http.request.RemoveProjectRequest;
 import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.dao.project.ProjectDAO;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
@@ -78,7 +80,7 @@ public class ProjectController {
 		Project project;
 		try {
 			project = this.projectDAO.findById(req.getId())
-					.orElseThrow(() -> new RessourceNotFoundException("project"));
+					.orElseThrow(() -> new RessourceNotFoundException("missionsheet"));
 			EProjectFieldname fieldName;
 			try { fieldName = EProjectFieldname.valueOf(req.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
@@ -113,6 +115,25 @@ public class ProjectController {
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
 		}
+	}
+	
+	@DeleteMapping
+	public ResponseEntity<?> deleteProject(@RequestBody RemoveProjectRequest req) {
+		try {
+			MissionSheet ms = this.missionDAL.findMostRecentVersion(req.getMissionId())
+					.orElseThrow(() -> new RessourceNotFoundException("missionsheet"));
+			Project p = this.projectDAO.findById(req.getProjectId())
+					.orElseThrow(() -> new RessourceNotFoundException("project"));
+			
+			if(!ms.getProjects().contains(p)) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			this.missionDAL.deleteProjetFromSheet(ms, p);
+			return ResponseEntity.ok().build();
+		} catch (RessourceNotFoundException e) {
+			return e.buildResponse();
+		}
+		
 	}
 
 }
