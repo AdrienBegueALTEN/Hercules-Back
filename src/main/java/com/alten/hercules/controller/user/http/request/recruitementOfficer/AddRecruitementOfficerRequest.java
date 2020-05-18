@@ -11,7 +11,7 @@ public class AddRecruitementOfficerRequest extends AddUserRequest {
 
 	@Override
 	public RecruitmentOfficer buildUser() {
-		return new RecruitmentOfficer(email, password, firstname, lastname);
+		return new RecruitmentOfficer(email, firstname, lastname);
 	}
 
 }

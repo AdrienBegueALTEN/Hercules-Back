@@ -4,4 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.alten.hercules.model.user.RecruitmentOfficer;
 
-public interface RecruitementOfficerDAO extends JpaRepository<RecruitmentOfficer, Long>  {}
+public interface RecruitementOfficerDAO extends JpaRepository<RecruitmentOfficer, Long>  {
+	
+	
+	
+	
+}

@@ -29,7 +29,7 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 @RestController
 @CrossOrigin(origins="*")
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/hercules/recruitment-officer")
+@RequestMapping("/hercules/recruitment-officers")
 public class RecruitementOfficerController {
 	
 	@Autowired RecruitementOfficerDAO recruitementOfficerDAO;
@@ -46,11 +46,11 @@ public class RecruitementOfficerController {
 		if (userDAO.existsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
 		
-		RecruitmentOfficer recruitementOfficer = request.buildUser();
-		recruitementOfficerDAO.save(recruitementOfficer);
-		URI location = URI.create(String.format("/recruitment-officer/%s", recruitementOfficer.getId()));
+		RecruitmentOfficer recruitmentOfficer = request.buildUser();
+		recruitementOfficerDAO.save(recruitmentOfficer);
 		
-		return ResponseEntity.created(location).build();
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(recruitmentOfficer.getId());
 	}
 	 
 	@PutMapping("")
