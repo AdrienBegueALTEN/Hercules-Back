@@ -212,7 +212,7 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@GetMapping("generate-email/{id}")
+	@GetMapping("email-access/{id}")
 	public ResponseEntity<?> getAnonymousTokenForMission(@PathVariable Long id) {
 		File file = null;
 		ResponseEntity<?> response = null;
