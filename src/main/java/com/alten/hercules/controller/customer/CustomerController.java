@@ -1,15 +1,21 @@
 package com.alten.hercules.controller.customer;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +33,7 @@ import com.alten.hercules.controller.customer.http.request.AddCustomerRequest;
 import com.alten.hercules.controller.customer.http.response.BasicCustomerResponse;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.service.IStoreImage;
+import com.alten.hercules.service.StoreImage;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -38,7 +44,7 @@ public class CustomerController {
 	private CustomerDAO dao;
 
 	@Autowired
-	private IStoreImage storeImage;
+	private StoreImage storeImage;
 
 	@GetMapping("")
 	public ResponseEntity<Object> getAllCustomer(@RequestParam(required = false) Boolean basic) {
@@ -136,5 +142,30 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
 		}
 	}
+	
+	@GetMapping("/downloadFile/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+        // Load file as Resource
+        Resource resource = storeImage.loadFileAsResource(fileName);
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+        	System.err.println(ex);
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+	
 
 }
