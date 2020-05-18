@@ -1,11 +1,11 @@
-package com.alten.hercules.controller.user.http.request.recruitementOfficer;
+package com.alten.hercules.controller.user.http.request.recruitmentOfficer;
 
 import com.alten.hercules.controller.user.http.request.AddUserRequest;
 import com.alten.hercules.model.user.RecruitmentOfficer;
 
-public class AddRecruitementOfficerRequest extends AddUserRequest {
+public class AddRecruitmentOfficerRequest extends AddUserRequest {
 	
-	public AddRecruitementOfficerRequest(String email, String password, String firstname, String lastname) {
+	public AddRecruitmentOfficerRequest(String email, String password, String firstname, String lastname) {
 		super(email, password, firstname, lastname);
 	}
 

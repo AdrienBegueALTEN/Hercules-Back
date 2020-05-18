@@ -1,4 +1,4 @@
-package com.alten.hercules.controller.user.http.request.recruitementOfficer;
+package com.alten.hercules.controller.user.http.request.recruitmentOfficer;
 
 import java.util.Date;
 
@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.UserConst;
 
-public class UpdateRecruitementOfficerRequest {
+public class UpdateRecruitmentOfficerRequest {
 	
 	@NotNull
 	private Long id;
@@ -23,7 +23,7 @@ public class UpdateRecruitementOfficerRequest {
 	
 	private Date releaseDate;
 	
-	public UpdateRecruitementOfficerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate) {
+	public UpdateRecruitmentOfficerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
