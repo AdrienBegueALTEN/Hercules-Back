@@ -60,8 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().cors().and()
 			.authorizeRequests()
-				.antMatchers("/hercules/auth/signin").permitAll()
-				.antMatchers("/hercules/customers/downloadFile/**").permitAll()
+				.antMatchers("/hercules/auth/signin", "/hercules/customers/downloadFile/**").permitAll()
 				.antMatchers("/hercules/missions/from-token").hasAuthority(EAuthorities.ANONYMOUS.name())
 				.anyRequest().authenticated()
 			.and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)

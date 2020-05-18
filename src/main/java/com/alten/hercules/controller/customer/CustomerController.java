@@ -33,6 +33,7 @@ import com.alten.hercules.controller.customer.http.request.AddCustomerRequest;
 import com.alten.hercules.controller.customer.http.response.BasicCustomerResponse;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.exception.RessourceNotFoundException;
 import com.alten.hercules.service.StoreImage;
 
 @CrossOrigin(origins = "*")
@@ -125,21 +126,18 @@ public class CustomerController {
 
 	@PostMapping("/{id}/upload-logo")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
-		String message = "";
 		try {
-			Optional<Customer> optCustomer = dao.findById(id);
-			if (!optCustomer.isPresent())
-				return ResponseEntity.notFound().build();
-			Customer c = optCustomer.get();
+			Customer customer = dao.findById(id).orElseThrow(() -> new RessourceNotFoundException("customer"));
+			if(customer.getLogo()!=null) {
+				this.storeImage.delete("img/"+customer.getLogo());
+				customer.setLogo(null);
+			}
 			storeImage.save(file);
-			c.setLogo(file.getOriginalFilename());
-			this.dao.save(c);
-			message = "Uploaded the file successfully: " + file.getOriginalFilename();
-			return ResponseEntity.status(HttpStatus.OK).body(message);
+			customer.setLogo(file.getOriginalFilename());
+			this.dao.save(customer);
+			return ResponseEntity.status(HttpStatus.OK).build();
 		} catch (Exception e) {
-			message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-			System.out.println(e);
-			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 		}
 	}
 	

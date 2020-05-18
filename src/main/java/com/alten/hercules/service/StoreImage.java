@@ -1,5 +1,6 @@
 package com.alten.hercules.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -18,7 +19,9 @@ public class StoreImage{
 
 	public void save(MultipartFile file) {
 		try {
-			Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
+			Path path = this.root.resolve(file.getOriginalFilename());
+			if(!Files.exists(path))
+				Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
