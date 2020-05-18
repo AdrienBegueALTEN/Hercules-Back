@@ -52,26 +52,6 @@ public class ConsultantController {
 				ResponseEntity.ok(dal.findAllEnabled()) :
 				ResponseEntity.ok(dal.findAll());
 	}
-	
-	@PreAuthorize("hasAuthority('MANAGER')")
-	@PutMapping("/rgpd")
-	public ResponseEntity<?> setConsultantRgpd() {
-		for(Consultant c : this.dal.findReleasedConsultantFiveyears()) {
-			String fname = c.getFirstname();
-			String lname = c.getLastname();
-			try {
-				String f1 = fname.substring(0, 1);
-				String l1 = lname.substring(0, 1);
-				c.setFirstname(f1);
-				c.setLastname(l1);
-				this.dal.save(c);
-			} catch (InvalidValueException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return ResponseEntity.ok().build();
-	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Long id) {
