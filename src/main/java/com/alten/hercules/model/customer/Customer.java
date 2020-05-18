@@ -29,7 +29,7 @@ public class Customer {
 	@Column(length = 1000)
 	private String description = null;
 	
-	private byte[] logo = null;
+	private String logo = null;
 	
 	@OneToMany(mappedBy="customer")
 	private Set<Mission> missions;
@@ -43,7 +43,7 @@ public class Customer {
 	}
 
 
-	public Customer(long id, String activitySector, String description, String name, byte[] logo) {
+	public Customer(long id, String activitySector, String description, String name, String logo) {
 		super();
 		this.id = id;
 		this.activitySector = activitySector;
@@ -64,8 +64,8 @@ public class Customer {
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 
-	public byte[] getLogo() { return logo; }
-	public void setLogo(byte[] logo) { this.logo = logo; }
+	public String getLogo() { return logo; }
+	public void setLogo(String logo) { this.logo = logo; }
 	
 	public Set<Mission> getMissions() { return missions; }
 	public void setMissions(Set<Mission> missions) { this.missions = missions; }
