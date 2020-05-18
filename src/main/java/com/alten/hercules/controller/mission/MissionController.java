@@ -131,7 +131,9 @@ public class MissionController {
 				throw new AlreadyExistingVersionException();
 			
 			dal.saveSheet(new MissionSheet(mostRecentVersion, new Date()));
-			dal.changeMissionSecret(mission);
+			mission.changeSecret();
+			mission.setSheetStatus(ESheetStatus.ON_WAITING);
+			dal.save(mission);
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -158,6 +160,7 @@ public class MissionController {
 		try {
 			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id)
 					.orElseThrow(() -> new RessourceNotFoundException("Sheet"));
+			Mission mission = dal.findById(id).get();
 			
 			EMissionFieldname fieldname;
 			try { fieldname = EMissionFieldname.valueOf(key); }
@@ -187,6 +190,16 @@ public class MissionController {
 				case description :
 					mostRecentVersion.setDescription((String)value);
 					break;
+				case sheetStatus :
+					try { 
+						ESheetStatus status = ESheetStatus.valueOf((String)value);
+						if (!status.equals(ESheetStatus.VALIDATED))
+							throw new InvalidValueException();
+						if (mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
+							throw new InvalidSheetStatusException();
+						mission.setSheetStatus(status);
+					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
+					return ResponseEntity.ok().build(); 
 				case teamSize :
 					mostRecentVersion.setTeamSize((Integer)value);
 					break;
@@ -196,7 +209,6 @@ public class MissionController {
 				default: throw new InvalidFieldnameException();
 			}
 			
-			Mission mission = dal.findById(id).get();
 			if (mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)) {
 				mission.setSheetStatus(ESheetStatus.ON_GOING);
 				dal.save(mission);
