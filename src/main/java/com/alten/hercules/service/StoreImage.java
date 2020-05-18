@@ -13,20 +13,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class StoreImage{
+public class StoreImage {
 
 	private final Path root = Paths.get("img");
+
+	public void init() {
+		try {
+			if(!Files.exists(this.root))
+				Files.createDirectory(root);
+		} catch (IOException e) {
+			throw new RuntimeException("Could not initialize folder for upload!");
+		}
+	}
 
 	public void save(MultipartFile file) {
 		try {
 			Path path = this.root.resolve(file.getOriginalFilename());
-			if(!Files.exists(path))
+			if (!Files.exists(path))
 				Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
 	}
-	
+
 	public boolean delete(String path) {
 		try {
 			return Files.deleteIfExists(Paths.get(path));
@@ -34,18 +43,17 @@ public class StoreImage{
 			throw new RuntimeException("Could not delete the file. Error: " + e.getMessage());
 		}
 	}
-	
-	public Resource loadFileAsResource(String fileName) {
-        try {
-            Path filePath = this.root.resolve(fileName).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-            if(resource.exists()) 
-                return resource;
-        } catch (MalformedURLException ex) {
-        	System.err.println(ex);
-        }
-        return null;
-    }
 
+	public Resource loadFileAsResource(String fileName) {
+		try {
+			Path filePath = this.root.resolve(fileName).normalize();
+			Resource resource = new UrlResource(filePath.toUri());
+			if (resource.exists())
+				return resource;
+		} catch (MalformedURLException ex) {
+			System.err.println(ex);
+		}
+		return null;
+	}
 
 }
