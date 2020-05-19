@@ -15,8 +15,11 @@ public class RecruitmentOfficer extends AppUser {
 
 	public RecruitmentOfficer() { super(); }
 	
-	public RecruitmentOfficer(String email, String password, String firstname, String lastname) {
-		super(email, password, firstname, lastname);
+	public RecruitmentOfficer(String email, String firstname, String lastname) {
+		setEmail(email);
+		setFirstname(firstname);
+		setLastname(lastname);
+		setReleaseDate(null);
 	}
 
 	@JsonIgnore

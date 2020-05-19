@@ -12,7 +12,7 @@ public abstract class AddUserRequest {
 	@Pattern(regexp = AppConst.EMAIL_PATTERN)
 	protected String email;
 	
-	@NotNull
+	
 	protected String password;
 	
 	@NotNull
