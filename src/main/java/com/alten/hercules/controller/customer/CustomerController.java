@@ -132,7 +132,7 @@ public class CustomerController {
 				this.storeImage.delete("img/"+customer.getLogo());
 				customer.setLogo(null);
 			}
-			storeImage.save(file);
+			storeImage.save(file,"logo");
 			customer.setLogo(file.getOriginalFilename());
 			this.dao.save(customer);
 			return ResponseEntity.status(HttpStatus.OK).build();
@@ -141,10 +141,10 @@ public class CustomerController {
 		}
 	}
 	
-	@GetMapping("/downloadFile/{fileName:.+}")
+	@GetMapping("/logo/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
-        Resource resource = storeImage.loadFileAsResource(fileName);
+        Resource resource = storeImage.loadFileAsResource(fileName,"logo");
 
         // Try to determine file's content type
         String contentType = null;
@@ -152,11 +152,8 @@ public class CustomerController {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
         	System.err.println(ex);
-        }
-
-        // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
+        } catch (NullPointerException npe) {
+        	contentType = "application/octet-stream";
         }
 
         return ResponseEntity.ok()

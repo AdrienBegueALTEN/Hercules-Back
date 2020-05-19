@@ -25,6 +25,7 @@ public class MainApp implements CommandLineRunner  {
 
 	@Override
 	public void run(String... arg) throws Exception {
+		this.storeImage.deleteAll();
 		this.storeImage.init();
 	}
 

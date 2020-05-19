@@ -10,25 +10,42 @@ import java.nio.file.Paths;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class StoreImage {
 
-	private final Path root = Paths.get("img");
+	private final Path rootLogo = Paths.get("img/logo");
+	private final Path rootProj = Paths.get("img/proj");
 
 	public void init() {
 		try {
-			if(!Files.exists(this.root))
-				Files.createDirectory(root);
+			if(!Files.exists(this.rootLogo))
+				Files.createDirectories(rootLogo);
+			if(!Files.exists(this.rootProj))
+				Files.createDirectories(rootProj);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not initialize folder for upload!");
 		}
 	}
+	
+	public void deleteAll() {
+	    FileSystemUtils.deleteRecursively(this.rootLogo.toFile());
+	    FileSystemUtils.deleteRecursively(this.rootProj.toFile());
+	}
 
-	public void save(MultipartFile file) {
+	public void save(MultipartFile file, String type) {
 		try {
-			Path path = this.root.resolve(file.getOriginalFilename());
+			Path path = null;
+			switch(type) {
+			case "logo":
+				path = this.rootLogo.resolve(file.getOriginalFilename());
+				break;
+			case "project":
+				path = this.rootProj.resolve(file.getOriginalFilename());
+				break;
+			}
 			if (!Files.exists(path))
 				Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
@@ -44,9 +61,17 @@ public class StoreImage {
 		}
 	}
 
-	public Resource loadFileAsResource(String fileName) {
+	public Resource loadFileAsResource(String fileName, String type) {
 		try {
-			Path filePath = this.root.resolve(fileName).normalize();
+			Path filePath = null;
+			switch(type) {
+			case "logo":
+				filePath = this.rootLogo.resolve(fileName).normalize();
+				break;
+			case "project":
+				filePath = this.rootProj.resolve(fileName).normalize();
+				break;
+			}
 			Resource resource = new UrlResource(filePath.toUri());
 			if (resource.exists())
 				return resource;
