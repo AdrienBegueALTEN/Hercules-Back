@@ -129,7 +129,7 @@ public class CustomerController {
 		try {
 			Customer customer = dao.findById(id).orElseThrow(() -> new RessourceNotFoundException("customer"));
 			if(customer.getLogo()!=null) {
-				this.storeImage.delete("img/"+customer.getLogo());
+				this.storeImage.delete("img/logo/"+customer.getLogo());
 				customer.setLogo(null);
 			}
 			storeImage.save(file,"logo");

@@ -32,17 +32,21 @@ public class Project {
 	
 	@Column(nullable = true)
 	private Date lastUpdate;
-
+	
+	@Column(nullable = true)
+	private String picture;
+	
 	public Project() {
 		super();
 	}
 
-	public Project(String title, @Length(max = 1000) String description, Date beginDate, Date endDate) {
+	public Project(String title, @Length(max = 1000) String description, Date beginDate, Date endDate, String picture) {
 		super();
 		this.title = title;
 		this.description = description;
 		this.beginDate = beginDate;
 		this.endDate = endDate;
+		this.picture = picture;
 	}
 
 	public String getTitle() {
@@ -83,5 +87,13 @@ public class Project {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
 	}
 }

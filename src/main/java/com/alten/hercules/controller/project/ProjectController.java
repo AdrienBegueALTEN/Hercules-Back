@@ -1,14 +1,16 @@
 package com.alten.hercules.controller.project;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Optional;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.project.http.request.ProjectRequest;
@@ -29,11 +33,11 @@ import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.RessourceNotFoundException;
-import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.response.MsgResponse;
+import com.alten.hercules.service.StoreImage;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -45,6 +49,9 @@ public class ProjectController {
 	
 	@Autowired
 	MissionDAL missionDAL;
+	
+	@Autowired
+	StoreImage storeImage;
 	
 	@GetMapping("{id}")
 	public ResponseEntity<?> get(@PathVariable Long id) {
@@ -135,5 +142,43 @@ public class ProjectController {
 		}
 		
 	}
+	
+	@PostMapping("/{id}/upload-picture")
+	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
+		try {
+			Project proj = this.projectDAO.findById(id).orElseThrow(() -> new RessourceNotFoundException("project"));
+			if(proj.getPicture()!=null) {
+				this.storeImage.delete("img/proj/"+proj.getPicture());
+				proj.setPicture(null);
+			}
+			storeImage.save(file,"project");
+			proj.setPicture(file.getOriginalFilename());
+			this.projectDAO.save(proj);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+		}
+	}
+	
+	@GetMapping("/picture/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+        // Load file as Resource
+        Resource resource = storeImage.loadFileAsResource(fileName,"project");
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+        	System.err.println(ex);
+        } catch (NullPointerException npe) {
+        	contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 
 }

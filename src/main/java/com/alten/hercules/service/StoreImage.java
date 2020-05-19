@@ -49,6 +49,7 @@ public class StoreImage {
 			if (!Files.exists(path))
 				Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
+			System.out.println(e.getClass());
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
 	}
