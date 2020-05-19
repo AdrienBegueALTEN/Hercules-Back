@@ -109,7 +109,7 @@ public class CustomerController {
 		Customer customer = optCustomer.get();
 		if (!customer.getMissions().isEmpty())
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
-
+		this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
 		dao.delete(customer);
 		return ResponseEntity.ok().build();
 	}

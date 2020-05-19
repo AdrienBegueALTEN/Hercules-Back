@@ -13,10 +13,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
 import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
@@ -54,6 +58,7 @@ import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
+import com.alten.hercules.service.StoreImage;
 import com.alten.hercules.utils.EmlFileUtils;
 
 @RestController
@@ -62,6 +67,7 @@ import com.alten.hercules.utils.EmlFileUtils;
 public class MissionController {
 
 	@Autowired private MissionDAL dal;
+	@Autowired private StoreImage storeImage;
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getMission(@PathVariable Long id) {
@@ -359,6 +365,7 @@ public class MissionController {
 			if (project.getMissionSheet().getMission().isValidated())
 				throw new InvalidSheetStatusException();
 			checkIfProjectOfLastVersion(project);
+			this.storeImage.delete(StoreImage.PROJECT_FOLDER+project.getPicture());
 			dal.removeProject(project);
 			return ResponseEntity.ok().build();
 		} catch (ResponseEntityException e) {
@@ -401,4 +408,48 @@ public class MissionController {
 		return todayCalendar.get(Calendar.DAY_OF_YEAR) == lastVersionCalendar.get(Calendar.DAY_OF_YEAR) 
 				&& todayCalendar.get(Calendar.YEAR) == lastVersionCalendar.get(Calendar.YEAR);
 	}
+	
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PostMapping("/projects/{id}/upload-picture")
+	public ResponseEntity<?> uploadLogoManager(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
+		return this.uploadLogo(file, id);
+	}
+	
+	private ResponseEntity<?> uploadLogo(MultipartFile file, Long id){
+		try {
+			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if(proj.getPicture()!=null) {
+				this.storeImage.delete("img/proj/"+proj.getPicture());
+				proj.setPicture(null);
+			}
+			storeImage.save(file,"project");
+			proj.setPicture(file.getOriginalFilename());
+			this.dal.saveProject(proj);
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+		}
+	}
+	
+	@GetMapping("/projects/picture/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+        // Load file as Resource
+        Resource resource = storeImage.loadFileAsResource(fileName,"project");
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+        	System.err.println(ex);
+        } catch (NullPointerException npe) {
+        	contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 }
