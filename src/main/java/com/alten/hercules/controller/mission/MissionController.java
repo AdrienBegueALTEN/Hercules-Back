@@ -245,15 +245,24 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@GetMapping("/new-project/{id}")
-	public ResponseEntity<?> newProject(@PathVariable Long missionId) {
+	@GetMapping("/new-project/{missionId}")
+	public ResponseEntity<?> getNewProject(@PathVariable Long missionId) {
+		return newProject(missionId);
+	}
+	
+	@PreAuthorize("hasAuthority('ANONYMOUS')")
+	@GetMapping("/new-project-from-token")
+	public ResponseEntity<?> getNewProjectFromToken() {
+		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		return newProject(missionId);
+	}
+	
+	private ResponseEntity<?> newProject(Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
 					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-			System.err.println("mission");
 			if (mission.isValidated())
 				throw new InvalidSheetStatusException();
-			System.err.println("invalide");
 			MissionSheet lastVersion = mission.getLastVersion();
 			if (!(lastVersion.getProjects().size() < 5))
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -266,32 +275,48 @@ public class MissionController {
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("projects")
-	public ResponseEntity<?> updateProject(@Valid @RequestBody UpdateEntityRequest request){
+	public ResponseEntity<?> putProject(@Valid @RequestBody UpdateEntityRequest req) {
+		return updateProject(req.getId(), req.getFieldName(), req.getValue());
+	}
+	
+	@PreAuthorize("hasAuthority('ANONYMOUS')")
+	@PutMapping("projects/from-token")
+	public ResponseEntity<?> putProjectFromToken(@RequestBody UpdateEntityRequest req) {
+		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		if (req.getFieldName() == null)
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.build();
+		return updateProject(missionId, req.getFieldName(), req.getValue());
+	}
+	
+	private ResponseEntity<?> updateProject(Long id, String key, Object value){
 		try {
-			Project project = dal.findProjectById(request.getId())
+			Project project = dal.findProjectById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if (project.getMissionSheet().getMission().isValidated())
 				throw new InvalidSheetStatusException();
 			checkIfProjectOfLastVersion(project);
 			EProjectFieldname fieldName;
-			try { fieldName = EProjectFieldname.valueOf(request.getFieldName()); }
+			try { fieldName = EProjectFieldname.valueOf(key); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
 			switch(fieldName) {
 			case title:
-				project.setTitle((String)request.getValue());
+				project.setTitle((String)value);
 				break;
 			case description:
-				project.setDescription((String)request.getValue());
+				project.setDescription((String)value);
 				break;
 			case beginDate:
-				project.setBeginDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
+				project.setBeginDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)value));
 				break;
 			case endDate:
-				project.setEndDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
+				project.setEndDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)value));
 				break;
 			default: 
 				throw new InvalidFieldnameException();
 			}
+			updateSheetStatus(project.getMissionSheet().getMission());
 			dal.saveProject(project);
 			return ResponseEntity.ok(null);
 		} catch (ResponseEntityException e) { 
@@ -304,6 +329,25 @@ public class MissionController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("projects/{id}")
 	public ResponseEntity<?> deleteProject(@PathVariable Long id) {
+		return projectDeletion(id);
+	}
+	
+	@PreAuthorize("hasAuthority('ANONYMOUS')")
+	@DeleteMapping("projects/from-token/{id}")
+	public ResponseEntity<?> deleteProjectFromToken(@PathVariable Long projectId) {
+		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		try {
+			Project project = dal.findProjectById(projectId)
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+		return projectDeletion(projectId);
+	}
+	
+	private ResponseEntity<?> projectDeletion(Long id) {
 		try {
 			Project project = dal.findProjectById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
