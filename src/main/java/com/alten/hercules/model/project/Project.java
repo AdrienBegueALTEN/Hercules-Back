@@ -38,6 +38,10 @@ public class Project {
 	
 	public Project() {}
 	
+	public Project(MissionSheet missionSheet) {
+		this.missionSheet = missionSheet;
+	}
+	
 	public Project(Project project, MissionSheet missionSheet) {
 		setTitle(project.getTitle());
 		setDescription(project.getDescription());

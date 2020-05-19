@@ -266,7 +266,8 @@ public class MissionController {
 			MissionSheet lastVersion = mission.getLastVersion();
 			if (!(lastVersion.getProjects().size() < 5))
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-			dal.addProjectForSheet(lastVersion, new Project());
+			Project newProject = new Project(lastVersion);
+			dal.addProjectForSheet(lastVersion, newProject);
 			return ResponseEntity.ok(null);
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -291,7 +292,7 @@ public class MissionController {
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
 		}
-		return updateProject(missionId, req.getFieldName(), req.getValue());
+		return updateProject(req.getId(), req.getFieldName(), req.getValue());
 	}
 	
 	private ResponseEntity<?> updateProject(Long id, String key, Object value){
@@ -366,7 +367,7 @@ public class MissionController {
 	}
 	
 	private void checkIfProjectOfLastVersion(Project project) throws NotLastVersionException {
-		if (!project.getMissionSheet().getMission().getLastVersion().equals(project.getMissionSheet()))
+		if (project.getMissionSheet().getMission().getLastVersion().getId() != project.getMissionSheet().getId())
 			throw new NotLastVersionException();
 	}
 	
