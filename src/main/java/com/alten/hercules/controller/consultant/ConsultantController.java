@@ -21,16 +21,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.consultant.http.request.AddConsultantRequest;
+import com.alten.hercules.controller.consultant.http.request.AddDiplomaRequest;
+import com.alten.hercules.controller.consultant.http.request.RemoveDiplomaRequest;
 import com.alten.hercules.controller.consultant.http.response.ConsultantResponse;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.consultant.EConsultantFieldname;
+import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.diploma.EDiplomaFieldname;
 import com.alten.hercules.model.exception.EntityDeletionException;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.ResponseEntityException;
-import com.alten.hercules.model.exception.RessourceNotFoundException;
+import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.Manager;
 
@@ -48,34 +52,14 @@ public class ConsultantController {
 				ResponseEntity.ok(dal.findAllEnabled()) :
 				ResponseEntity.ok(dal.findAll());
 	}
-	
-	@PreAuthorize("hasAuthority('MANAGER')")
-	@PutMapping("/rgpd")
-	public ResponseEntity<?> setConsultantRgpd() {
-		for(Consultant c : this.dal.findReleasedConsultantFiveyears()) {
-			String fname = c.getFirstname();
-			String lname = c.getLastname();
-			try {
-				String f1 = fname.substring(0, 1);
-				String l1 = lname.substring(0, 1);
-				c.setFirstname(f1);
-				c.setLastname(l1);
-				this.dal.save(c);
-			} catch (InvalidValueException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return ResponseEntity.ok().build();
-	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Long id) {
 		try {
 			Consultant consultant = dal.findById(id)
-					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException("consultant"));
 			return ResponseEntity.ok(new ConsultantResponse(consultant));
-		} catch (RessourceNotFoundException e) {
+		} catch (ResourceNotFoundException e) {
 			return ResponseEntity
 					.status(HttpStatus.NOT_FOUND)
 					.body(e.getMessage());
@@ -94,7 +78,7 @@ public class ConsultantController {
 			if (!dal.emailIsAvailable(req.getEmail()))
 				throw new UnavailableEmailException();
 			Manager manager = dal.findEnabledManager(req.getManager())
-					.orElseThrow(() -> new RessourceNotFoundException("manager"));
+					.orElseThrow(() -> new ResourceNotFoundException("manager"));
 			Consultant consultant = new Consultant(req.getEmail(), req.getFirstname(), req.getLastname(), manager);
 			dal.save(consultant);
 			return ResponseEntity
@@ -110,7 +94,7 @@ public class ConsultantController {
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
 		try {
 			Consultant consultant = dal.findById(id)
-				.orElseThrow(() -> new RessourceNotFoundException("consultant"));
+				.orElseThrow(() -> new ResourceNotFoundException("consultant"));
 			if (!consultant.getMissions().isEmpty())
 				throw new EntityDeletionException("The consultant is linked to one or more missions.");
 			dal.delete(consultant);
@@ -127,7 +111,7 @@ public class ConsultantController {
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
 		try {
 			Consultant consultant = dal.findById(req.getId())
-					.orElseThrow(() -> new RessourceNotFoundException("consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException("consultant"));
 			EConsultantFieldname fieldName;
 			try { fieldName = EConsultantFieldname.valueOf(req.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
@@ -151,7 +135,7 @@ public class ConsultantController {
 					if(req.getValue() instanceof Integer || req.getValue() instanceof Long) {
 						int id = (Integer)req.getValue();
 						Manager manager = dal.findEnabledManager(Long.valueOf(id))
-							.orElseThrow(() -> new RessourceNotFoundException("manager"));
+							.orElseThrow(() -> new ResourceNotFoundException("manager"));
 						consultant.setManager(manager);
 					}
 					else
@@ -173,5 +157,64 @@ public class ConsultantController {
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
 		}
+	}
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PutMapping("add-diploma")
+	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
+		try {
+			Consultant consultant = dal.findById(request.getConsultant())
+					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
+			Diploma diploma = dal.addDiplomaForConsultant(request.buildDiploma(), consultant);
+			return ResponseEntity.ok(diploma.getId());
+		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
+	}
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PutMapping("update-diploma")
+	public ResponseEntity<?> updateDiploma(@Valid @RequestBody UpdateEntityRequest request) {
+		try {
+			if (request.getValue() == null)
+				throw new InvalidValueException();
+			Diploma diploma = dal.findDiplomaById(request.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("Diploma"));
+			EDiplomaFieldname fieldName;
+			try { fieldName = EDiplomaFieldname.valueOf(request.getFieldName()); }
+			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
+			switch (fieldName) {
+			case entitled:
+				diploma.setEntitled((String)request.getValue());
+				break;
+			case establishment:
+				diploma.setEstablishment((String)request.getValue());
+				break;
+			case level:
+				diploma.setLevel((String)request.getValue());
+				break;
+			case year:
+				diploma.setYear((Integer)request.getValue());
+				break;
+			default: throw new InvalidFieldnameException();
+			}
+			dal.saveDiploma(diploma);
+			return ResponseEntity.ok(null);
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
+		} catch (ClassCastException e) {
+			return new InvalidValueException().buildResponse();
+		}
+	}
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PutMapping("remove-diploma")
+	public ResponseEntity<?> removeDiploma(@Valid @RequestBody RemoveDiplomaRequest request){
+		try {
+			Diploma diploma = dal.findDiplomaById(request.getDiploma())
+					.orElseThrow(() -> new ResourceNotFoundException("Diploma"));
+			Consultant consultant = dal.findById(request.getConsultant())
+					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
+			dal.removeDiplomaForConsultant(diploma, consultant);
+			return ResponseEntity.ok(null);
+		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
 	}
 }

@@ -9,11 +9,14 @@ import com.alten.hercules.dao.consultant.ConsultantDAO;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.mission.MissionSheetDAO;
+import com.alten.hercules.dao.project.ProjectDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
+import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
+import com.alten.hercules.model.project.Project;
 
 @Service
 public class MissionDAL {
@@ -22,6 +25,7 @@ public class MissionDAL {
 	@Autowired private MissionSheetDAO sheetDAO;
 	@Autowired private ConsultantDAO consultantDAO;
 	@Autowired private CustomerDAO customerDAO;
+	@Autowired private ProjectDAO projectDAO;
 	
 	public Optional<Mission> findById(Long id) {
 		return missionDAO.findById(id);
@@ -39,9 +43,14 @@ public class MissionDAL {
 		missionDAO.save(mission);
 	}
 	
-	public void saveSheet(MissionSheet sheet) {
-		sheetDAO.save(sheet);
+	public MissionSheet saveSheet(MissionSheet sheet) {
+		return sheetDAO.save(sheet);
 	}
+	
+	public void saveProject(Project project) {
+		projectDAO.save(project);
+	}
+
 
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
 		return sheetDAO.findMostRecentVersion(missionId);
@@ -60,6 +69,21 @@ public class MissionDAL {
 		missionDAO.save(mission);
 	}
 	
+	public void removeProject(Project project) throws ResourceNotFoundException {
+		MissionSheet sheet = project.getMissionSheet();
+		sheet.removeProject(project);
+		sheetDAO.save(sheet);
+		projectDAO.delete(project);
+	}
+
+	public void addProjectForSheet(MissionSheet sheet, Project project) throws ResourceNotFoundException {
+		project = projectDAO.save(project);
+		sheet.addProject(project);
+		sheetDAO.save(sheet);
+	}
 	
+	public Optional<Project> findProjectById(Long id) {
+		return projectDAO.findById(id);
+	}
 
 }

@@ -1,6 +1,5 @@
 package com.alten.hercules.model.project;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -8,7 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import org.hibernate.validator.constraints.Length;
+import javax.persistence.ManyToOne;
+
+import com.alten.hercules.model.exception.InvalidValueException;
+import com.alten.hercules.model.mission.MissionSheet;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Project {
@@ -17,71 +20,46 @@ public class Project {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(nullable = true)
-	private String title;
+	@JsonIgnore
+	@ManyToOne
+	private MissionSheet missionSheet;
+
+	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
+	private String title = "";
+	
+	@Column(nullable = false, columnDefinition = "VARCHAR(1000) default ''")
+	private String description = "";
 	
 	@Column(nullable = true)
-	@Length(max=1000)
-	private String description;
+	private Date beginDate = null;
 	
 	@Column(nullable = true)
-	private Date beginDate;
+	private Date endDate = null;
 	
-	@Column(nullable = true)
-	private Date endDate;
+	public Project() {}
 	
-	@Column(nullable = true)
-	private Date lastUpdate;
-
-	public Project() {
-		super();
+	public Project(Project project, MissionSheet missionSheet) {
+		setTitle(project.getTitle());
+		setDescription(project.getDescription());
+		setBeginDate(project.getBeginDate());
+		setEndDate(project.getEndDate());
+		this.missionSheet = missionSheet;
 	}
+	
+	public Long getId() { return id; }
 
-	public Project(String title, @Length(max = 1000) String description, Date beginDate, Date endDate) {
-		super();
-		this.title = title;
-		this.description = description;
-		this.beginDate = beginDate;
-		this.endDate = endDate;
-	}
+	public String getTitle() { return title; }
+	public void setTitle(String title) { this.title = title; }
 
-	public String getTitle() {
-		return title;
-	}
+	public String getDescription() { return description; }
+	public void setDescription(String description) { this.description = description; }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+	public Date getBeginDate() { return beginDate; }
+	public void setBeginDate(Date beginDate) { this.beginDate = beginDate; }
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Date getBeginDate() {
-		return beginDate;
-	}
-
-	public void setBeginDate(Date beginDate) {
-		this.beginDate = beginDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+	public Date getEndDate() { return endDate; }
+	public void setEndDate(Date endDate) { this.endDate = endDate; }
+	
+	public MissionSheet getMissionSheet() { return missionSheet; }
+	
 }

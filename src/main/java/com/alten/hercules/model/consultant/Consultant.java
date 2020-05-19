@@ -13,15 +13,14 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.alten.hercules.StrUtils;
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
+import com.alten.hercules.utils.StrUtils;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -53,10 +52,10 @@ public class Consultant {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Manager manager;
 	
-	@ManyToMany
+	@OneToMany(fetch = FetchType.LAZY)
 	private Set<Diploma> diplomas;
 	
-	@OneToMany(mappedBy="consultant")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="consultant")
 	private Set<Mission> missions;
 	
 	public Consultant() { super(); }
@@ -131,4 +130,12 @@ public class Consultant {
 			manager.put("releaseDate", this.manager.getReleaseDate());
         return manager;
     }
+
+	public void addDiploma(Diploma diploma) {
+		diplomas.add(diploma);
+	}
+	
+	public void removeDiploma(Diploma diploma) {
+		diplomas.remove(diploma);
+	}
 }

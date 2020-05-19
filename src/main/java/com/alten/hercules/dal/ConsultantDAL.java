@@ -69,8 +69,21 @@ public class ConsultantDAL {
 	public void delete(Consultant consultant) {
 		consultantDAO.delete(consultant);
 	}
-	
-	public List<Consultant> findReleasedConsultantFiveyears(){
-		return this.consultantDAO.findReleasedConsultantFiveyears();
+
+	public Diploma addDiplomaForConsultant(Diploma diploma, Consultant consultant) {
+		diploma = diplomaDAO.save(diploma);
+		consultant.addDiploma(diploma);
+		consultantDAO.save(consultant);
+		return diploma;
+	}
+
+	public void removeDiplomaForConsultant(Diploma diploma, Consultant consultant) {
+		consultant.removeDiploma(diploma);
+		consultantDAO.save(consultant);
+		diplomaDAO.delete(diploma);
+	}
+
+	public Diploma saveDiploma(Diploma diploma) {
+		return diplomaDAO.save(diploma);
 	}
 }

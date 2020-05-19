@@ -80,6 +80,11 @@ public class Mission {
 		this.secret = (int)Math.floor(Math.random() * Math.floor(Integer.MAX_VALUE));
 	}
 	
+	@JsonIgnore
+	public boolean isValidated() {
+		return sheetStatus.equals(ESheetStatus.VALIDATED);
+	}
+	
 	@JsonGetter("consultant")
     private Long getConsultantId() {
         return consultant.getId();

@@ -3,12 +3,12 @@ package com.alten.hercules.controller.consultant.http.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import com.alten.hercules.consts.UserConst;
+import com.alten.hercules.consts.AppConst;
 
 public class AddConsultantRequest {
 	
 	@NotNull
-	@Pattern(regexp = UserConst.EMAIL_PATTERN, message = UserConst.EMAIL_PATTERN_MSG)
+	@Pattern(regexp = AppConst.EMAIL_PATTERN)
 	private String email;
 
 	@NotNull
