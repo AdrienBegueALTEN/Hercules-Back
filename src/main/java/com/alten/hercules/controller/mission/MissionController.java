@@ -281,12 +281,16 @@ public class MissionController {
 	
 	@PreAuthorize("hasAuthority('ANONYMOUS')")
 	@PutMapping("projects/from-token")
-	public ResponseEntity<?> putProjectFromToken(@RequestBody UpdateEntityRequest req) {
+	public ResponseEntity<?> putProjectFromToken(@Valid @RequestBody UpdateEntityRequest req) {
 		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-		if (req.getFieldName() == null)
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.build();
+		try {
+			Project project = dal.findProjectById(req.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
 		return updateProject(missionId, req.getFieldName(), req.getValue());
 	}
 	
@@ -333,7 +337,7 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@DeleteMapping("projects/from-token/{id}")
+	@DeleteMapping("projects/from-token/{projectId}")
 	public ResponseEntity<?> deleteProjectFromToken(@PathVariable Long projectId) {
 		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		try {
