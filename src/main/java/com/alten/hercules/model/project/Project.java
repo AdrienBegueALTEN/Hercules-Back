@@ -67,7 +67,7 @@ public class Project {
 	public Date getEndDate() { return endDate; }
 	public void setEndDate(Date endDate) { this.endDate = endDate; }
 
-	public Date getPicture() { return picture; }
+	public String getPicture() { return picture; }
 	public void setpicture(String picture) { this.picture = picture; }
 	
 	public MissionSheet getMissionSheet() { return missionSheet; }
