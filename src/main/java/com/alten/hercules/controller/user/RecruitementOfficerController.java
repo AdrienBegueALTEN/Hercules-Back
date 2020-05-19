@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.controller.user.http.request.recruitementOfficer.AddRecruitementOfficerRequest;
-import com.alten.hercules.controller.user.http.request.recruitementOfficer.UpdateRecruitementOfficerRequest;
-import com.alten.hercules.dao.user.RecruitementOfficerDAO;
+import com.alten.hercules.controller.user.http.request.recruitmentOfficer.AddRecruitmentOfficerRequest;
+import com.alten.hercules.controller.user.http.request.recruitmentOfficer.UpdateRecruitmentOfficerRequest;
+import com.alten.hercules.dao.user.RecruitmentOfficerDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.RecruitmentOfficer;
@@ -29,47 +29,46 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 @RestController
 @CrossOrigin(origins="*")
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/hercules/recruitment-officer")
+@RequestMapping("/hercules/recruitment-officers")
 public class RecruitementOfficerController {
 	
-	@Autowired RecruitementOfficerDAO recruitementOfficerDAO;
+	@Autowired RecruitmentOfficerDAO recruitmentOfficerDAO;
 	@Autowired UserDAO userDAO;
 	
 	@GetMapping("")
 	public ResponseEntity<?> getAll() {
-		return ResponseEntity.ok(recruitementOfficerDAO.findAll());
+		return ResponseEntity.ok(recruitmentOfficerDAO.findAll());
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<?> addRecruitementOfficer(@Valid @RequestBody AddRecruitementOfficerRequest request) {
+	public ResponseEntity<?> addRecruitementOfficer(@Valid @RequestBody AddRecruitmentOfficerRequest request) {
 
 		if (userDAO.existsByEmail(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
 		
-		RecruitmentOfficer recruitementOfficer = request.buildUser();
-		recruitementOfficerDAO.save(recruitementOfficer);
-		URI location = URI.create(String.format("/recruitment-officer/%s", recruitementOfficer.getId()));
+		RecruitmentOfficer recruitmentOfficer = request.buildUser();
+		recruitmentOfficerDAO.save(recruitmentOfficer);
+		
+		
+		URI location = URI.create(String.format("/recruitement-officers/%s", recruitmentOfficer.getId()));
 		
 		return ResponseEntity.created(location).build();
 	}
 	 
 	@PutMapping("")
-	public ResponseEntity<?> updateRecruitementOfficer(@Valid @RequestBody UpdateRecruitementOfficerRequest request) {
-		Optional<RecruitmentOfficer> optRecruitementOfficer = recruitementOfficerDAO.findById(request.getId());
+	public ResponseEntity<?> updateRecruitementOfficer(@Valid @RequestBody UpdateRecruitmentOfficerRequest request) {
+		Optional<RecruitmentOfficer> optRecruitmentOfficer = recruitmentOfficerDAO.findById(request.getId());
 		
-		if (!optRecruitementOfficer.isPresent())
+		if (!optRecruitmentOfficer.isPresent())
 			return ResponseEntity.notFound().build();
 			
-		RecruitmentOfficer recruitementOfficer = optRecruitementOfficer.get();
+		RecruitmentOfficer recruitementOfficer = optRecruitmentOfficer.get();
 		
 		if (request.getEmail() != null) {
 			if (userDAO.existsByEmail(request.getEmail()))
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			recruitementOfficer.setEmail(request.getEmail());
 		}
-		
-		if (request.getPassword() != null)
-			recruitementOfficer.setPassword(request.getPassword());
 		
 		if (request.getFirstname() != null)
 			recruitementOfficer.setEmail(request.getFirstname());
@@ -80,19 +79,19 @@ public class RecruitementOfficerController {
 		if (request.getReleaseDate() != null)
 			recruitementOfficer.setReleaseDate(request.getReleaseDate());
 		
-		URI location = URI.create(String.format("/recruitementOfficer/%s", recruitementOfficer.getId()));
+		URI location = URI.create(String.format("/recruitement-officers/%s", recruitementOfficer.getId()));
 		
 		return ResponseEntity.created(location).build();
 	}
 	 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteRecruitementOfficer(@PathVariable Long id) {
-		Optional<RecruitmentOfficer> optRecruitementOfficer = recruitementOfficerDAO.findById(id);
+		Optional<RecruitmentOfficer> optRecruitementOfficer = recruitmentOfficerDAO.findById(id);
 			
 		if (!optRecruitementOfficer.isPresent())
 			return ResponseEntity.notFound().build();
 		
-		recruitementOfficerDAO.delete(optRecruitementOfficer.get());
+		recruitmentOfficerDAO.delete(optRecruitementOfficer.get());
 		return ResponseEntity.ok().build();
 	 }
 }

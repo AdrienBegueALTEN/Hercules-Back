@@ -33,7 +33,7 @@ import com.alten.hercules.controller.customer.http.request.AddCustomerRequest;
 import com.alten.hercules.controller.customer.http.response.BasicCustomerResponse;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.exception.RessourceNotFoundException;
+import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.service.StoreImage;
 
 @CrossOrigin(origins = "*")
@@ -127,7 +127,7 @@ public class CustomerController {
 	@PostMapping("/{id}/upload-logo")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
-			Customer customer = dao.findById(id).orElseThrow(() -> new RessourceNotFoundException("customer"));
+			Customer customer = dao.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
 			if(customer.getLogo()!=null) {
 				this.storeImage.delete("img/logo/"+customer.getLogo());
 				customer.setLogo(null);

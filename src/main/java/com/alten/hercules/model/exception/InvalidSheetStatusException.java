@@ -4,6 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidSheetStatusException extends ResponseEntityException {
 	public InvalidSheetStatusException() {
-		super("The current mission sheet status doesn't allow this operation.", HttpStatus.CONFLICT);
+		super("The current mission sheet status doesn't allow this operation.", HttpStatus.FORBIDDEN);
 	}
 }

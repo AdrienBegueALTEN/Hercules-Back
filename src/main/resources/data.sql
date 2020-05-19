@@ -26,12 +26,7 @@ INSERT INTO MISSION_SHEET(mission_id, version_date, city, comment, country, cons
 INSERT INTO MISSION_SHEET(mission_id, version_date, city, comment, country, consultant_start_xp, team_size, title, contract_type) VALUES (2, '2020-04-10', 'Schiltigheim', 'Commentaire pour la v2', 'France', 3, 1, 'BTitre v2', 'technical_assistance') ON CONFLICT DO NOTHING;
 INSERT INTO MISSION_SHEET(mission_id, version_date, city, comment, country, consultant_start_xp, team_size, title, contract_type) VALUES (3, '2020-04-10', 'Schiltigheim', 'Commentaire pour la v2', 'France', 3, 1, 'CTitre v2', 'technical_assistance') ON CONFLICT DO NOTHING;
 
-INSERT INTO PROJECT(description) VALUES ('projet 1') ON CONFLICT DO NOTHING;
-INSERT INTO PROJECT(description) VALUES ('projet 2') ON CONFLICT DO NOTHING;
-INSERT INTO PROJECT(description) VALUES ('projet 3') ON CONFLICT DO NOTHING;
-INSERT INTO PROJECT(description) VALUES ('projet 4') ON CONFLICT DO NOTHING;
-
-INSERT INTO MISSION_SHEET_PROJECTS (mission_sheet_id,projects_id) VALUES (2,1) ON CONFLICT DO NOTHING;
-INSERT INTO MISSION_SHEET_PROJECTS (mission_sheet_id,projects_id) VALUES (2,2) ON CONFLICT DO NOTHING;
-INSERT INTO MISSION_SHEET_PROJECTS (mission_sheet_id,projects_id) VALUES (4,3) ON CONFLICT DO NOTHING;
-INSERT INTO MISSION_SHEET_PROJECTS (mission_sheet_id,projects_id) VALUES (4,4) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 1-1', 1) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 1-2', 1) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 2-1', 2) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 2-2', 2) ON CONFLICT DO NOTHING;

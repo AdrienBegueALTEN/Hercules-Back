@@ -3,11 +3,13 @@ package com.alten.hercules.model.mission;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,7 +32,7 @@ public class MissionSheet {
 	
 	@Column(nullable = false, columnDefinition = "VARCHAR(255) default ''")
 	private String comment = "";
-	
+
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String consultantRole = "";
 	
@@ -41,7 +43,7 @@ public class MissionSheet {
 	private EContractType contractType;
 	
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
-	private String country = "";
+	private String country = "";;
 	
 	@Column(nullable = false, columnDefinition = "VARCHAR(1000) default ''")
 	private String description = "";
@@ -56,7 +58,7 @@ public class MissionSheet {
 	private Mission mission;
 	
 	@OrderBy("beginDate")
-	@OneToMany
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="missionSheet")
 	private Set<Project> projects = new HashSet<>();
 	
 	@Min(1)
@@ -84,7 +86,10 @@ public class MissionSheet {
 		setConsultantStartXp(sheet.getConsultantStartXp());
 		setContractType(sheet.getContractType());
 		setTeamSize(sheet.getTeamSize());
-		//setProjects(sheet.getProjects());
+		setProjects(
+				sheet.getProjects().stream()
+				.map(project -> new Project(project, this))
+				.collect(Collectors.toSet()));
 	}
 	
 	public String getCity() { return city; }
@@ -131,4 +136,12 @@ public class MissionSheet {
 
 	public Date getVersionDate() { return versionDate; }
 	public void setVersionDate(Date versionDate) { this.versionDate = versionDate; }
+	
+	public void addProject(Project project) {
+		projects.add(project);
+	}
+	
+	public void removeProject(Project project) {
+		projects.remove(project);
+	}
 }
