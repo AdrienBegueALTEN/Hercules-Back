@@ -62,24 +62,23 @@ public class RecruitementOfficerController {
 		if (!optRecruitmentOfficer.isPresent())
 			return ResponseEntity.notFound().build();
 			
-		RecruitmentOfficer recruitementOfficer = optRecruitmentOfficer.get();
+		RecruitmentOfficer recruitmentOfficer = optRecruitmentOfficer.get();
 		
 		if (request.getEmail() != null) {
-			if (userDAO.existsByEmail(request.getEmail()))
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			recruitementOfficer.setEmail(request.getEmail());
+			if (!userDAO.existsByEmail(request.getEmail()))
+				recruitmentOfficer.setEmail(request.getEmail());
 		}
 		
 		if (request.getFirstname() != null)
-			recruitementOfficer.setEmail(request.getFirstname());
+			recruitmentOfficer.setFirstname(request.getFirstname());
 		
 		if (request.getLastname() != null)
-			recruitementOfficer.setLastname(request.getLastname());
+			recruitmentOfficer.setLastname(request.getLastname());
 		
-		if (request.getReleaseDate() != null)
-			recruitementOfficer.setReleaseDate(request.getReleaseDate());
+
+		recruitmentOfficerDAO.save(recruitmentOfficer);
 		
-		URI location = URI.create(String.format("/recruitement-officers/%s", recruitementOfficer.getId()));
+		URI location = URI.create(String.format("/recruitment-officers/%s", recruitmentOfficer.getId()));
 		
 		return ResponseEntity.created(location).build();
 	}
@@ -93,5 +92,11 @@ public class RecruitementOfficerController {
 		
 		recruitmentOfficerDAO.delete(optRecruitementOfficer.get());
 		return ResponseEntity.ok().build();
+	 }
+	
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getRecruitementOfficerById(@PathVariable Long id) {
+		return ResponseEntity.ok(recruitmentOfficerDAO.findById(id));
 	 }
 }
