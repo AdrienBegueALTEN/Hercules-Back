@@ -39,8 +39,8 @@ public class MissionDAL {
 		return customerDAO.findById(id);
 	}
 	
-	public void save(Mission mission) {
-		missionDAO.save(mission);
+	public Mission save(Mission mission) {
+		return missionDAO.save(mission);
 	}
 	
 	public MissionSheet saveSheet(MissionSheet sheet) {

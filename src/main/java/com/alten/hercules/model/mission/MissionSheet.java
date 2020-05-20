@@ -73,11 +73,12 @@ public class MissionSheet {
 	
 	public MissionSheet(Mission mission) {
 		this.mission = mission;
+		this.versionDate = new Date();
 	}
 	
-	public MissionSheet(MissionSheet sheet, Date versionDate) throws InvalidValueException {
+	public MissionSheet(MissionSheet sheet) throws InvalidValueException {
 		setMission(sheet.mission);
-		setVersionDate(versionDate);
+		setVersionDate(new Date());
 		setTitle(sheet.getTitle());
 		setDescription(sheet.getDescription());
 		setComment(sheet.getComment());
