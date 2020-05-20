@@ -436,14 +436,20 @@ public class MissionController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"project");
-
+        
+        if(resource == null) {
+        	return ResponseEntity.notFound().build();
+        }
+        
         // Try to determine file's content type
         String contentType = null;
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
         	System.err.println(ex);
-        } catch (NullPointerException npe) {
+        }
+        
+        if(contentType == null) {
         	contentType = "application/octet-stream";
         }
 

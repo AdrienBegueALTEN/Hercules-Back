@@ -145,6 +145,10 @@ public class CustomerController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"logo");
+        
+        if(resource == null) {
+        	return ResponseEntity.notFound().build();
+        }
 
         // Try to determine file's content type
         String contentType = null;
@@ -152,14 +156,17 @@ public class CustomerController {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
         	System.err.println(ex);
-        } catch (NullPointerException npe) {
+        } 
+        
+        if(contentType == null) {
         	contentType = "application/octet-stream";
         }
-
+        
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+        
     }
 	
 
