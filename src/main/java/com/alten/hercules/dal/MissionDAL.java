@@ -85,5 +85,10 @@ public class MissionDAL {
 	public Optional<Project> findProjectById(Long id) {
 		return projectDAO.findById(id);
 	}
+	
+	
+	public void delete(Mission mission) {
+		missionDAO.delete(mission);
+	}
 
 }

@@ -45,6 +45,7 @@ import com.alten.hercules.dal.MissionDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.AlreadyExistingVersionException;
+import com.alten.hercules.model.exception.EntityDeletionException;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.NotLastVersionException;
@@ -60,6 +61,9 @@ import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.service.StoreImage;
 import com.alten.hercules.utils.EmlFileUtils;
+import com.alten.hercules.model.exception.ResourceNotFoundException;
+
+
 
 @RestController
 @CrossOrigin(origins="*")
@@ -91,6 +95,25 @@ public class MissionController {
 			return e.buildResponse();
 		}
 	}
+	
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteMission(@PathVariable Long id) {
+		try {
+			Mission mission = dal.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("mission"));
+			if (!(mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)))
+				throw new EntityDeletionException("The mission is not on waiting");
+			dal.delete(mission);
+			return ResponseEntity
+					.ok()
+					.build();
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
+	}
+	
 	
 	@GetMapping("")
 	public ResponseEntity<?> getAll(@RequestParam Optional<Long> manager) {

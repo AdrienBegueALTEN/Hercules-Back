@@ -3,6 +3,7 @@ package com.alten.hercules.model.mission;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,7 +39,7 @@ public class Mission {
 	@JoinColumn(nullable = false)
 	private Customer customer;
 	
-	@OneToMany(mappedBy="mission")
+	@OneToMany(mappedBy="mission", cascade = CascadeType.ALL)
 	@OrderBy("version_date DESC")
 	private Set<MissionSheet> versions = new HashSet<>();
 	
