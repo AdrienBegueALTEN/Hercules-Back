@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -58,7 +59,7 @@ public class MissionSheet {
 	private Mission mission;
 	
 	@OrderBy("beginDate")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy="missionSheet")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="missionSheet", cascade = CascadeType.ALL)
 	private Set<Project> projects = new HashSet<>();
 	
 	@Min(1)
@@ -73,7 +74,7 @@ public class MissionSheet {
 	
 	public MissionSheet(Mission mission) {
 		this.mission = mission;
-		this.versionDate = new Date();
+		//this.versionDate = new Date();
 	}
 	
 	public MissionSheet(MissionSheet sheet) throws InvalidValueException {
@@ -123,6 +124,7 @@ public class MissionSheet {
 	public Mission getMission() { return mission; }
 	public void setMission(Mission mission) { this.mission = mission; }
 
+	
 	public Set<Project> getProjects() { return projects; }
 	public void setProjects(Set<Project> projects) { this.projects = projects; }
 	

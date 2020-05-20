@@ -104,8 +104,8 @@ public class MissionController {
 		try {
 			Mission mission = dal.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("mission"));
-			if (!(mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)))
-				throw new EntityDeletionException("The mission is not on waiting");
+			if (!(mission.getLastVersion().getVersionDate()==null)&&!(mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)))
+				throw new EntityDeletionException("The mission is not on waiting and has a last version date");
 			dal.delete(mission);
 			return ResponseEntity
 					.ok()
