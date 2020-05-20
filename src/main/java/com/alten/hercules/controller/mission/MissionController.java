@@ -49,6 +49,7 @@ import com.alten.hercules.model.exception.EntityDeletionException;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.NotLastVersionException;
+import com.alten.hercules.model.exception.ProjectsBoundsException;
 import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.exception.InvalidSheetStatusException;
@@ -133,43 +134,41 @@ public class MissionController {
 
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
-	public ResponseEntity<?> addMission(@Valid @RequestBody AddMissionRequest req) {
+	public ResponseEntity<?> addMission(@Valid @RequestBody AddMissionRequest request) {
 		try {
-			Consultant consultant = dal.findConsultantById(req.getConsultant())
+			Consultant consultant = dal.findConsultantById(request.getConsultant())
 					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
-			Customer customer = dal.findCustomerById(req.getCustomer())
+			Customer customer = dal.findCustomerById(request.getCustomer())
 					.orElseThrow(() -> new ResourceNotFoundException("Customer"));
-			Mission mission = new Mission(consultant, customer);
-			MissionSheet v0 = new MissionSheet(mission);
-			dal.save(mission);
-			dal.saveSheet(v0);
+			Mission mission = dal.save(new Mission(consultant, customer));
+			MissionSheet firstVersion = dal.saveSheet(new MissionSheet(mission));
+			dal.saveProject(new Project(firstVersion));
 			return ResponseEntity.status(HttpStatus.CREATED).body(mission.getId());
-		} catch (ResourceNotFoundException e) {
+		} catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@GetMapping("/new-version/{id}")
-	public ResponseEntity<?> newVersion(@PathVariable Long id) {
+	@GetMapping("/new-version/{missionId}")
+	public ResponseEntity<?> newVersion(@PathVariable Long missionId) {
 		try {
-			Mission mission = dal.findById(id)
+			Mission mission = dal.findById(missionId)
 					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-			if (!mission.isValidated())
-				throw new InvalidSheetStatusException();
-			MissionSheet lastVersion = dal.findMostRecentVersion(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Sheet"));
-			if (isToday(lastVersion.getVersionDate()))
-				throw new AlreadyExistingVersionException();
-			MissionSheet newVersion = dal.saveSheet(new MissionSheet(lastVersion, new Date()));
-			newVersion.getProjects().forEach(project -> dal.saveProject(project));
-			mission.changeSecret();
-			mission.setSheetStatus(ESheetStatus.ON_WAITING);
-			dal.save(mission);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
+				if (!mission.isValidated())
+					throw new InvalidSheetStatusException();
+				MissionSheet lastVersion = dal.findMostRecentVersion(mission.getId()).get();;
+				if (isToday(lastVersion.getVersionDate()))
+					throw new AlreadyExistingVersionException();
+				MissionSheet newVersion = dal.saveSheet(new MissionSheet(lastVersion));
+				newVersion.getProjects().forEach(project -> dal.saveProject(project));
+				mission.changeSecret();
+				mission.setSheetStatus(ESheetStatus.ON_WAITING);
+				dal.save(mission);
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
@@ -275,32 +274,35 @@ public class MissionController {
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-project/{missionId}")
-	public ResponseEntity<?> getNewProject(@PathVariable Long missionId) {
-		return newProject(missionId);
+	public ResponseEntity<?> NewProject(@PathVariable Long missionId) {
+		try { newProject(missionId); }
+		catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 	@PreAuthorize("hasAuthority('ANONYMOUS')")
 	@GetMapping("/new-project-from-token")
-	public ResponseEntity<?> getNewProjectFromToken() {
+	public ResponseEntity<?> newProjectFromToken() {
 		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-		return newProject(missionId);
+		try { newProject(missionId); }
+		catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	private ResponseEntity<?> newProject(Long missionId) {
-		try {
-			Mission mission = dal.findById(missionId)
-					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+	private void newProject(Long missionId) throws ResponseEntityException {
+		Mission mission = dal.findById(missionId)
+				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
 			if (mission.isValidated())
 				throw new InvalidSheetStatusException();
 			MissionSheet lastVersion = mission.getLastVersion();
 			if (!(lastVersion.getProjects().size() < 5))
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+				throw new ProjectsBoundsException();
 			Project newProject = new Project(lastVersion);
 			dal.addProjectForSheet(lastVersion, newProject);
-			return ResponseEntity.ok(null);
-		} catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
@@ -361,39 +363,41 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@DeleteMapping("projects/{id}")
-	public ResponseEntity<?> deleteProject(@PathVariable Long id) {
-		return projectDeletion(id);
+	@DeleteMapping("projects/{projectId}")
+	public ResponseEntity<?> deleteProject(@PathVariable Long projectId) {
+		try { projectDeletion(projectId); }
+		catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
+		return ResponseEntity.ok(null);
 	}
 	
 	@PreAuthorize("hasAuthority('ANONYMOUS')")
 	@DeleteMapping("projects/from-token/{projectId}")
 	public ResponseEntity<?> deleteProjectFromToken(@PathVariable Long projectId) {
-		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		try {
+			Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 			Project project = dal.findProjectById(projectId)
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		} catch (ResourceNotFoundException e) {
+			projectDeletion(projectId);
+		} catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}
-		return projectDeletion(projectId);
+		return ResponseEntity.ok(null);
 	}
 	
-	private ResponseEntity<?> projectDeletion(Long id) {
-		try {
+	private void projectDeletion(Long id) throws ResponseEntityException {
 			Project project = dal.findProjectById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if (project.getMissionSheet().getMission().isValidated())
 				throw new InvalidSheetStatusException();
+			if (!(project.getMissionSheet().getMission().getLastVersion().getProjects().size() > 1))
+				throw new ProjectsBoundsException();
 			checkIfProjectOfLastVersion(project);
 			this.storeImage.delete(StoreImage.PROJECT_FOLDER+project.getPicture());
 			dal.removeProject(project);
-			return ResponseEntity.ok().build();
-		} catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
 	}
 	
 	private void checkIfProjectOfLastVersion(Project project) throws NotLastVersionException {
