@@ -16,8 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class StoreImage {
 
-	private final Path rootLogo = Paths.get("img/logo");
-	private final Path rootProj = Paths.get("img/proj");
+	private final Path rootLogo = Paths.get("img/logo/");
+	private final Path rootProj = Paths.get("img/proj/");
+	
+	public final static String LOGO_FOLDER = "img/logo/";
+	public final static String PROJECT_FOLDER = "img/proj/";
 
 	public void init() {
 		try {
@@ -49,6 +52,7 @@ public class StoreImage {
 			if (!Files.exists(path))
 				Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
+			System.out.println(e.getClass());
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
 	}

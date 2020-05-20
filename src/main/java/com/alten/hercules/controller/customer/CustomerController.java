@@ -109,7 +109,7 @@ public class CustomerController {
 		Customer customer = optCustomer.get();
 		if (!customer.getMissions().isEmpty())
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
-
+		this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
 		dao.delete(customer);
 		return ResponseEntity.ok().build();
 	}
@@ -129,7 +129,7 @@ public class CustomerController {
 		try {
 			Customer customer = dao.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
 			if(customer.getLogo()!=null) {
-				this.storeImage.delete("img/"+customer.getLogo());
+				this.storeImage.delete("img/logo/"+customer.getLogo());
 				customer.setLogo(null);
 			}
 			storeImage.save(file,"logo");
@@ -145,6 +145,10 @@ public class CustomerController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"logo");
+        
+        if(resource == null) {
+        	return ResponseEntity.notFound().build();
+        }
 
         // Try to determine file's content type
         String contentType = null;
@@ -152,14 +156,17 @@ public class CustomerController {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
         	System.err.println(ex);
-        } catch (NullPointerException npe) {
+        } 
+        
+        if(contentType == null) {
         	contentType = "application/octet-stream";
         }
-
+        
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+        
     }
 	
 

@@ -35,8 +35,15 @@ public class Project {
 	
 	@Column(nullable = true)
 	private Date endDate = null;
+
+	@Column(nullable = true)
+	private String picture = null;
 	
 	public Project() {}
+	
+	public Project(MissionSheet missionSheet) {
+		this.missionSheet = missionSheet;
+	}
 	
 	public Project(Project project, MissionSheet missionSheet) {
 		setTitle(project.getTitle());
@@ -59,6 +66,9 @@ public class Project {
 
 	public Date getEndDate() { return endDate; }
 	public void setEndDate(Date endDate) { this.endDate = endDate; }
+
+	public String getPicture() { return picture; }
+	public void setPicture(String picture) { this.picture = picture; }
 	
 	public MissionSheet getMissionSheet() { return missionSheet; }
 	
