@@ -413,10 +413,16 @@ public class MissionController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/upload-picture")
 	public ResponseEntity<?> uploadLogoManager(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
-		return this.uploadLogo(file, id);
+		return this.uploadPicture(file, id);
 	}
 	
-	private ResponseEntity<?> uploadLogo(MultipartFile file, Long id){
+	@PreAuthorize("hasAuthority('ANONYMOUS')")
+	@PostMapping("/projects/from-token/{id}/upload-picture")
+	public ResponseEntity<?> uploadLogoToken(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
+		return this.uploadPicture(file, id);
+	}
+	
+	private ResponseEntity<?> uploadPicture(MultipartFile file, Long id){
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if(proj.getPicture()!=null) {
