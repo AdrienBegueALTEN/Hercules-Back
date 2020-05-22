@@ -23,4 +23,6 @@ public interface MissionDAO extends JpaRepository<Mission, Long> {
 	public List<Mission> findAllByManager(Long managerId);
 	
 	public List<Mission> findAllBySheetStatus(ESheetStatus status);
+	
+	public List<Mission> findByCustomerId(Long customerId);
 }

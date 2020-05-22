@@ -130,6 +130,13 @@ public class MissionController {
 		}
 		return ResponseEntity.ok(body);
 	}
+	
+	@GetMapping("/by-customer/{id}")
+	public ResponseEntity<?> getAllByCustomer(@PathVariable Long id){
+		return ResponseEntity.ok(this.dal.findMissionsByCustomer(id).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.collect(Collectors.toList()));
+	}
 
 
 	@PreAuthorize("hasAuthority('MANAGER')")
