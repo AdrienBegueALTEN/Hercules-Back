@@ -46,7 +46,7 @@ public class ManagerController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<Object> getAll(@RequestParam boolean basic) {
+	public ResponseEntity<Object> getAll() {
 		List<Manager> managers = dal.findAllManagers();
 		return ResponseEntity.ok(managers);
 	}

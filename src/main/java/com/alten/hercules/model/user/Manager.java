@@ -34,7 +34,7 @@ public class Manager extends AppUser {
 		setAdmin(isAdmin);
 	}
 	
-	@JsonIgnore
+	
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
 	
