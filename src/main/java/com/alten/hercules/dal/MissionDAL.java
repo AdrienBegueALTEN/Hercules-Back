@@ -90,5 +90,9 @@ public class MissionDAL {
 	public void delete(Mission mission) {
 		missionDAO.delete(mission);
 	}
+	
+	public List<Mission> findMissionsByCustomer(Long customerId){
+		return this.missionDAO.findByCustomerId(customerId);
+	}
 
 }
