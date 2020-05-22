@@ -17,7 +17,7 @@ public class AddManagerRequest extends AddUserRequest {
 	
 	@Override
 	public Manager buildUser() {
-		return new Manager(email, password, firstname, lastname, isAdmin);
+		return new Manager(email, firstname, lastname, isAdmin);
 	}
 
 }

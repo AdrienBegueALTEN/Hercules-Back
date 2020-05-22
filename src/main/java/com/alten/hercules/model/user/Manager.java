@@ -34,6 +34,11 @@ public class Manager extends AppUser {
 		setAdmin(isAdmin);
 	}
 	
+	public Manager(String email, String firstname, String lastname, boolean isAdmin) {
+		super(email, "", firstname, lastname);
+		setAdmin(isAdmin);
+	}
+	
 	
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
