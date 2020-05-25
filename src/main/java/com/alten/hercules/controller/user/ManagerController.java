@@ -75,24 +75,32 @@ public class ManagerController {
 		Manager manager = optManager.get();
 		
 		if (request.getEmail() != null) {
+			if (!dal.userExistsByEmail(request.getEmail()))
+				manager.setEmail(request.getEmail());
+		}
+		
+		/*if (request.getEmail() != null) {
 			if (dal.userExistsByEmail(request.getEmail()))
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			manager.setEmail(request.getEmail());
-		}
+		}*/
 		
-		if (request.getPassword() != null)
-			manager.setPassword(request.getPassword());
+		/*if (request.getPassword() != null)
+			manager.setPassword(request.getPassword());*/
 		
 		if (request.getFirstname() != null)
-			manager.setEmail(request.getFirstname());
+			manager.setFirstname(request.getFirstname());
 		
 		if (request.getLastname() != null)
 			manager.setLastname(request.getLastname());
 		
-		if (request.getReleaseDate() != null)
-			manager.setReleaseDate(request.getReleaseDate());
+		/*if (request.getReleaseDate() != null)
+			manager.setReleaseDate(request.getReleaseDate());*/
 
-			manager.setAdmin(request.isAdmin());
+			//manager.setAdmin(request.isAdmin());
+		
+		
+		dal.saveManager(manager);
 		
 		URI location = URI.create(String.format("/managers/%s", manager.getId()));
 		
