@@ -14,10 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.alten.hercules.model.user.EAuthorities;
 import com.alten.hercules.security.jwt.AuthEntryPointJwt;
 import com.alten.hercules.security.jwt.filter.AnonymousTokenFilter;
-import com.alten.hercules.security.jwt.filter.UserTokenFilter;
+import com.alten.hercules.security.jwt.filter.SessionTokenFilter;
 import com.alten.hercules.service.AppUserDetailsService;
 
 @Configuration
@@ -41,8 +40,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	@Bean
-	public UserTokenFilter userTokenFilter() {
-		return new UserTokenFilter();
+	public SessionTokenFilter userTokenFilter() {
+		return new SessionTokenFilter();
 	}
 
 	@Override
@@ -63,13 +62,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/hercules/auth/signin", 
 						"/hercules/customers/logo/**",
 						"/hercules/missions/projects/picture/**").permitAll()
-				.antMatchers("/hercules/missions/from-token").hasAuthority(EAuthorities.ANONYMOUS.name())
-				.antMatchers("/hercules/missions/new-project-from-token/**").hasAuthority(EAuthorities.ANONYMOUS.name())
-				.antMatchers("/hercules/missions/projects/from-token/**").hasAuthority(EAuthorities.ANONYMOUS.name())
+				.antMatchers("/hercules/missions/anonymous").anonymous()
+				.antMatchers("/hercules/missions/new-project-anonymous/**").anonymous()
+				.antMatchers("/hercules/missions/projects/anonymous/**").anonymous()
 				.anyRequest().authenticated()
 			.and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
 			.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.addFilterAt(anonymousTokenFilter(), AnonymousAuthenticationFilter.class);
-		http.addFilterAt(userTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(anonymousTokenFilter(), AnonymousAuthenticationFilter.class);
+		http.addFilterBefore(userTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 }

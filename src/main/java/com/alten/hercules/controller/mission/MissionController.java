@@ -62,9 +62,6 @@ import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.service.StoreImage;
 import com.alten.hercules.utils.EmlFileUtils;
-import com.alten.hercules.model.exception.ResourceNotFoundException;
-
-
 
 @RestController
 @CrossOrigin(origins="*")
@@ -79,9 +76,10 @@ public class MissionController {
 		return getMissionDetails(id, true);
 	}
 	
-	@GetMapping("/from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@GetMapping("/anonymous")
 	public ResponseEntity<?> getMissionFromToken() {
-		Long id = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		return getMissionDetails(id, false);
 	}
 	
@@ -184,10 +182,10 @@ public class MissionController {
 		return updateMission(req.getId(), req.getFieldName(), req.getValue());
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@PutMapping("/from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PutMapping("/anonymous")
 	public ResponseEntity<?> putMissionFromToken(@RequestBody UpdateEntityRequest req) {
-		Long id = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		if (req.getFieldName() == null)
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
@@ -289,10 +287,10 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@GetMapping("/new-project-from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@GetMapping("/new-project-anonymous")
 	public ResponseEntity<?> newProjectFromToken() {
-		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try { newProject(missionId); }
 		catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -318,10 +316,10 @@ public class MissionController {
 		return updateProject(req.getId(), req.getFieldName(), req.getValue());
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@PutMapping("projects/from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PutMapping("projects/anonymous")
 	public ResponseEntity<?> putProjectFromToken(@Valid @RequestBody UpdateEntityRequest req) {
-		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(req.getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -379,11 +377,11 @@ public class MissionController {
 		return ResponseEntity.ok(null);
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@DeleteMapping("projects/from-token/{projectId}")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@DeleteMapping("projects/anonymous/{projectId}")
 	public ResponseEntity<?> deleteProjectFromToken(@PathVariable Long projectId) {
 		try {
-			Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+			Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 			Project project = dal.findProjectById(projectId)
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if (project.getMissionSheet().getMission().getId() != missionId)
@@ -450,8 +448,8 @@ public class MissionController {
 		return this.uploadPicture(file, id);
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@PostMapping("/projects/from-token/{id}/upload-picture")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PostMapping("/projects/anonymous/{id}/upload-picture")
 	public ResponseEntity<?> uploadLogoToken(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		return this.uploadPicture(file, id);
 	}

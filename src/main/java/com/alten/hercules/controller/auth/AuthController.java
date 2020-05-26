@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,5 +34,15 @@ public class AuthController {
 				new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		return ResponseEntity.ok(new JWTResponse((AppUser)authentication.getPrincipal()));
+	}
+	
+	private void changePassword(AppUser user, String providedPassword, String newPassword) {
+		String userPassword = user.getPassword();
+		providedPassword = new BCryptPasswordEncoder().encode(providedPassword);
+		if (!user.equals(providedPassword));
+	}
+	
+	private void createPassword(AppUser user, String newPassword) {
+		if (user.getPassword() != null);
 	}
 }

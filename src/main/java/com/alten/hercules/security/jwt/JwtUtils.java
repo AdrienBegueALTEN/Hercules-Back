@@ -16,47 +16,86 @@ import io.jsonwebtoken.*;
 @Component
 public class JwtUtils {
 	
-	private static final long USER_EXPIRATION = TimeUnit.HOURS.toMillis(12);
-	private static final long ANONYMOUS_EXPIRATION = TimeUnit.DAYS.toMillis(30);
-	private static final String USER_SIGNATURE = "E2DA29B2567D55BF33A313FA7964C";
-	private static final String ANONYMOUS_SIGNATURE = "7D56AACF33887F684376CA646A8E5";
+	private static final long MISSION_EXPIRATION = TimeUnit.DAYS.toMillis(30);
+	private static final long PASSWORD_CREATION_EXPIRATION = TimeUnit.DAYS.toMillis(7);
+	private static final long SESSION_EXPIRATION = TimeUnit.HOURS.toMillis(12);
+	private static final String MISSION_SIGNATURE = "7D56AACF33887F684376CA646A8E5";
+	private static final String PASSWORD_CREATION_SIGNATURE = "4D6EB7557B6DE6FEC5E777F14181E";
+	private static final String SESSION_SIGNATURE = "E2DA29B2567D55BF33A313FA7964C";
 	private static final String AUTHORIZATION_HEADER = "Authorization";
 	private static final String TOKEN_PREFIX = "Bearer ";
-
-	public static String generateJwt(AppUser user) {
-		return Jwts.builder()
-				.setSubject(Long.toString(user.getId()))
-				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + USER_EXPIRATION))
-				.signWith(SignatureAlgorithm.HS512, USER_SIGNATURE)
-				.compact();
-	}
 	
-	public static String generateJwt(Mission mission) {
+	public static String generateMissionToken(Mission mission) {
 		return Jwts.builder()
 				.setSubject(Long.toString(mission.getId()))
 				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + ANONYMOUS_EXPIRATION))
+				.setExpiration(new Date((new Date()).getTime() + MISSION_EXPIRATION))
 				.claim("secret", mission.getSecret())
-				.signWith(SignatureAlgorithm.HS512, ANONYMOUS_SIGNATURE)
+				.signWith(SignatureAlgorithm.HS512, MISSION_SIGNATURE)
 				.compact();
 	}
 	
-	private static String getSignature(boolean anonymous) {
-		return anonymous ? ANONYMOUS_SIGNATURE : USER_SIGNATURE;
+	public static String generatePasswordCreationToken(AppUser user) {
+		return Jwts.builder()
+				.setSubject(Long.toString(user.getId()))
+				.setIssuedAt(new Date())
+				.setExpiration(new Date((new Date()).getTime() + PASSWORD_CREATION_EXPIRATION))
+				.signWith(SignatureAlgorithm.HS512, PASSWORD_CREATION_SIGNATURE)
+				.compact();
+	}
+	
+	public static String generateSessionToken(AppUser user) {
+		return Jwts.builder()
+				.setSubject(Long.toString(user.getId()))
+				.setIssuedAt(new Date())
+				.setExpiration(new Date((new Date()).getTime() + SESSION_EXPIRATION))
+				.signWith(SignatureAlgorithm.HS512, SESSION_SIGNATURE)
+				.compact();
+	}
+	
+	public static Optional<ETokenType> getTokenType(String token) {
+		ETokenType tokenType = null;
+		try {
+			Jwts.parser().setSigningKey(SESSION_SIGNATURE).parseClaimsJws(token);
+			tokenType = ETokenType.SESSION;
+		} catch (Exception notSessionType) {
+			try {
+				Jwts.parser().setSigningKey(MISSION_SIGNATURE).parseClaimsJws(token);
+				tokenType = ETokenType.MISSION;
+			} catch (Exception notMissionType) {
+				try {
+					Jwts.parser().setSigningKey(PASSWORD_CREATION_SIGNATURE).parseClaimsJws(token);
+					tokenType = ETokenType.PASSWORD_CREATION;
+				} catch (Exception notPasswordCreationType) {}
+			}
+		}
+		return Optional.ofNullable(tokenType);
+	}
+	
+	public static Optional<String> parseToken(HttpServletRequest request) {
+		String token = null;
+		String headerAuth = request.getHeader(AUTHORIZATION_HEADER);
+		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(TOKEN_PREFIX))
+			token = headerAuth.substring(7, headerAuth.length());
+		return Optional.ofNullable(token);
 	}
 
-	public static Optional<Claims> parseJwt(HttpServletRequest request, boolean anonymous) {
+	public static Optional<Claims> getClaims(String token, ETokenType tokenType) {
+		Claims claims = null;
 		try {
-			String headerAuth = request.getHeader(AUTHORIZATION_HEADER);
-			if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(TOKEN_PREFIX)) {
-				String token = headerAuth.substring(7, headerAuth.length());
-				return Optional.of(Jwts.parser()
-							.setSigningKey(getSignature(anonymous))
-							.parseClaimsJws(token)
-							.getBody());
+			String signature = null;
+			switch (tokenType) {
+			case MISSION:
+				signature = MISSION_SIGNATURE;
+				break;
+			case PASSWORD_CREATION:
+				signature = PASSWORD_CREATION_SIGNATURE;
+				break;
+			case SESSION:
+				signature = SESSION_SIGNATURE;
 			}
+			claims = Jwts.parser().setSigningKey(signature).parseClaimsJws(token).getBody();
 		} catch (Exception ignored) {}
-		return Optional.ofNullable(null);
+		return Optional.ofNullable(claims);
 	}
 }

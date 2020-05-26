@@ -65,7 +65,7 @@ public class EmlFileUtils {
 		final String body =
 				"<p>Bonjour,</p>" +
 				"<p>Merci de bien vouloir renseigner les informations relatives à votre dernière mission chez '" + customer + "' via cette page :</p>" +
-				"<p>" + AppConst.CLIENT_EXTERNAL_URI + JwtUtils.generateJwt(mission) + "</p>" +
+				"<p>" + AppConst.CLIENT_EXTERNAL_URI + JwtUtils.generateMissionToken(mission) + "</p>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + manager + ".</p>";
 		final String fileName = 
