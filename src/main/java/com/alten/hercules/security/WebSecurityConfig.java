@@ -65,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/hercules/missions/anonymous").anonymous()
 				.antMatchers("/hercules/missions/new-project-anonymous/**").anonymous()
 				.antMatchers("/hercules/missions/projects/anonymous/**").anonymous()
+				.antMatchers("/hercules/auth/create-password-anonymous").anonymous()
 				.anyRequest().authenticated()
 			.and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
 			.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
