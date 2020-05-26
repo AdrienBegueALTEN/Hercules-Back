@@ -2,9 +2,9 @@ INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur inf
 INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur informatique', 'Polytech Nancy', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
 INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Master Ingénierie Système & Logiciel', 'UFR ST Besançon', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
 
-INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'Admin', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', true) ON CONFLICT DO NOTHING;
-INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'manager.manager@alten.com', 'Manager', 'Manager', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', false) ON CONFLICT DO NOTHING;
-INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('RecruitmentOfficer', 'recruitment.officer@alten.com', 'Recruitment', 'Officer', '$2y$10$Go90NvdWdA4EwarDvcKC8eVkYVjQmTBVsxWn9iwl07iUOzHppItbW', false) ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'Admin', '$2y$10$.Es5icVLyL/DEvFwqdzNN.1ALzIMhlB3g6UFtyDA8p2KVEvqD74wG', true) ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'manager.manager@alten.com', 'Manager', 'Manager', '$2y$10$.Es5icVLyL/DEvFwqdzNN.1ALzIMhlB3g6UFtyDA8p2KVEvqD74wG', false) ON CONFLICT DO NOTHING;
+INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('RecruitmentOfficer', 'recruitment.officer@alten.com', 'Recruitment', 'Officer', '$2y$10$.Es5icVLyL/DEvFwqdzNN.1ALzIMhlB3g6UFtyDA8p2KVEvqD74wG', false) ON CONFLICT DO NOTHING;
 
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('julien.baudot@alten.com', 'Julien', 'Baudot', 7, 2) ON CONFLICT DO NOTHING;
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('adrien.begue@alten.com', 'Adrien', 'Bègue', 1, 1) ON CONFLICT DO NOTHING;
