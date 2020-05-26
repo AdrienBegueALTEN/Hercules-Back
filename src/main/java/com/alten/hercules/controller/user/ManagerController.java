@@ -90,8 +90,8 @@ public class ManagerController {
 		if (request.getLastname() != null)
 			manager.setLastname(request.getLastname());
 		
-		/*if (request.getReleaseDate() != null)
-			manager.setReleaseDate(request.getReleaseDate());*/
+		if (request.getReleaseDate() != null)
+			manager.setReleaseDate(request.getReleaseDate());
 
 		manager.setAdmin(request.isAdmin());
 		
