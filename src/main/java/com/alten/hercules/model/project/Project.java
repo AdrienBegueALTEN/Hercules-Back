@@ -1,16 +1,26 @@
 package com.alten.hercules.model.project;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.mission.MissionSheet;
+import com.alten.hercules.model.skill.Skill;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -38,6 +48,13 @@ public class Project {
 
 	@Column(nullable = true)
 	private String picture = null;
+	
+	@ManyToMany
+	@JoinTable(
+			  name = "projects_skills", 
+			  joinColumns = @JoinColumn(name = "project_id"), 
+			  inverseJoinColumns = @JoinColumn(name = "skill_label"))
+	private Set<Skill> skills = new HashSet<>();
 	
 	public Project() {}
 	
@@ -70,6 +87,9 @@ public class Project {
 	public String getPicture() { return picture; }
 	public void setPicture(String picture) { this.picture = picture; }
 	
+	public Set<Skill> getSkills() { return skills; }
+	public void setSkills(Set<Skill> skills) { this.skills = skills; }
+
 	public MissionSheet getMissionSheet() { return missionSheet; }
 	
 }
