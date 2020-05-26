@@ -64,10 +64,13 @@ public class RecruitementOfficerController {
 			
 		RecruitmentOfficer recruitmentOfficer = optRecruitmentOfficer.get();
 		
+		
 		if (request.getEmail() != null) {
-			if (!userDAO.existsByEmail(request.getEmail()))
-				recruitmentOfficer.setEmail(request.getEmail());
+			if (userDAO.existsByEmail(request.getEmail()) && !recruitmentOfficer.getEmail().equals(request.getEmail()))
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			recruitmentOfficer.setEmail(request.getEmail());
 		}
+		
 		
 		if (request.getFirstname() != null)
 			recruitmentOfficer.setFirstname(request.getFirstname());

@@ -74,16 +74,12 @@ public class ManagerController {
 			
 		Manager manager = optManager.get();
 		
-		if (request.getEmail() != null) {
-			if (!dal.userExistsByEmail(request.getEmail()))
-				manager.setEmail(request.getEmail());
-		}
 		
-		/*if (request.getEmail() != null) {
-			if (dal.userExistsByEmail(request.getEmail()))
+		if (request.getEmail() != null) {
+			if (dal.userExistsByEmail(request.getEmail()) && !manager.getEmail().equals(request.getEmail()))
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			manager.setEmail(request.getEmail());
-		}*/
+		}
 		
 		/*if (request.getPassword() != null)
 			manager.setPassword(request.getPassword());*/
@@ -97,7 +93,7 @@ public class ManagerController {
 		/*if (request.getReleaseDate() != null)
 			manager.setReleaseDate(request.getReleaseDate());*/
 
-			//manager.setAdmin(request.isAdmin());
+		manager.setAdmin(request.isAdmin());
 		
 		
 		dal.saveManager(manager);
