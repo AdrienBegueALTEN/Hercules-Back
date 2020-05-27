@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import com.alten.hercules.controller.consultant.http.response.BasicConsultantResponse;
 import com.alten.hercules.dao.consultant.ConsultantDAO;
 import com.alten.hercules.dao.diploma.DiplomaDAO;
+import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.user.ManagerDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.diploma.Diploma;
+import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.user.Manager;
 
 @Service
@@ -30,6 +32,9 @@ public class ConsultantDAL {
 	
 	@Autowired
 	private DiplomaDAO diplomaDAO;
+	
+	@Autowired
+	private MissionDAO missionDAO;
 	
 	public ConsultantDAL() {}
 	
@@ -85,5 +90,9 @@ public class ConsultantDAL {
 
 	public Diploma saveDiploma(Diploma diploma) {
 		return diplomaDAO.save(diploma);
+	}
+	
+	public List<Mission> findMissionsByConsultant(Long consultantId){
+		return this.missionDAO.findByConsultantId(consultantId);
 	}
 }

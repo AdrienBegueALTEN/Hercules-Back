@@ -3,6 +3,8 @@ package com.alten.hercules.controller.consultant;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import com.alten.hercules.controller.consultant.http.request.AddDiplomaRequest;
 import com.alten.hercules.controller.consultant.http.request.RemoveDiplomaRequest;
 import com.alten.hercules.controller.consultant.http.response.ConsultantResponse;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
+import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.consultant.EConsultantFieldname;
@@ -216,5 +219,12 @@ public class ConsultantController {
 			dal.removeDiplomaForConsultant(diploma, consultant);
 			return ResponseEntity.ok(null);
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
+	}
+	
+	@GetMapping("/{id}/missions")
+	public ResponseEntity<?> getConsultantMissions(@PathVariable Long id){
+		return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.collect(Collectors.toList()));
 	}
 }
