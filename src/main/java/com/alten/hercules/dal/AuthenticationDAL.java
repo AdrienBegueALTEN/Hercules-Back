@@ -28,8 +28,8 @@ public class AuthenticationDAL {
 		return userDAO.existsByEmail(email);
 	}
 	
-	public void saveManager(Manager manager) {
-		managerDao.save(manager);
+	public Manager saveManager(Manager manager) {
+		return managerDao.save(manager);
 	}
 
 	public void deleteManager(Manager manager) {

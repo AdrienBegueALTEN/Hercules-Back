@@ -1,8 +1,6 @@
 package com.alten.hercules.controller.user;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.user.http.request.manager.AddManagerRequest;
 import com.alten.hercules.controller.user.http.request.manager.UpdateManagerRequest;
 import com.alten.hercules.dal.AuthenticationDAL;
-import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.Manager;
 
 @RestController
@@ -39,10 +35,8 @@ public class ManagerController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getManager(@PathVariable Long id) {
 		Optional<Manager> manager = dal.findManagerById(id);
-		
 		if (!manager.isPresent())
 			return ResponseEntity.notFound().build();
-		
 		return ResponseEntity.ok(manager.get());
 	}
 	
@@ -56,13 +50,12 @@ public class ManagerController {
 	@PostMapping("")
 	public ResponseEntity<Object> addManager(@Valid @RequestBody AddManagerRequest request) {
 		if (dal.userExistsByEmail(request.getEmail()))
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
-		
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		Manager manager = request.buildUser();
-		dal.saveManager(manager);
-		URI location = URI.create(String.format("/manager/%s", manager.getId()));
-			
-		return ResponseEntity.created(location).build();
+		manager = dal.saveManager(manager);
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.body(manager.getId());
 	}
 	 
 	@PreAuthorize("hasAuthority('ADMIN')")

@@ -23,7 +23,6 @@ import com.alten.hercules.controller.user.http.request.recruitmentOfficer.AddRec
 import com.alten.hercules.controller.user.http.request.recruitmentOfficer.UpdateRecruitmentOfficerRequest;
 import com.alten.hercules.dao.user.RecruitmentOfficerDAO;
 import com.alten.hercules.dao.user.UserDAO;
-import com.alten.hercules.model.response.MsgResponse;
 import com.alten.hercules.model.user.RecruitmentOfficer;
 
 @RestController
@@ -42,17 +41,13 @@ public class RecruitementOfficerController {
 	
 	@PostMapping("")
 	public ResponseEntity<?> addRecruitementOfficer(@Valid @RequestBody AddRecruitmentOfficerRequest request) {
-
 		if (userDAO.existsByEmail(request.getEmail()))
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(new MsgResponse("Erreur : email déjà utilisé"));
-		
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		RecruitmentOfficer recruitmentOfficer = request.buildUser();
-		recruitmentOfficerDAO.save(recruitmentOfficer);
-		
-		
-		URI location = URI.create(String.format("/recruitement-officers/%s", recruitmentOfficer.getId()));
-		
-		return ResponseEntity.created(location).build();
+		recruitmentOfficer = recruitmentOfficerDAO.save(recruitmentOfficer);
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.body(recruitmentOfficer.getId());
 	}
 	 
 	@PutMapping("")
