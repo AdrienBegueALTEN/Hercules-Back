@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -31,6 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alten.hercules.controller.customer.http.request.AddCustomerRequest;
 import com.alten.hercules.controller.customer.http.response.BasicCustomerResponse;
+import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
+import com.alten.hercules.dal.CustomerDAL;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
@@ -42,7 +45,7 @@ import com.alten.hercules.service.StoreImage;
 public class CustomerController {
 
 	@Autowired
-	private CustomerDAO dao;
+	private CustomerDAL dal;
 
 	@Autowired
 	private StoreImage storeImage;
@@ -50,9 +53,9 @@ public class CustomerController {
 	@GetMapping("")
 	public ResponseEntity<Object> getAllCustomer(@RequestParam(required = false) Boolean basic) {
 		if (basic == null || !basic)
-			return ResponseEntity.ok(dao.findAll());
+			return ResponseEntity.ok(dal.findAll());
 		List<BasicCustomerResponse> customers = new ArrayList<>();
-		dao.findAll().forEach((customer) -> {
+		dal.findAll().forEach((customer) -> {
 			customers.add(new BasicCustomerResponse(customer));
 		});
 		;
@@ -63,7 +66,7 @@ public class CustomerController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Optional<Customer>> getCustomerById(@PathVariable Long id) {
 
-		Optional<Customer> customer = dao.findById(id);
+		Optional<Customer> customer = dal.findById(id);
 
 		if (id == null || !customer.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,22 +75,29 @@ public class CustomerController {
 		return ResponseEntity.ok().body(customer);
 
 	}
+	
+	@GetMapping("/{id}/missions")
+	public ResponseEntity<?> getAllByCustomer(@PathVariable Long id){
+		return ResponseEntity.ok(this.dal.findMissionsByCustomer(id).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.collect(Collectors.toList()));
+	}
 
 	@PostMapping
 	public ResponseEntity<?> addCustomer(@Valid @RequestBody AddCustomerRequest request) {
-		Optional<Customer> optCustomer = dao.findByNameIgnoreCase(request.getName());
+		Optional<Customer> optCustomer = dal.findByNameIgnoreCase(request.getName());
 		if (optCustomer.isPresent())
 			return ResponseEntity.accepted().body(optCustomer.get().getId());
 
 		Customer customer = request.buildCustomer();
-		dao.save(customer);
+		dal.save(customer);
 		return ResponseEntity.status(HttpStatus.CREATED).body(customer.getId());
 	}
 
 	@PutMapping
 	public ResponseEntity<?> updateCustomer(@Valid @RequestBody Customer customer) {
 
-		if (this.dao.findById(customer.getId()) == null) {
+		if (this.dal.findById(customer.getId()) == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
@@ -95,14 +105,14 @@ public class CustomerController {
 			return ResponseEntity.noContent().build();
 		}
 
-		dao.save(customer);
+		dal.save(customer);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
-		Optional<Customer> optCustomer = dao.findById(id);
+		Optional<Customer> optCustomer = dal.findById(id);
 		if (!optCustomer.isPresent())
 			return ResponseEntity.notFound().build();
 
@@ -110,31 +120,21 @@ public class CustomerController {
 		if (!customer.getMissions().isEmpty())
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
-		dao.delete(customer);
+		dal.delete(customer);
 		return ResponseEntity.ok().build();
-	}
-
-	@GetMapping("/search")
-	public List<Customer> searchCustomer(@RequestParam(name = "q") List<String> keys) {
-		List<Customer> customers = new ArrayList<>();
-		for (String key : keys) {
-			customers.addAll(this.dao.findByNameOrActivitySector(key));
-		}
-		List<Customer> listRes = new ArrayList<>(new HashSet<>(customers));
-		return listRes;
 	}
 
 	@PostMapping("/{id}/upload-logo")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
-			Customer customer = dao.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
+			Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
 			if(customer.getLogo()!=null) {
 				this.storeImage.delete("img/logo/"+customer.getLogo());
 				customer.setLogo(null);
 			}
 			storeImage.save(file,"logo");
 			customer.setLogo(file.getOriginalFilename());
-			this.dao.save(customer);
+			this.dal.save(customer);
 			return ResponseEntity.status(HttpStatus.OK).build();
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
