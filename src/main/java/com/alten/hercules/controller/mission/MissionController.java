@@ -1,10 +1,6 @@
 package com.alten.hercules.controller.mission;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,7 +56,6 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.service.StoreImage;
-import com.alten.hercules.utils.EmlFileUtils;
 
 @RestController
 @CrossOrigin(origins="*")
@@ -256,28 +250,6 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@GetMapping("email-access/{id}")
-	public ResponseEntity<?> getAnonymousTokenForMission(@PathVariable Long id) {
-		File file = null;
-		ResponseEntity<?> response = null;
-		try {
-			Mission mission = dal.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-			if (mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
-				throw new InvalidSheetStatusException();
-			file = EmlFileUtils.genereateEmlFile(mission).orElseThrow();
-			response = buildEmlFileResponse(file);
-		} catch (ResponseEntityException e) {
-			response = e.buildResponse();
-		} catch (IOException e) {
-			response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		} finally {
-			if (file != null) file.delete();
-		}
-		return response;		
-	}
-	
-	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-project/{missionId}")
 	public ResponseEntity<?> NewProject(@PathVariable Long missionId) {
 		try { newProject(missionId); }
@@ -415,21 +387,6 @@ public class MissionController {
 			mission.setSheetStatus(ESheetStatus.ON_GOING);
 			dal.save(mission);
 		}
-	}
-	
-	private ResponseEntity<ByteArrayResource> buildEmlFileResponse(File file) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-		Path path = Paths.get(file.getAbsolutePath());
-        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
-	    return ResponseEntity.ok()
-	            .headers(headers)
-	            .contentLength(file.length())
-	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-	            .body(resource);
 	}
 	
 	private boolean isToday(Date date) {
