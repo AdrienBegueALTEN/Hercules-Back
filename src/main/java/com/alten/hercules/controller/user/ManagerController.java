@@ -2,6 +2,7 @@ package com.alten.hercules.controller.user;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,10 +91,16 @@ public class ManagerController {
 		if (request.getLastname() != null)
 			manager.setLastname(request.getLastname());
 		
-		/*if (request.getReleaseDate() != null)
-			manager.setReleaseDate(request.getReleaseDate());*/
+		if (request.getReleaseDate() != null) {
+			
+			manager.setReleaseDate(request.getReleaseDate());
+		}
 
 		manager.setAdmin(request.isAdmin());
+		
+		if (request.getRevive()) {
+			manager.setReleaseDate(null);
+		}
 		
 		
 		dal.saveManager(manager);

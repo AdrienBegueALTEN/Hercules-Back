@@ -1,10 +1,6 @@
 package com.alten.hercules.controller.mission;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,10 +56,6 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.service.StoreImage;
-import com.alten.hercules.utils.EmlFileUtils;
-import com.alten.hercules.model.exception.ResourceNotFoundException;
-
-
 
 @RestController
 @CrossOrigin(origins="*")
@@ -79,9 +70,10 @@ public class MissionController {
 		return getMissionDetails(id, true);
 	}
 	
-	@GetMapping("/from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@GetMapping("/anonymous")
 	public ResponseEntity<?> getMissionFromToken() {
-		Long id = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		return getMissionDetails(id, false);
 	}
 	
@@ -184,10 +176,10 @@ public class MissionController {
 		return updateMission(req.getId(), req.getFieldName(), req.getValue());
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@PutMapping("/from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PutMapping("/anonymous")
 	public ResponseEntity<?> putMissionFromToken(@RequestBody UpdateEntityRequest req) {
-		Long id = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		if (req.getFieldName() == null)
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
@@ -258,28 +250,6 @@ public class MissionController {
 	}
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@GetMapping("email-access/{id}")
-	public ResponseEntity<?> getAnonymousTokenForMission(@PathVariable Long id) {
-		File file = null;
-		ResponseEntity<?> response = null;
-		try {
-			Mission mission = dal.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-			if (mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
-				throw new InvalidSheetStatusException();
-			file = EmlFileUtils.genereateEmlFile(mission).orElseThrow();
-			response = buildEmlFileResponse(file);
-		} catch (ResponseEntityException e) {
-			response = e.buildResponse();
-		} catch (IOException e) {
-			response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		} finally {
-			if (file != null) file.delete();
-		}
-		return response;		
-	}
-	
-	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-project/{missionId}")
 	public ResponseEntity<?> NewProject(@PathVariable Long missionId) {
 		try { newProject(missionId); }
@@ -289,10 +259,10 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@GetMapping("/new-project-from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@GetMapping("/new-project-anonymous")
 	public ResponseEntity<?> newProjectFromToken() {
-		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try { newProject(missionId); }
 		catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -318,10 +288,10 @@ public class MissionController {
 		return updateProject(req.getId(), req.getFieldName(), req.getValue());
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@PutMapping("projects/from-token")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PutMapping("projects/anonymous")
 	public ResponseEntity<?> putProjectFromToken(@Valid @RequestBody UpdateEntityRequest req) {
-		Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(req.getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -379,11 +349,11 @@ public class MissionController {
 		return ResponseEntity.ok(null);
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@DeleteMapping("projects/from-token/{projectId}")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@DeleteMapping("projects/anonymous/{projectId}")
 	public ResponseEntity<?> deleteProjectFromToken(@PathVariable Long projectId) {
 		try {
-			Long missionId = (Long)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+			Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 			Project project = dal.findProjectById(projectId)
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if (project.getMissionSheet().getMission().getId() != missionId)
@@ -419,21 +389,6 @@ public class MissionController {
 		}
 	}
 	
-	private ResponseEntity<ByteArrayResource> buildEmlFileResponse(File file) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-		Path path = Paths.get(file.getAbsolutePath());
-        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
-	    return ResponseEntity.ok()
-	            .headers(headers)
-	            .contentLength(file.length())
-	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-	            .body(resource);
-	}
-	
 	private boolean isToday(Date date) {
 		Calendar todayCalendar = Calendar.getInstance();
 		Calendar lastVersionCalendar = Calendar.getInstance();
@@ -450,8 +405,8 @@ public class MissionController {
 		return this.uploadPicture(file, id);
 	}
 	
-	@PreAuthorize("hasAuthority('ANONYMOUS')")
-	@PostMapping("/projects/from-token/{id}/upload-picture")
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PostMapping("/projects/anonymous/{id}/upload-picture")
 	public ResponseEntity<?> uploadLogoToken(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		return this.uploadPicture(file, id);
 	}

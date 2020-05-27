@@ -12,7 +12,7 @@ public class JWTResponse {
 	private Map<String, Object> user;
 
 	public JWTResponse(AppUser user) {
-		accessToken = JwtUtils.generateJwt(user);
+		accessToken = JwtUtils.generateSessionToken(user);
 		this.user = new HashMap<String, Object>();
 		this.user.put("id", user.getId());
 		this.user.put("firstname", user.getFirstname());

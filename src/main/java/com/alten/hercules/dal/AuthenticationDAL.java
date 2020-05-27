@@ -10,6 +10,7 @@ import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.user.ManagerDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.mission.Mission;
+import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.model.user.Manager;
 
 @Service
@@ -17,14 +18,14 @@ public class AuthenticationDAL {
 	
 	@Autowired private ManagerDAO managerDao;
 	@Autowired private MissionDAO missionDao;
-	@Autowired private UserDAO userDao;
+	@Autowired private UserDAO userDAO;
 	
 	public Optional<Manager> findManagerById(Long id) {
 		return managerDao.findById(id);
 	}
 	
 	public boolean userExistsByEmail(String email) {
-		return userDao.existsByEmail(email);
+		return userDAO.existsByEmail(email);
 	}
 	
 	public void saveManager(Manager manager) {
@@ -46,6 +47,14 @@ public class AuthenticationDAL {
 	public void changeMissionSecret(Mission mission) {
 		mission.changeSecret();
 		missionDao.save(mission);
+	}
+
+	public AppUser saveUser(AppUser user) {
+		return userDAO.save(user);
+	}
+
+	public Optional<AppUser> findUserById(Long id) {
+		return userDAO.findById(id);
 	}
 
 }

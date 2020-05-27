@@ -23,13 +23,16 @@ public class UpdateRecruitmentOfficerRequest {
 	
 	private Date releaseDate;
 	
-	public UpdateRecruitmentOfficerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate) {
+	private boolean revive;
+	
+	public UpdateRecruitmentOfficerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate,boolean revive) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.releaseDate = releaseDate;
+		this.revive = revive;
 	}
 	
 	public Long getId() { return id; }
@@ -49,5 +52,7 @@ public class UpdateRecruitmentOfficerRequest {
 	
 	public Date getReleaseDate() { return releaseDate; }
 	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate;}
+	
+	public boolean getRevive() { return revive; }
 
 }

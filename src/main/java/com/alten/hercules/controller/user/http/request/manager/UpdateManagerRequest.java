@@ -25,7 +25,9 @@ public class UpdateManagerRequest {
 	@JsonFormat(pattern="dd/MM/yyy")
 	private Date releaseDate;
 	
-	public UpdateManagerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate, boolean isAdmin) {
+	private boolean revive;
+	
+	public UpdateManagerRequest(Long id, String email, String password, String firstname, String lastname, Date releaseDate, boolean isAdmin, boolean revive) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
@@ -33,6 +35,7 @@ public class UpdateManagerRequest {
 		this.lastname = lastname;
 		this.releaseDate = releaseDate;
 		this.isAdmin = isAdmin;
+		this.revive = revive;
 	}
 	
 	private boolean isAdmin;
@@ -57,5 +60,7 @@ public class UpdateManagerRequest {
 	
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }
+	
+	public boolean getRevive() { return revive; }
 	
 }

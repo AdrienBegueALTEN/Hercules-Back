@@ -78,6 +78,14 @@ public class RecruitementOfficerController {
 		if (request.getLastname() != null)
 			recruitmentOfficer.setLastname(request.getLastname());
 		
+		if (request.getReleaseDate() != null) {
+					
+					recruitmentOfficer.setReleaseDate(request.getReleaseDate());
+				}
+		if (request.getRevive()) {
+			recruitmentOfficer.setReleaseDate(null);
+		}
+				
 
 		recruitmentOfficerDAO.save(recruitmentOfficer);
 		
