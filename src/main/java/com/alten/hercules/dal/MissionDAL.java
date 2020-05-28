@@ -10,6 +10,7 @@ import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.mission.MissionSheetDAO;
 import com.alten.hercules.dao.project.ProjectDAO;
+import com.alten.hercules.dao.skill.SkillDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
@@ -17,6 +18,7 @@ import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.Project;
+import com.alten.hercules.model.skill.Skill;
 
 @Service
 public class MissionDAL {
@@ -26,6 +28,7 @@ public class MissionDAL {
 	@Autowired private ConsultantDAO consultantDAO;
 	@Autowired private CustomerDAO customerDAO;
 	@Autowired private ProjectDAO projectDAO;
+	@Autowired private SkillDAO skillDAO;
 	
 	public Optional<Mission> findById(Long id) {
 		return missionDAO.findById(id);
@@ -93,6 +96,17 @@ public class MissionDAL {
 	
 	public List<Mission> findMissionsByCustomer(Long customerId){
 		return this.missionDAO.findByCustomerId(customerId);
+	}
+	
+	public void addSkillToProject(Project p, Skill s) {
+		s=this.skillDAO.save(s);
+		p.getSkills().add(s);
+		s.getProjects().add(p);
+		this.projectDAO.save(p);
+	}
+	
+	public Optional<Skill> findSkillByLabel(String label){
+		return this.skillDAO.findById(label);
 	}
 
 }

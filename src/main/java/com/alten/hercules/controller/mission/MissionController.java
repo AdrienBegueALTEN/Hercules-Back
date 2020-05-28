@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
+import com.alten.hercules.controller.mission.http.request.AddSkillProjectRequest;
 import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
 import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.MissionDAL;
@@ -55,6 +56,7 @@ import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
+import com.alten.hercules.model.skill.Skill;
 import com.alten.hercules.service.StoreImage;
 
 @RestController
@@ -446,4 +448,34 @@ public class MissionController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@PostMapping("/projects/{id}/skills")
+	public ResponseEntity<?> addSkillToProjectManager(@RequestBody String label, @PathVariable Long id) {
+		return this.addSkillToProject(label, id);
+	}
+	
+	private ResponseEntity<?> addSkillToProject(String label, Long id) {
+		try {
+			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Skill s = this.dal.findSkillByLabel(label).orElse(new Skill(label));
+			this.dal.addSkillToProject(proj, s);
+			return ResponseEntity.ok().build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+	}
+	
+	private ResponseEntity<?> deleteSkillToProject(String label, Long id) {
+		try {
+			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Skill s = this.dal.findSkillByLabel(label).orElse(new Skill(label));
+			this.dal.addSkillToProject(proj, s);
+			return ResponseEntity.ok().build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+	}
+	
+	
 }

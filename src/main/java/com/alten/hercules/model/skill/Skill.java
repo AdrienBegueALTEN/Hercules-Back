@@ -19,7 +19,7 @@ public class Skill {
 	@ManyToMany(mappedBy = "skills")
 	private Set<Project> projects = new HashSet<>();
 
-	public Skill(String label, Set<Project> projects) {
+	public Skill(String label) {
 		super();
 		this.label = label;
 	}
