@@ -59,6 +59,7 @@ public abstract class AppUser implements UserDetails {
 	
 	public String getPassword() { return password; }
 	public void setPassword(String password) { this.password = new BCryptPasswordEncoder().encode(password); }
+	public void expireCredentials() { this.password = null; }
 	
 	public String getFirstname() { return firstname; }
 	public void setFirstname(String firstname) { this.firstname = firstname; }
@@ -83,7 +84,7 @@ public abstract class AppUser implements UserDetails {
 
 	@JsonIgnore
 	@Override
-	public boolean isCredentialsNonExpired() { return true; }
+	public boolean isCredentialsNonExpired() { return password != null; }
 
 	@JsonIgnore
 	@Override

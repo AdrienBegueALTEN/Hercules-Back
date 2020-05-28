@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -58,8 +60,18 @@ public class AuthController {
 	}
 	
 	@PreAuthorize("hasAuthority('CREATE_PASSWORD')")
-	@PutMapping("/create-password-anonymous")
-	public ResponseEntity<?> createPassword(@RequestBody String password) {
+	@GetMapping("/change-password-anonymous")
+	public ResponseEntity<?> checkTokenValidity() {
+		AppUser user = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Map<String, String> response = new HashMap<String, String>();
+		response.put("firstname", user.getFirstname());
+		response.put("lastname", user.getLastname());
+		return ResponseEntity.ok(response);
+	}
+	
+	@PreAuthorize("hasAuthority('CREATE_PASSWORD')")
+	@PutMapping("/change-password-anonymous")
+	public ResponseEntity<?> changePasswordAnonymous(@RequestBody String password) {
 		AppUser user = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		if (user.getPassword() != null)
 			ResponseEntity.status(HttpStatus.CONFLICT).body("Password already definded.");
@@ -117,6 +129,8 @@ public class AuthController {
 					.orElseThrow(() -> new ResourceNotFoundException("User"));
 			file = EmlFileUtils.genereateEmlFileWithPasswordCreationLink(user).orElseThrow();
 			response = buildEmlFileResponse(file);
+			user.expireCredentials();;
+			dal.saveUser(user);
 		} catch (ResponseEntityException e) {
 			response = e.buildResponse();
 		} catch (IOException e) {

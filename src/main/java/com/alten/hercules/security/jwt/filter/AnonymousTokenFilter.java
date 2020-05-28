@@ -52,11 +52,13 @@ public class AnonymousTokenFilter extends OncePerRequestFilter {
 				case PASSWORD_CREATION:
 					Long userId = Long.parseLong(claims.getSubject());
 					UserDetails userDetails = userDao.findById(userId).get();
-					Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-					authorities.add(new SimpleGrantedAuthority(EAuthorities.PASSWORD_CREATION.name()));
-					AnonymousAuthenticationToken authentication = new AnonymousAuthenticationToken("user", userDetails, authorities);
-					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(authentication);
+					if (!userDetails.isCredentialsNonExpired()) {
+						Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+						authorities.add(new SimpleGrantedAuthority(EAuthorities.PASSWORD_CREATION.name()));
+						AnonymousAuthenticationToken authentication = new AnonymousAuthenticationToken("user", userDetails, authorities);
+						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+					}
 				}
 		} catch (Exception ignored) {}
 		filterChain.doFilter(request, response);
