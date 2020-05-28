@@ -451,26 +451,17 @@ public class MissionController {
 	
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/skills")
-	public ResponseEntity<?> addSkillToProjectManager(@RequestBody String label, @PathVariable Long id) {
-		return this.addSkillToProject(label, id);
+	public ResponseEntity<?> addSkillToProjectManager(@PathVariable Long id, @RequestBody String... labels) {
+		return this.addSkillToProject(id, labels);
 	}
 	
-	private ResponseEntity<?> addSkillToProject(String label, Long id) {
+	private ResponseEntity<?> addSkillToProject(Long id, String... labels) {
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
-			Skill s = this.dal.findSkillByLabel(label).orElse(new Skill(label));
-			this.dal.addSkillToProject(proj, s);
-			return ResponseEntity.ok().build();
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		}
-	}
-	
-	private ResponseEntity<?> deleteSkillToProject(String label, Long id) {
-		try {
-			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
-			Skill s = this.dal.findSkillByLabel(label).orElse(new Skill(label));
-			this.dal.addSkillToProject(proj, s);
+			for(int i=0;i<labels.length;i++) {
+				Skill s = this.dal.findSkillByLabel(labels[i]).orElse(new Skill(labels[i]));
+				this.dal.addSkillToProject(proj, s);
+			}
 			return ResponseEntity.ok().build();
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
