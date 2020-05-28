@@ -485,5 +485,10 @@ public class MissionController {
 		}
 	}
 	
+	@GetMapping("/projects/skills")
+	public ResponseEntity<?> getAllSkills() {
+		return ResponseEntity.ok(this.dal.findAllSkills());
+	}
+	
 	
 }

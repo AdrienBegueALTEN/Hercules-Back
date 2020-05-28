@@ -118,5 +118,9 @@ public class MissionDAL {
 			this.skillDAO.delete(s);
 		
 	}
+	
+	public List<Skill> findAllSkills(){
+		return this.skillDAO.findAll();
+	}
 
 }
