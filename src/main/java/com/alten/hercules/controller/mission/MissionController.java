@@ -467,5 +467,23 @@ public class MissionController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@DeleteMapping("/projects/{id}/skills")
+	public ResponseEntity<?> removeSkillFromProjectManager(@PathVariable Long id, @RequestBody Skill skill) {
+		return this.removeSkillFromProject(id, skill);
+	}
+	
+	private ResponseEntity<?> removeSkillFromProject(Long id, Skill skill) {
+		try {
+			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Skill s = this.dal.findSkillByLabel(skill.getLabel())
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			this.dal.removeSkillFromProject(proj, s);
+			return ResponseEntity.ok().build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+	}
+	
 	
 }

@@ -108,5 +108,15 @@ public class MissionDAL {
 	public Optional<Skill> findSkillByLabel(String label){
 		return this.skillDAO.findById(label);
 	}
+	
+	public void removeSkillFromProject(Project p, Skill s) {
+		p.getSkills().remove(s);
+		this.projectDAO.save(p);
+		s.getProjects().remove(p);
+		this.skillDAO.save(s);
+		if(s.getProjects().isEmpty())
+			this.skillDAO.delete(s);
+		
+	}
 
 }
