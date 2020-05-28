@@ -34,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
-import com.alten.hercules.controller.mission.http.request.AddSkillProjectRequest;
 import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
 import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.MissionDAL;

@@ -10,12 +10,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import com.alten.hercules.model.project.Project;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Skill {
 	@Id
 	private String label;
 	
+	@JsonIgnore
 	@ManyToMany(mappedBy = "skills")
 	private Set<Project> projects = new HashSet<>();
 
