@@ -65,7 +65,7 @@ public class EmlFileUtils {
 		final String body =
 				"<p>Bonjour,</p>" +
 				"<p>Merci de bien vouloir renseigner les informations relatives à votre dernière mission chez '" + customer + "' via cette page :</p>" +
-				"<p>" + AppConst.MISSION_SHEET_URI + JwtUtils.generateMissionToken(mission) + "</p>" +
+				"<p>" + AppConst.MISSION_SHEET_URL + JwtUtils.generateMissionToken(mission) + "</p>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + manager + ".</p>";
 		final String fileName = 
@@ -81,7 +81,7 @@ public class EmlFileUtils {
 		final String body =
 				"<p>Bonjour,</p>" +
 				"<p>Voici le lien d'activation de votre compte Hercules :</p>" +
-				"<p>" + AppConst.PASSWORD_CREATION_URI + JwtUtils.generatePasswordCreationToken(targetedUser) + "</p>" +
+				"<p>" + AppConst.LOGIN_URL + JwtUtils.generatePasswordCreationToken(targetedUser) + "</p>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + loggedUser.getFirstname() + " " + loggedUser.getLastname() + ".</p>";
 		final String fileName = 

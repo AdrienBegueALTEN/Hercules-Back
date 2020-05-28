@@ -54,7 +54,7 @@ public class AnonymousTokenFilter extends OncePerRequestFilter {
 					UserDetails userDetails = userDao.findById(userId).get();
 					if (!userDetails.isCredentialsNonExpired()) {
 						Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-						authorities.add(new SimpleGrantedAuthority(EAuthorities.PASSWORD_CREATION.name()));
+						authorities.add(new SimpleGrantedAuthority(EAuthorities.CHANGE_PASSWORD.name()));
 						AnonymousAuthenticationToken authentication = new AnonymousAuthenticationToken("user", userDetails, authorities);
 						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 						SecurityContextHolder.getContext().setAuthentication(authentication);

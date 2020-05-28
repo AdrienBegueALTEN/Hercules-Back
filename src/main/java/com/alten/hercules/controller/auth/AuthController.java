@@ -59,7 +59,7 @@ public class AuthController {
 		return ResponseEntity.ok(new JWTResponse((AppUser)authentication.getPrincipal()));
 	}
 	
-	@PreAuthorize("hasAuthority('CREATE_PASSWORD')")
+	@PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
 	@GetMapping("/change-password-anonymous")
 	public ResponseEntity<?> checkTokenValidity() {
 		AppUser user = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -69,12 +69,13 @@ public class AuthController {
 		return ResponseEntity.ok(response);
 	}
 	
-	@PreAuthorize("hasAuthority('CREATE_PASSWORD')")
+	@PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
 	@PutMapping("/change-password-anonymous")
 	public ResponseEntity<?> changePasswordAnonymous(@RequestBody String password) {
 		AppUser user = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		if (user.getPassword() != null)
 			ResponseEntity.status(HttpStatus.CONFLICT).body("Password already definded.");
+		user = dal.findUserById(user.getId()).get();
 		user.setPassword(password);
 		user = dal.saveUser(user);
 		return ResponseEntity.ok(new JWTResponse(user));
