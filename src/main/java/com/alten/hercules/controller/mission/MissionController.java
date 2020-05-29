@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
+import com.alten.hercules.controller.mission.http.request.GeneratePDFRequest;
 import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
 import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.MissionDAL;
@@ -489,6 +490,15 @@ public class MissionController {
 	public ResponseEntity<?> getAllSkills() {
 		return ResponseEntity.ok(this.dal.findAllSkills());
 	}
+	
+	
+	@PostMapping("/pdf")
+	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
+		//System.out.println(elements.get(0).getId());
+		return ResponseEntity.ok("yo");
+	}
+	
+	
 	
 	
 }
