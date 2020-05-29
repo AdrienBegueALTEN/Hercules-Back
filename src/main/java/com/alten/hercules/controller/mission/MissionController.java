@@ -455,6 +455,21 @@ public class MissionController {
 		return this.addSkillToProject(id, labels);
 	}
 	
+	@PreAuthorize("hasAuthority('MISSION')")
+	@PostMapping("/projects/anonymous/{id}/skills")
+	public ResponseEntity<?> addSkillToProjectToken(@PathVariable Long id, @RequestBody String... labels) {
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		try {
+			Project project = dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+		return this.addSkillToProject(id, labels);
+	}
+	
 	private ResponseEntity<?> addSkillToProject(Long id, String... labels) {
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -474,6 +489,21 @@ public class MissionController {
 		return this.removeSkillFromProject(id, skill);
 	}
 	
+	@PreAuthorize("hasAuthority('MISSION')")
+	@DeleteMapping("/projects/anonymous/{id}/skills")
+	public ResponseEntity<?> removeSkillFromProjectToken(@PathVariable Long id, @RequestBody Skill skill) {
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		try {
+			Project project = dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+		return this.removeSkillFromProject(id, skill);
+	}
+	
 	private ResponseEntity<?> removeSkillFromProject(Long id, Skill skill) {
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -486,7 +516,7 @@ public class MissionController {
 		}
 	}
 	
-	@GetMapping("/projects/skills")
+	@GetMapping("/projects/skills-all")
 	public ResponseEntity<?> getAllSkills() {
 		return ResponseEntity.ok(this.dal.findAllSkills());
 	}

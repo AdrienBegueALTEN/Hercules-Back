@@ -61,7 +61,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.authorizeRequests()
 				.antMatchers("/hercules/auth/signin", 
 						"/hercules/customers/logo/**",
-						"/hercules/missions/projects/picture/**").permitAll()
+						"/hercules/missions/projects/picture/**",
+						"/hercules/missions/projects/skills-all").permitAll()
 				.antMatchers("/hercules/missions/anonymous").anonymous()
 				.antMatchers("/hercules/missions/new-project-anonymous/**").anonymous()
 				.antMatchers("/hercules/missions/projects/anonymous/**").anonymous()
