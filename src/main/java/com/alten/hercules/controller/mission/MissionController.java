@@ -525,7 +525,7 @@ public class MissionController {
 	@PostMapping("/pdf")
 	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
 		//System.out.println(elements.get(0).getId());
-		return ResponseEntity.ok("yo");
+		return ResponseEntity.ok("");
 	}
 	
 	
