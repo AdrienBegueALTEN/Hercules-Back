@@ -1,5 +1,7 @@
 package com.alten.hercules.controller.mission;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,6 +60,12 @@ import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
 import com.alten.hercules.service.StoreImage;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+
+
 
 @RestController
 @CrossOrigin(origins="*")
@@ -97,7 +105,7 @@ public class MissionController {
 	public ResponseEntity<?> deleteMission(@PathVariable Long id) {
 		try {
 			Mission mission = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("mission"));
+				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
 			if (!(mission.getLastVersion().getVersionDate()==null)&&!(mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)))
 				throw new EntityDeletionException("The mission is not on waiting and has a last version date");
 			dal.delete(mission);
@@ -525,6 +533,46 @@ public class MissionController {
 	@PostMapping("/pdf")
 	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
 		//System.out.println(elements.get(0).getId());
+		
+		int n = elements.size();
+		
+		try {
+			
+			if(elements.get(0).getType().equals("m")){
+				Mission mission = dal.findById(elements.get(0).getId())
+						.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+				
+				PdfWriter writer = new PdfWriter("C:\\Users\\mfoltz\\Documents\\iTextHelloWorld.pdf");
+
+		        
+		        PdfDocument pdf = new PdfDocument(writer);
+		        
+		        
+		        Document document = new Document(pdf);
+
+		        
+		        document.add(new Paragraph(mission.getLastVersion().getTitle()));
+		        
+		        
+
+		        
+		        document.close();
+			}
+			else {
+				Project project = dal.findProjectById(elements.get(0).getId())
+						.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			}
+			
+			
+	        
+			
+			
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		} catch (FileNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+		} 
+		
 		return ResponseEntity.ok("");
 	}
 	
