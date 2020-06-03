@@ -603,10 +603,8 @@ public class MissionController {
 				
 			} catch (ResourceNotFoundException e) {
 				return e.buildResponse();
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
-			} catch (MalformedURLException e) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("link not found");
 			} 
 		}
 		

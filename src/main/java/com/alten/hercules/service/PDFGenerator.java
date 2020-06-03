@@ -1,125 +1,62 @@
 package com.alten.hercules.service;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.project.Project;
-import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.events.PdfDocumentEvent;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfName;
-import com.itextpdf.kernel.pdf.PdfNumber;
-import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.layout.Canvas;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.VerticalAlignment;
-import com.itextpdf.kernel.events.Event;
-import com.itextpdf.kernel.events.IEventHandler;
 
-import com.itextpdf.layout.element.AreaBreak;
 
 
 public class PDFGenerator {
 	
 	
-	public static void makeMissionPDF(Mission mission) throws FileNotFoundException, MalformedURLException {
+	public static void makeMissionPDF(Mission mission) throws IOException {
 		
-		PdfWriter writer = new PdfWriter("C:\\Users\\mfoltz\\Documents\\"+mission.getLastVersion().getTitle()+".pdf");
+		
+        //Image logo = new Image(ImageDataFactory.create("src\\main\\resources\\alten.png"));
+        
+        //logo.setWidth(60);
+        //logo.setHeight(99.9f);
+        // Create a document and add a page to it
+        PDDocument document = new PDDocument();
+        PDPage page = new PDPage();
+        document.addPage( page );
 
-        
-        PdfDocument pdf = new PdfDocument(writer);
-        
-        
-        Document document = new Document(pdf);
-        PageOrientationsEventHandler eventHandler1 = new PageOrientationsEventHandler();
-        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, eventHandler1);
-        PageRotationEventHandler eventHandler2 = new PageRotationEventHandler();
-        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, eventHandler2);
-        
-        
+        // Create a new font object selecting one of the PDF base fonts
+        PDFont font = PDType1Font.HELVETICA_BOLD;
 
-        Image logo = new Image(ImageDataFactory.create("src\\main\\resources\\alten.png"));
-        
-        logo.setWidth(30);
-        logo.setHeight(50);
-        
-        Paragraph p = new Paragraph().add(logo).add(mission.getLastVersion().getTitle()).setRotationAngle(Math.PI/2);
-        
-        document.add(p);
-        eventHandler2.setRotation(new PdfNumber(90));
-        
-        
+        // Start a new content stream which will "hold" the to be created content
+        PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
-        //eventHandler.setOrientation(new PdfNumber(90));
-        
-        //doc.add(new Paragraph("A simple page in landscape orientation").setRotationAngle(Math.PI/2).setRelativePosition(100, 0, 0, 0));
+        // Define a text content stream using the selected font, moving the cursor and drawing the text "Hello World"
+        contentStream.beginText();
+        contentStream.setFont( font, 12 );
+        contentStream.showText( "Mission « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" " );
+        contentStream.showText(mission.getLastVersion().getTitle());
+        contentStream.endText();
 
-        
+        // Make sure that the content stream is closed:
+        contentStream.close();
 
+        // Save the results and ensure that the document is properly closed:
+        document.save("C:\\Users\\mfoltz\\Documents\\"+mission.getLastVersion().getTitle()+".pdf");
         document.close();
 	}
 	
 	public static void makeProjectPDF(Project project) throws FileNotFoundException, MalformedURLException {
 		
-		PdfWriter writer = new PdfWriter("C:\\Users\\mfoltz\\Documents\\"+project.getTitle()+".pdf");
-
-        
-        PdfDocument pdf = new PdfDocument(writer);
-        
-        
-        Document document = new Document(pdf);
-        
-        
-        PageOrientationsEventHandler eventHandler = new PageOrientationsEventHandler();
-        pdf.addEventHandler(PdfDocumentEvent.START_PAGE, eventHandler);
-        
-        eventHandler.setOrientation(new PdfNumber(90));
-
-        Image logo = new Image(ImageDataFactory.create("src\\main\\resources\\alten.png"));
-        
-        logo.setWidth(30);
-        logo.setHeight(50);
-        
-        Paragraph p = new Paragraph("").add(logo).add(project.getTitle());
-        
-        document.add(p);
-
-        
-        document.close();
+		
 	}
 	
-	public static class PageOrientationsEventHandler implements IEventHandler {
-        protected PdfNumber orientation = new PdfNumber(0);
-
-        public void setOrientation(PdfNumber orientation) {
-            this.orientation = orientation;
-        }
-
-        @Override
-        public void handleEvent(Event event) {
-            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
-            docEvent.getPage().put(PdfName.Rotate, orientation);
-        }
-    }
 	
-	private static class PageRotationEventHandler implements IEventHandler {
-        private PdfNumber rotation = new PdfNumber(0);
-
-        public void setRotation(PdfNumber orientation) {
-            this.rotation = orientation;
-        }
-
-        @Override
-        public void handleEvent(Event currentEvent) {
-            PdfDocumentEvent docEvent = (PdfDocumentEvent) currentEvent;
-            docEvent.getPage().put(PdfName.Rotate, rotation);
-        }
-    }
+    
 	
 }
