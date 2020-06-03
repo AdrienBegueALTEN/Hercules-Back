@@ -84,5 +84,23 @@ public class StoreImage {
 		}
 		return null;
 	}
+	
+	public void deleteFile(String fileName, String type) {
+		Path filePath = null;
+		switch(type) {
+		case "logo":
+			filePath = this.rootLogo.resolve(fileName).normalize();
+			break;
+		case "project":
+			filePath = this.rootProj.resolve(fileName).normalize();
+			break;
+		}
+		try {
+			Files.delete(filePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -5,8 +5,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -368,8 +370,19 @@ public class MissionController {
 			if (!(project.getMissionSheet().getMission().getLastVersion().getProjects().size() > 1))
 				throw new ProjectsBoundsException();
 			checkIfProjectOfLastVersion(project);
+			removeSkillFromDeletionProject(project);
 			this.storeImage.delete(StoreImage.PROJECT_FOLDER+project.getPicture());
 			dal.removeProject(project);
+	}
+	
+	private void removeSkillFromDeletionProject(Project project) {
+		Set<Skill> skillsCopy = new HashSet<>();
+		for(Skill skill : project.getSkills()) {
+			skillsCopy.add(skill);
+		}
+		for(Skill skill : skillsCopy) {
+			this.dal.removeSkillFromProject(project, skill);
+		}
 	}
 	
 	private void checkIfProjectOfLastVersion(Project project) throws NotLastVersionException {
@@ -420,6 +433,42 @@ public class MissionController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 		}
+	}
+	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@DeleteMapping("/projects/{id}/delete-picture")
+	public ResponseEntity<?> deletePictureManager(@PathVariable Long id) {
+		return this.deletePicture(id);
+	}
+	
+	@PreAuthorize("hasAuthority('MISSION')")
+	@DeleteMapping("/projects/anonymous/{id}/delete-picture")
+	public ResponseEntity<?> deletePictureToken(@PathVariable Long id) {
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		try {
+			Project project = dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+		return this.deletePicture(id);
+	}
+	
+	private ResponseEntity<?> deletePicture(Long projectId){
+		try {
+			Project proj = this.dal.findProjectById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if(proj.getPicture()!=null) {
+				this.storeImage.delete("img/proj/"+proj.getPicture());
+				proj.setPicture(null);
+			}
+			this.dal.saveProject(proj);
+		} catch (ResourceNotFoundException e) {
+			// TODO Auto-generated catch block
+			return e.buildResponse();
+		}
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
 	@GetMapping("/projects/picture/{fileName:.+}")
