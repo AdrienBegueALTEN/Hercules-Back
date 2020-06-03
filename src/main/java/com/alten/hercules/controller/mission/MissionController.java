@@ -222,7 +222,8 @@ public class MissionController {
 							throw new InvalidValueException();
 						if (mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
 							throw new InvalidSheetStatusException();
-						mission.setSheetStatus(status);
+						mission.changeSecret();
+						mission.setSheetStatus(ESheetStatus.VALIDATED);
 					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
 					return ResponseEntity.ok().build(); 
 				case teamSize :
