@@ -3,6 +3,7 @@ package com.alten.hercules.controller.mission;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -59,11 +60,9 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
+import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
+
 
 
 
@@ -536,42 +535,31 @@ public class MissionController {
 		
 		int n = elements.size();
 		
-		try {
-			
-			if(elements.get(0).getType().equals("m")){
-				Mission mission = dal.findById(elements.get(0).getId())
-						.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+		for(int i = 0; i<n ; i++) {
+			try {
 				
-				PdfWriter writer = new PdfWriter("C:\\Users\\mfoltz\\Documents\\iTextHelloWorld.pdf");
-
-		        
-		        PdfDocument pdf = new PdfDocument(writer);
-		        
-		        
-		        Document document = new Document(pdf);
-
-		        
-		        document.add(new Paragraph(mission.getLastVersion().getTitle()));
-		        
-		        
-
-		        
-		        document.close();
-			}
-			else {
-				Project project = dal.findProjectById(elements.get(0).getId())
-						.orElseThrow(() -> new ResourceNotFoundException("Project"));
-			}
+					if(elements.get(i).getType().equals("m")){
+						Mission mission = dal.findById(elements.get(i).getId())
+								.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+						PDFGenerator.makeMissionPDF(mission);
+					
+					}
+					else {
+						Project project = dal.findProjectById(elements.get(i).getId())
+								.orElseThrow(() -> new ResourceNotFoundException("Project"));
+						PDFGenerator.makeProjectPDF(project);
+					}
+				
+			} catch (ResourceNotFoundException e) {
+				return e.buildResponse();
+			} catch (FileNotFoundException e) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+			} catch (MalformedURLException e) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("link not found");
+			} 
+		}
+		
 			
-			
-	        
-			
-			
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		} catch (FileNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
-		} 
 		
 		return ResponseEntity.ok("");
 	}
