@@ -434,6 +434,42 @@ public class MissionController {
 		}
 	}
 	
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@DeleteMapping("/projects/{id}/delete-picture")
+	public ResponseEntity<?> deletePictureManager(@PathVariable Long id) {
+		return this.deletePicture(id);
+	}
+	
+	@PreAuthorize("hasAuthority('MISSION')")
+	@DeleteMapping("/projects/anonymous/{id}/delete-picture")
+	public ResponseEntity<?> deletePictureToken(@PathVariable Long id) {
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		try {
+			Project project = dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
+		return this.deletePicture(id);
+	}
+	
+	private ResponseEntity<?> deletePicture(Long projectId){
+		try {
+			Project proj = this.dal.findProjectById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if(proj.getPicture()!=null) {
+				this.storeImage.delete("img/proj/"+proj.getPicture());
+				proj.setPicture(null);
+			}
+			this.dal.saveProject(proj);
+		} catch (ResourceNotFoundException e) {
+			// TODO Auto-generated catch block
+			return e.buildResponse();
+		}
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+	
 	@GetMapping("/projects/picture/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
