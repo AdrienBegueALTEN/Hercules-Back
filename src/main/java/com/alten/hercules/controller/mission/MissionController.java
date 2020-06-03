@@ -5,8 +5,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -367,8 +369,19 @@ public class MissionController {
 			if (!(project.getMissionSheet().getMission().getLastVersion().getProjects().size() > 1))
 				throw new ProjectsBoundsException();
 			checkIfProjectOfLastVersion(project);
+			removeSkillFromDeletionProject(project);
 			this.storeImage.delete(StoreImage.PROJECT_FOLDER+project.getPicture());
 			dal.removeProject(project);
+	}
+	
+	private void removeSkillFromDeletionProject(Project project) {
+		Set<Skill> skillsCopy = new HashSet<>();
+		for(Skill skill : project.getSkills()) {
+			skillsCopy.add(skill);
+		}
+		for(Skill skill : skillsCopy) {
+			this.dal.removeSkillFromProject(project, skill);
+		}
 	}
 	
 	private void checkIfProjectOfLastVersion(Project project) throws NotLastVersionException {
