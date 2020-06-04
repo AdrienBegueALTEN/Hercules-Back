@@ -62,11 +62,7 @@ public class AuthController {
 	@PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
 	@GetMapping("/change-password-anonymous")
 	public ResponseEntity<?> checkTokenValidity() {
-		AppUser user = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-		Map<String, String> response = new HashMap<String, String>();
-		response.put("firstname", user.getFirstname());
-		response.put("lastname", user.getLastname());
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(null);
 	}
 	
 	@PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
