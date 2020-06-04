@@ -10,6 +10,9 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
 
 import com.alten.hercules.model.mission.Mission;
@@ -21,39 +24,75 @@ public class PDFGenerator {
 	
 	
 	public static void makeMissionPDF(Mission mission) throws IOException {
-		
-		
-        //Image logo = new Image(ImageDataFactory.create("src\\main\\resources\\alten.png"));
-        
-        //logo.setWidth(60);
-        //logo.setHeight(99.9f);
+
         
         PDDocument document = new PDDocument();
         PDPage page = new PDPage(PDRectangle.A4);
         page.setRotation(90);
         document.addPage( page );
 
-        PDRectangle pageSize = page.getMediaBox();
-        float pageWidth = pageSize.getWidth();
         
+        PDFont font1 = PDType1Font.HELVETICA;
+        PDFont font2 = PDType1Font.HELVETICA_BOLD;
         
-        
-        PDFont font = PDType1Font.HELVETICA;
         float height=page.getMediaBox().getHeight();
         float width= page.getMediaBox().getWidth();
+        
+        
+        PDImageXObject layoutAlten = PDImageXObject.createFromFile("src\\main\\resources\\pdflayout.png", document);
+        
+        
+        //Couleurs utilisées
+        PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
+        PDColor black = new PDColor(new float[] { 0f, 0f, 0f }, PDDeviceRGB.INSTANCE);
+        PDColor darkblue = new PDColor(new float[] { 4/255f, 57/255f, 98/255f }, PDDeviceRGB.INSTANCE);
+        PDColor lightblue = new PDColor(new float[] { 0f, 139/255f, 210/255f }, PDDeviceRGB.INSTANCE);
         
         PDPageContentStream contentStream = new PDPageContentStream(document, page);
         
         
-        contentStream.transform(new Matrix(0, 1, -1, 0, pageWidth, 0));
+        contentStream.transform(new Matrix(0, 1, -1, 0, width, 0));
+        contentStream.drawImage(layoutAlten,0,0,height,width);
+        
+        if(mission.getCustomer().getLogo()!=null) {
+	        PDImageXObject customerLogo = PDImageXObject.createFromFile("img\\logo\\"+mission.getCustomer().getLogo(), document);
+	        float optimalHeight = customerLogo.getHeight();
+	        float optimalWidth = customerLogo.getWidth();
+	        if(customerLogo.getWidth()>customerLogo.getHeight()) {
+	        	if(customerLogo.getWidth()>=65) {
+	        		optimalHeight = customerLogo.getHeight()/(customerLogo.getWidth()/65);
+	        		optimalWidth = 65;
+	        	}
+	        }
+	        else {
+	        	if(customerLogo.getHeight()>=65) {
+	        		optimalWidth = customerLogo.getWidth()/(customerLogo.getHeight()/65);
+	        		optimalHeight = 65;
+	        	}
+	        }
+	        
+	        contentStream.drawImage(customerLogo, height-70,width-70,optimalWidth,optimalHeight); //65 max en hauteur   65 max en largeur
+        }
+        	
+        
         contentStream.beginText();
-        contentStream.setFont( font, 12 );
-        contentStream.newLineAtOffset(50, width-62);
+        contentStream.setFont( font1, 12 );
+        contentStream.setNonStrokingColor(white);
+        contentStream.newLineAtOffset(75, width-70);
         contentStream.showText(mission.getLastVersion().getTitle());
-        contentStream.newLineAtOffset(0,25);
-        contentStream.showText( "Mission « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" " );
+        contentStream.newLineAtOffset(0,35);
+        contentStream.setFont(font2, 18);
+        contentStream.setNonStrokingColor(darkblue);
+        contentStream.showText( "Mission");
+        contentStream.setFont(font1, 18);
+        contentStream.showText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" " );
         contentStream.endText();
-
+        
+        contentStream.beginText();
+        contentStream.endText();
+        
+        
+        System.out.println(mission.getCustomer().getLogo());
         
         contentStream.close();
         
