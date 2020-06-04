@@ -37,6 +37,7 @@ import com.alten.hercules.dal.CustomerDAL;
 import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
+import com.alten.hercules.model.project.Project;
 import com.alten.hercules.service.StoreImage;
 
 @CrossOrigin(origins = "*")
@@ -124,12 +125,12 @@ public class CustomerController {
 		return ResponseEntity.ok().build();
 	}
 
-	@PostMapping("/{id}/upload-logo")
+	@PostMapping("/{id}/logo")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
 			Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
 			if(customer.getLogo()!=null) {
-				this.storeImage.delete("img/logo/"+customer.getLogo());
+				this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
 				customer.setLogo(null);
 			}
 			storeImage.save(file,"logo");
@@ -145,22 +146,15 @@ public class CustomerController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"logo");
-        
-        if(resource == null) {
-        	return ResponseEntity.notFound().build();
-        }
+        if(resource == null) return ResponseEntity.notFound().build();
 
         // Try to determine file's content type
         String contentType = null;
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-        	System.err.println(ex);
-        } 
+        } catch (IOException ex) {System.err.println(ex);} 
         
-        if(contentType == null) {
-        	contentType = "application/octet-stream";
-        }
+        if(contentType == null) contentType = "application/octet-stream";
         
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
@@ -169,5 +163,20 @@ public class CustomerController {
         
     }
 	
+	@DeleteMapping("/{id}/logo")
+	private ResponseEntity<?> deletePicture(@PathVariable Long id){
+		try {
+			Customer customer = this.dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer"));
+			if(customer.getLogo()!=null) {
+				this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
+				customer.setLogo(null);
+			}
+			this.dal.save(customer);
+		} catch (ResourceNotFoundException e) {
+			// TODO Auto-generated catch block
+			return e.buildResponse();
+		}
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 
 }
