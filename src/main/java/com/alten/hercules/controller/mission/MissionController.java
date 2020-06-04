@@ -1,6 +1,9 @@
 package com.alten.hercules.controller.mission;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.mission.http.request.AddMissionRequest;
+import com.alten.hercules.controller.mission.http.request.GeneratePDFRequest;
 import com.alten.hercules.controller.mission.http.response.RefinedMissionResponse;
 import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.MissionDAL;
@@ -58,7 +62,11 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
+import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
+
+
+
 
 @RestController
 @CrossOrigin(origins="*")
@@ -98,7 +106,7 @@ public class MissionController {
 	public ResponseEntity<?> deleteMission(@PathVariable Long id) {
 		try {
 			Mission mission = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("mission"));
+				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
 			if (!(mission.getLastVersion().getVersionDate()==null)&&!(mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)))
 				throw new EntityDeletionException("The mission is not on waiting and has a last version date");
 			dal.delete(mission);
@@ -570,6 +578,42 @@ public class MissionController {
 	public ResponseEntity<?> getAllSkills() {
 		return ResponseEntity.ok(this.dal.findAllSkills());
 	}
+	
+	
+	@PostMapping("/pdf")
+	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
+		//System.out.println(elements.get(0).getId());
+		
+		int n = elements.size();
+		
+		for(int i = 0; i<n ; i++) {
+			try {
+				
+					if(elements.get(i).getType().equals("m")){
+						Mission mission = dal.findById(elements.get(i).getId())
+								.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+						PDFGenerator.makeMissionPDF(mission);
+					
+					}
+					else {
+						Project project = dal.findProjectById(elements.get(i).getId())
+								.orElseThrow(() -> new ResourceNotFoundException("Project"));
+						PDFGenerator.makeProjectPDF(project);
+					}
+				
+			} catch (ResourceNotFoundException e) {
+				return e.buildResponse();
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+			} 
+		}
+		
+			
+		
+		return ResponseEntity.ok("");
+	}
+	
+	
 	
 	
 }
