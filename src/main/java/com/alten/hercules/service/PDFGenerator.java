@@ -96,7 +96,7 @@ public class PDFGenerator {
         
         contentStream.close();
         
-        document.save("C:\\Users\\mfoltz\\Documents\\"+mission.getLastVersion().getTitle()+".pdf");
+        document.save("..\\"+mission.getLastVersion().getTitle()+".pdf");
         document.close();
 	}
 	
