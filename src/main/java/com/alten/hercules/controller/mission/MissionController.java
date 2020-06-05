@@ -87,7 +87,7 @@ public class MissionController {
 	public ResponseEntity<?> TestAdvancedSearch()
 	{
 		List<Mission> body;
-		body = dal.advancedSearch("Titre v1","","","","","","");
+		body = dal.advancedSearch("","","","","","Jul","");
 		return ResponseEntity.ok(body);
 	}
 	

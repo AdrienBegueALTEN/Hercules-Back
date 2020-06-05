@@ -91,10 +91,50 @@ public class MissionDAL {
         List<Predicate> criteriaList = new ArrayList<>();
         
         
-        
-        Predicate firstCondition = criteriaBuilder.equal(sheetJoin.get("title"), missionTitle);
+        if(queryMissionTitle)
+        {
+        Predicate firstCondition = criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%");
         criteriaList.add(firstCondition);
+        }
         
+        
+        if(queryCustomerName)
+        {
+        Predicate secondCondition = criteriaBuilder.like(customerJoin.get("name"), "%" + customerName + "%");
+        criteriaList.add(secondCondition);
+        }
+        
+        if(queryActivitySector)
+        {
+        	 Predicate thirdCondition = criteriaBuilder.like(customerJoin.get("activitySector"), "%" + activitySector + "%");
+        	 criteriaList.add(thirdCondition);
+        }
+        
+        if(queryMissionCity)
+        {
+        	 Predicate fourthCondition = criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%");
+        	 criteriaList.add(fourthCondition);
+        }
+        
+        if(queryMissionCountry)
+        {
+         Predicate fifthCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
+       	 criteriaList.add(fifthCondition);
+        }
+        
+        if(queryConsultantFirstName)
+        {
+        	Predicate sixthCondition = criteriaBuilder.like(consultantJoin.get("firstname"), "%" + consultantFirstName + "%");
+        	criteriaList.add(sixthCondition);
+        }
+        
+        if(queryConsultantLastName)
+        {
+        	Predicate seventhCondition = criteriaBuilder.like(consultantJoin.get("lastname"), "%" + consultantLastName + "%");
+        	criteriaList.add(seventhCondition);	
+        }
+        
+        System.out.println(queryMissionTitle);
         
         
         criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
