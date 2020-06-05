@@ -11,8 +11,10 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,17 +137,28 @@ public class MissionDAL {
         }
         
         System.out.println(queryMissionTitle);
-        
-        
+        /*
+        Expression<Object> caseExpression = criteriaBuilder.selectCase()
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_WAITING")), 1)
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_GOING")), 2)
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("VALIDATED")), 3);
+
+    	Order temp2 = criteriaBuilder.asc(caseExpression);
+    	criteriaQuery = criteriaQuery.orderBy(temp2);
+        */
         criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
 	    
-	    //criteriaQuery.where(criteriaBuilder.equal(missionRoot.get("id"), 2));
+	    
 	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
-	    //Join<Mission, Consultant> p = variableRoot.join("consultant_id", JoinType.INNER);
-	    
+	    /*
+	    Expression<Object> caseExpression = criteriaBuilder.selectCase()
+	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_WAITING")), 1)
+	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_GOING")), 2)
+	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("VALIDATED")), 3)
 
-
-	    
+	Order temp2 = criteriaBuilder.asc(caseExpression);
+	criteriaQuery = criteriaQuery.orderBy(temp2);
+	    */
 
 	    return query.getResultList();
 	}
