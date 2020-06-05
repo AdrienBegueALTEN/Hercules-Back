@@ -69,7 +69,16 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
-	public List<Mission> loadAllVariables() {
+	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName) {
+		
+		
+		boolean queryMissionTitle = missionTitle != null && !missionTitle.equals("");
+		boolean queryCustomerName = customerName != null && !customerName.equals("");
+		boolean queryActivitySector = activitySector != null && !activitySector.equals("");
+		boolean queryMissionCity = missionCity != null && !missionCity.equals("");
+		boolean queryMissionCountry = missionCountry != null && !missionCountry.equals("");
+		boolean queryConsultantFirstName = consultantFirstName != null && !consultantFirstName.equals("");
+		boolean queryConsultantLastName = consultantLastName != null && !consultantLastName.equals("");
 		
 		
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -81,26 +90,23 @@ public class MissionDAL {
 	    
         List<Predicate> criteriaList = new ArrayList<>();
         
-        Predicate firstCondition = criteriaBuilder.equal(sheetJoin.get("title"), "Titre v1");
+        
+        
+        Predicate firstCondition = criteriaBuilder.equal(sheetJoin.get("title"), missionTitle);
         criteriaList.add(firstCondition);
+        
+        
+        
         criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
 	    
 	    //criteriaQuery.where(criteriaBuilder.equal(missionRoot.get("id"), 2));
 	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
 	    //Join<Mission, Consultant> p = variableRoot.join("consultant_id", JoinType.INNER);
 	    
-	    //Join<Mission, Consultant> consultant = missionRoot.join("consultant", JoinType.INNER);
-	    //Join<Mission, MissionSheet> missionSheet = consultant.join("versions", JoinType.INNER);
-	    //Join<Mission, Customer> customer = missionSheet.join("customer", JoinType.INNER);
+
+
 	    
-	    
-	    //Join<Mission, Consultant> consultant = missionRoot.join("consultant", JoinType.INNER);
-	    //Join<Mission, MissionSheet> missionSheet = missionRoot.join("versions", JoinType.INNER);
-	    //Join<Mission, Customer> customer = missionRoot.join("customer", JoinType.INNER);
-	    
-	    //criteriaQuery.select(missionRoot);
-	    //return em.createQuery(criteriaQuery).getResultList();
-	    
+
 	    return query.getResultList();
 	}
 	
