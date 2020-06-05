@@ -81,6 +81,16 @@ public class MissionController {
 		return getMissionDetails(id, true);
 	}
 	
+	
+	@GetMapping("/testcriteria")
+	public ResponseEntity<?> TestAdvancedSearch()
+	{
+		List<Mission> body;
+		body = dal.loadAllVariables();
+		return ResponseEntity.ok(body);
+	}
+	
+	
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/anonymous")
 	public ResponseEntity<?> getMissionFromToken() {

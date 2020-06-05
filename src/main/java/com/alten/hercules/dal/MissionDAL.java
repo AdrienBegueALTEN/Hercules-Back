@@ -3,6 +3,12 @@ package com.alten.hercules.dal;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.CriteriaQuery;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alten.hercules.dao.consultant.ConsultantDAO;
@@ -30,6 +36,9 @@ public class MissionDAL {
 	@Autowired private ProjectDAO projectDAO;
 	@Autowired private SkillDAO skillDAO;
 	
+	@PersistenceContext
+	EntityManager em;
+	
 	public Optional<Mission> findById(Long id) {
 		return missionDAO.findById(id);
 	}
@@ -54,6 +63,14 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
+	public List<Mission> loadAllVariables() {
+	    CriteriaBuilder builder = em.getCriteriaBuilder();
+	    CriteriaQuery<Mission> query = builder.createQuery(Mission.class);
+	    Root<Mission> variableRoot = query.from(Mission.class);
+	    query.select(variableRoot);
+
+	    return em.createQuery(query).getResultList();
+	}
 
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
 		return sheetDAO.findMostRecentVersion(missionId);
