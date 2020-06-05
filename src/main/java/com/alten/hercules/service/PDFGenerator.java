@@ -3,6 +3,8 @@ package com.alten.hercules.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +38,7 @@ public class PDFGenerator {
         page.setRotation(90);
         document.addPage( page );
 
-        
+        // Polices utilisées
         PDFont font1 = PDType1Font.HELVETICA;
         PDFont font2 = PDType1Font.HELVETICA_BOLD;
         PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
@@ -44,9 +46,14 @@ public class PDFGenerator {
         float height=page.getMediaBox().getHeight();
         float width= page.getMediaBox().getWidth();
         
-        
+        // Images utilisées
         PDImageXObject layoutAlten = PDImageXObject.createFromFile("src\\main\\resources\\pdflayout.png", document);
         PDImageXObject blueStick = PDImageXObject.createFromFile("src\\main\\resources\\bluestick.png", document);
+        PDImageXObject contractIcon = PDImageXObject.createFromFile("src\\main\\resources\\contrat.png", document);
+        PDImageXObject teamIcon = PDImageXObject.createFromFile("src\\main\\resources\\equipe.png", document);
+        PDImageXObject durationIcon = PDImageXObject.createFromFile("src\\main\\resources\\duree.png", document);
+        PDImageXObject localizationIcon = PDImageXObject.createFromFile("src\\main\\resources\\localisation.png", document);
+        
         
         //Couleurs utilisées
         PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
@@ -59,7 +66,7 @@ public class PDFGenerator {
         
         contentStream.transform(new Matrix(0, 1, -1, 0, width, 0));
         
-        //
+        // en-tête
         contentStream.drawImage(layoutAlten,0,0,height,width);
         
         if(mission.getCustomer().getLogo()!=null) {
@@ -96,7 +103,7 @@ public class PDFGenerator {
         contentStream.showText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" " );
         contentStream.endText();
         
-        //
+        // description du client
         contentStream.drawImage(blueStick,60,280,15,220);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(75, 280, 220, 220);
@@ -114,13 +121,13 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(0, -5);
         
         String customerDescription = mission.getCustomer().getDescription();
-        for(String line : separateLines(customerDescription,font1,185)) {
+        for(String line : separateLines(customerDescription,font1,185,10)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
         }
         contentStream.endText();
                 
-        //
+        // description de la mission
         contentStream.drawImage(blueStick,315,280,15,220);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(330, 280, 480, 220);
@@ -135,13 +142,13 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(black);
         
         String missionDescription = mission.getLastVersion().getDescription();
-        for(String line : separateLines(missionDescription,font1,445)) {
+        for(String line : separateLines(missionDescription,font1,445,10)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
         }
         contentStream.endText();
         
-        //
+        // diplômes du consultant
         contentStream.drawImage(blueStick,315,80,15,180);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(330, 80, 220, 180);
@@ -157,11 +164,11 @@ public class PDFGenerator {
         
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
         for(Diploma diploma : diplomas ) {
-	        for(String line : separateLines(diploma.getEntitled(),font1,185)) {
+	        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
 	        }
-	        for(String line : separateLines(diploma.getEstablishment(),font1,185)) {
+	        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
 	        }
@@ -169,7 +176,7 @@ public class PDFGenerator {
         }
         contentStream.endText();
         
-        //
+        // compétences de la mission
         contentStream.drawImage(blueStick,565,80,15,180);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(580, 80, 230, 180);
@@ -187,13 +194,67 @@ public class PDFGenerator {
         for(Project project : projects ) {
         	Set<Skill> skills =  project.getSkills();
         	for(Skill skill : skills) {
-		        for(String line : separateLines(skill.getLabel(),font1,195)) {
+		        for(String line : separateLines(skill.getLabel(),font1,195,10)) {
 		        	contentStream.newLineAtOffset(0, -15);
 		        	contentStream.showText(line);
 		        }
         	}
         }
         contentStream.endText();
+        
+        // Commentaire
+        contentStream.setNonStrokingColor(lightblue);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(60, 240);
+        contentStream.setFont( font2, 15 );
+        contentStream.showText("«");
+        contentStream.newLineAtOffset(0, -5);
+        contentStream.setFont( font1, 10 );
+        String commentary = mission.getLastVersion().getComment();
+        for(String line : separateLines(commentary,font1,220,10)) {
+        	contentStream.newLineAtOffset(0, -15);
+        	contentStream.showText(line);
+        }
+        contentStream.newLineAtOffset(220, -15);
+        contentStream.setFont( font2, 15 );
+        contentStream.showText("»");
+        contentStream.endText();
+        
+        
+        
+        // Note de version
+        contentStream.setNonStrokingColor(black);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(10, 10);
+        contentStream.setFont( font1, 10 );
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); 
+        contentStream.showText(dateFormat.format(mission.getLastVersion().getVersionDate()));
+        contentStream.endText();
+        
+        // Bulles
+        
+        float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves 
+        int rayon = 28;
+        int cx1 = 420;
+        int cy1 = 40;
+        
+        
+        // Bulle contrat
+        contentStream.setNonStrokingColor(white);
+        contentStream.moveTo(cx1 - rayon, cy1);
+        contentStream.curveTo(cx1 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1, cy1 + rayon);
+        contentStream.curveTo(cx1 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 + rayon, cy1);
+        contentStream.curveTo(cx1 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx1 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx1, cy1 - rayon);
+        contentStream.curveTo(cx1 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx1 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx1 - rayon, cy1);
+        contentStream.fill();
+        contentStream.drawImage(contractIcon,411,45,contractIcon.getWidth()/3,contractIcon.getHeight()/3);
+        contentStream.setNonStrokingColor(black);
+        contentStream.setFont( font1, 8 );
+        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1);
+        
+        
+        // Bulle équipe 
+        
         
         contentStream.close();
         
@@ -206,7 +267,17 @@ public class PDFGenerator {
 		
 	}
 	
-	private static List<String> separateLines(String text,PDFont font, int maxWidth ) throws IOException{
+	
+	 
+	/**
+	 * Fonction qui va prendre en argument un String text et le découper en plusieurs lignes de façon à ce que chaque ligne soit de longueur inférieure à maxWidth avec la police font.
+	 * @param text String contenant le texte à découper
+	 * @param font PDFont utilisé pour le texte
+	 * @param maxWidth longueur maximale d'une ligne
+	 * @return Une List<String> contenant le texte donné en argument où chaque ligne
+	 * @throws IOException
+	 */
+	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize ) throws IOException{
 		
 		if(text == null)
 			return new ArrayList<String>();
@@ -217,7 +288,7 @@ public class PDFGenerator {
         	end2 = text.indexOf(" ", end1+1);
         	if(end2<0)
         		end2 = text.length();
-        	float size = font.getStringWidth(text.substring(0, end2))/100;
+        	float size = fontSize*font.getStringWidth(text.substring(0, end2))/1000;
         	if(size>maxWidth) {
         		if(end1<0)
         			end1 = end2;
@@ -238,5 +309,28 @@ public class PDFGenerator {
         return lines;
 	}
     
+	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx) throws IOException {
+		List<String> lines = separateLines(text,PDType1Font.HELVETICA,46,8);
+		int count = 0;
+		for(String line : lines) {
+			float size = 8*PDType1Font.HELVETICA.getStringWidth(line)/1000;
+			contentStream.beginText();
+			contentStream.newLineAtOffset(cx-size/2, 35-10*count);
+			contentStream.showText(line);
+			contentStream.endText();
+			count ++;
+		}
+		
+	}
 	
+	private static String modifyText(String text) {
+		if(text.equals("technical_assistance")) {
+			return "Assistance technique";
+		}
+		else if(text.equals("")) {
+			return text;
+		}
+		else 
+			return text;
+	}
 }
