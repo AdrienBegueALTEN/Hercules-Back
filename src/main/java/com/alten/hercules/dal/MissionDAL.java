@@ -90,9 +90,6 @@ public class MissionDAL {
 	    CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
 	    Root<Mission> missionRoot = criteriaQuery.from(Mission.class);
 	    
-	    //Truc ajouté
-	    //Fetch<Mission, Consultant> consultantFetch = missionRoot.fetch("consultant", JoinType.LEFT);
-	    
 	    
 	    Join<Mission, Consultant> consultantJoin = missionRoot.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = missionRoot.join("customer", JoinType.INNER);
@@ -105,61 +102,67 @@ public class MissionDAL {
         
         if(queryMissionTitle)
         {
-        Predicate firstCondition = criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%");
-        criteriaList.add(firstCondition);
+        Predicate titleCondition = criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%");
+        criteriaList.add(titleCondition);
         }
         
         if(queryMissionCity)
         {
-        	 Predicate fourthCondition = criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%");
-        	 criteriaList.add(fourthCondition);
+        	 Predicate cityCondition = criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%");
+        	 criteriaList.add(cityCondition);
         }
         
         if(queryMissionCountry)
         {
-         Predicate fifthCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
-       	 criteriaList.add(fifthCondition);
+         Predicate countryCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
+       	 criteriaList.add(countryCondition);
         }
         
         
         if(queryCustomerName)
         {
-        Predicate secondCondition = criteriaBuilder.like(customerJoin.get("name"), "%" + customerName + "%");
-        criteriaList.add(secondCondition);
+        Predicate customerNameCondition = criteriaBuilder.like(customerJoin.get("name"), "%" + customerName + "%");
+        criteriaList.add(customerNameCondition);
         }
         
         if(queryActivitySector)
         {
-        	 Predicate thirdCondition = criteriaBuilder.like(customerJoin.get("activitySector"), "%" + activitySector + "%");
-        	 criteriaList.add(thirdCondition);
+        	 Predicate activitySectorCondition = criteriaBuilder.like(customerJoin.get("activitySector"), "%" + activitySector + "%");
+        	 criteriaList.add(activitySectorCondition);
         }
         
         
         
         if(queryConsultantFirstName)
         {
-        	Predicate sixthCondition = criteriaBuilder.like(consultantJoin.get("firstname"), "%" + consultantFirstName + "%");
-        	criteriaList.add(sixthCondition);
+        	Predicate consultantFirstNameCondition = criteriaBuilder.like(consultantJoin.get("firstname"), "%" + consultantFirstName + "%");
+        	criteriaList.add(consultantFirstNameCondition);
         }
         
         if(queryConsultantLastName)
         {
-        	Predicate seventhCondition = criteriaBuilder.like(consultantJoin.get("lastname"), "%" + consultantLastName + "%");
-        	criteriaList.add(seventhCondition);	
+        	Predicate consultantLastNameCondition = criteriaBuilder.like(consultantJoin.get("lastname"), "%" + consultantLastName + "%");
+        	criteriaList.add(consultantLastNameCondition);	
         }
         
-        
-        //System.out.println(queryMissionTitle);
+
+    	Predicate AllValidatedMissions = criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), "VALIDATED");
+    	Predicate MyMissions = criteriaBuilder.equal(consultantJoin.get("manager"), managerId);
+    	Predicate AllValidatedMissionsOrMyMissions = criteriaBuilder.or(AllValidatedMissions,MyMissions);
+    	
+    	criteriaList.add(AllValidatedMissionsOrMyMissions);
           
         Expression<Object> caseExpression = criteriaBuilder.selectCase()
     	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("VALIDATED")), 3)
     	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("ON_GOING")), 2)
     	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("ON_WAITING")), 1);
 
-    	Order temp2 = criteriaBuilder.asc(caseExpression);
-    	criteriaQuery = criteriaQuery.orderBy(temp2);
+     
+    	Order bySheetStatus = criteriaBuilder.asc(caseExpression);
+    	criteriaQuery = criteriaQuery.orderBy(bySheetStatus);
         
-        criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
+    	
+    	criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
 	    
 	   
         
