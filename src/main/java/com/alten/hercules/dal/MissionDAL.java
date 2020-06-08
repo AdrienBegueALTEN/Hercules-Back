@@ -1,6 +1,7 @@
 package com.alten.hercules.dal;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
@@ -47,6 +49,7 @@ public class MissionDAL {
 	@PersistenceContext
 	EntityManager em;
 	
+	
 	public Optional<Mission> findById(Long id) {
 		return missionDAO.findById(id);
 	}
@@ -71,7 +74,7 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
-	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName) {
+	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) {
 		
 		
 		boolean queryMissionTitle = missionTitle != null && !missionTitle.equals("");
@@ -86,8 +89,15 @@ public class MissionDAL {
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 	    CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
 	    Root<Mission> missionRoot = criteriaQuery.from(Mission.class);
+	    
+	    //Truc ajouté
+	    //Fetch<Mission, Consultant> consultantFetch = missionRoot.fetch("consultant", JoinType.LEFT);
+	    
+	    
 	    Join<Mission, Consultant> consultantJoin = missionRoot.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = missionRoot.join("customer", JoinType.INNER);
+	    
+	    
 	    Join<Mission, Customer> sheetJoin = missionRoot.join("versions", JoinType.INNER);
 	    
         List<Predicate> criteriaList = new ArrayList<>();
@@ -97,6 +107,18 @@ public class MissionDAL {
         {
         Predicate firstCondition = criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%");
         criteriaList.add(firstCondition);
+        }
+        
+        if(queryMissionCity)
+        {
+        	 Predicate fourthCondition = criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%");
+        	 criteriaList.add(fourthCondition);
+        }
+        
+        if(queryMissionCountry)
+        {
+         Predicate fifthCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
+       	 criteriaList.add(fifthCondition);
         }
         
         
@@ -112,17 +134,7 @@ public class MissionDAL {
         	 criteriaList.add(thirdCondition);
         }
         
-        if(queryMissionCity)
-        {
-        	 Predicate fourthCondition = criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%");
-        	 criteriaList.add(fourthCondition);
-        }
         
-        if(queryMissionCountry)
-        {
-         Predicate fifthCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
-       	 criteriaList.add(fifthCondition);
-        }
         
         if(queryConsultantFirstName)
         {
@@ -136,30 +148,26 @@ public class MissionDAL {
         	criteriaList.add(seventhCondition);	
         }
         
-        System.out.println(queryMissionTitle);
-        /*
+        
+        //System.out.println(queryMissionTitle);
+          
         Expression<Object> caseExpression = criteriaBuilder.selectCase()
-    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_WAITING")), 1)
-    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_GOING")), 2)
-    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("VALIDATED")), 3);
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("VALIDATED")), 3)
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("ON_GOING")), 2)
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("ON_WAITING")), 1);
 
     	Order temp2 = criteriaBuilder.asc(caseExpression);
     	criteriaQuery = criteriaQuery.orderBy(temp2);
-        */
+        
         criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
 	    
-	    
+	   
+        
 	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
-	    /*
-	    Expression<Object> caseExpression = criteriaBuilder.selectCase()
-	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_WAITING")), 1)
-	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("ON_GOING")), 2)
-	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus"), criteriaBuilder.literal("VALIDATED")), 3)
-
-	Order temp2 = criteriaBuilder.asc(caseExpression);
-	criteriaQuery = criteriaQuery.orderBy(temp2);
-	    */
-
+	    
+	    
+	    
+	    
 	    return query.getResultList();
 	}
 	
@@ -170,6 +178,7 @@ public class MissionDAL {
 	    
 	    
 	    criteriaQuery.where(criteriaBuilder.equal(missionRoot.get("id"), 1));
+	    //In<String> inClause = criteriaBuilder.in(root.get("title"));
 	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
 	    //Join<Mission, Consultant> p = variableRoot.join("consultant_id", JoinType.INNER);
 	    
