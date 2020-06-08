@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -237,6 +240,9 @@ public class PDFGenerator {
         int rayon = 28;
         int cx1 = 420;
         int cy1 = 40;
+        int cx2 = 520;
+        int cx3 = 620;
+        int cx4 = 720;
         
         
         // Bulle contrat
@@ -254,7 +260,57 @@ public class PDFGenerator {
         
         
         // Bulle équipe 
+        contentStream.setNonStrokingColor(white);
+        contentStream.moveTo(cx2 - rayon, cy1);
+        contentStream.curveTo(cx2 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2, cy1 + rayon);
+        contentStream.curveTo(cx2 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 + rayon, cy1);
+        contentStream.curveTo(cx2 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx2 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx2, cy1 - rayon);
+        contentStream.curveTo(cx2 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx2 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx2 - rayon, cy1);
+        contentStream.fill();
+        contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
+        contentStream.setNonStrokingColor(black);
+        contentStream.setFont( font1, 8 );
+        showCenteredText(contentStream,modifyText("Taille : "+mission.getLastVersion().getTeamSize().toString()),cx2);
         
+     // Bulle durée 
+        contentStream.setNonStrokingColor(white);
+        contentStream.moveTo(cx3 - rayon, cy1);
+        contentStream.curveTo(cx3 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3, cy1 + rayon);
+        contentStream.curveTo(cx3 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 + rayon, cy1);
+        contentStream.curveTo(cx3 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx3 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx3, cy1 - rayon);
+        contentStream.curveTo(cx3 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx3 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx3 - rayon, cy1);
+        contentStream.fill();
+        contentStream.drawImage(durationIcon,610,45,durationIcon.getWidth()/3,durationIcon.getHeight()/3);
+        contentStream.setNonStrokingColor(black);
+        contentStream.setFont( font1, 8 );
+        int durationDay = 0;
+        int durationMonth = 0;
+        int durationYear = 0;
+        for(Project project : projects ) {
+        	if(project.getBeginDate()!=null && project.getEndDate()!=null) {
+	        	Period period = Period.between(project.getBeginDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+	        			                       project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+	        	durationDay +=  period.getDays();
+	        	durationMonth += period.getMonths();
+	        	durationYear += period.getYears();
+        	}
+        	
+        }
+        
+        showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3);
+        
+     // Bulle localisation
+        contentStream.setNonStrokingColor(white);
+        contentStream.moveTo(cx4 - rayon, cy1);
+        contentStream.curveTo(cx4 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4, cy1 + rayon);
+        contentStream.curveTo(cx4 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 + rayon, cy1);
+        contentStream.curveTo(cx4 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx4 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx4, cy1 - rayon);
+        contentStream.curveTo(cx4 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx4 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx4 - rayon, cy1);
+        contentStream.fill();
+        contentStream.drawImage(localizationIcon,709,45,localizationIcon.getWidth()/3,localizationIcon.getHeight()/3);
+        contentStream.setNonStrokingColor(black);
+        contentStream.setFont( font1, 8 );
+        showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4);
         
         contentStream.close();
         
@@ -310,7 +366,7 @@ public class PDFGenerator {
 	}
     
 	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx) throws IOException {
-		List<String> lines = separateLines(text,PDType1Font.HELVETICA,46,8);
+		List<String> lines = separateLines(text,PDType1Font.HELVETICA,42,8);
 		int count = 0;
 		for(String line : lines) {
 			float size = 8*PDType1Font.HELVETICA.getStringWidth(line)/1000;
@@ -327,10 +383,37 @@ public class PDFGenerator {
 		if(text.equals("technical_assistance")) {
 			return "Assistance technique";
 		}
-		else if(text.equals("")) {
-			return text;
+		else if(text.equals("services_center")) {
+			return "Centre de services";
+		}
+		else if(text.equals("flat_fee")) {
+			return "Forfait";
 		}
 		else 
 			return text;
+	}
+	
+	private static String durationToText(Integer days, Integer months, Integer years) {
+		if(days<7) {
+			if(days == 0 || days==1 )
+				return days.toString()+" jour";
+			else
+				return days.toString()+" jours";
+		}
+		else if(days>=7 && months<1) {
+			if(days/7 == 1)
+				return Integer.valueOf(days/7).toString()+" semaine";
+			else
+				return Integer.valueOf(days/7).toString()+" semaines";
+		}
+		else if(months>=1 && years<1) {
+			return months.toString()+" mois";
+		}
+		else {
+			if(years==1)
+				return years.toString()+" année";
+			else
+				return years.toString()+" années";
+		}
 	}
 }
