@@ -74,7 +74,10 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
-	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) {
+	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) 
+	//public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName) 
+	
+	{
 		
 		
 		boolean queryMissionTitle = missionTitle != null && !missionTitle.equals("");
@@ -89,17 +92,19 @@ public class MissionDAL {
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 	    CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
 	    Root<Mission> missionRoot = criteriaQuery.from(Mission.class);
-	    
+	    //Root<MissionSheet> sheetRoot = criteriaQuery.from(MissionSheet.class);
 	    
 	    Join<Mission, Consultant> consultantJoin = missionRoot.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = missionRoot.join("customer", JoinType.INNER);
 	    
 	    
-	    Join<Mission, Customer> sheetJoin = missionRoot.join("versions", JoinType.INNER);
+	    //Join<Mission, MissionSheet> sheetJoin = missionRoot.join("mission", JoinType.LEFT);
+	    //Join<MissionSheet>
 	    
         List<Predicate> criteriaList = new ArrayList<>();
         
         
+        /*
         if(queryMissionTitle)
         {
         Predicate titleCondition = criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%");
@@ -117,7 +122,7 @@ public class MissionDAL {
          Predicate countryCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
        	 criteriaList.add(countryCondition);
         }
-        
+        */
         
         if(queryCustomerName)
         {
@@ -145,12 +150,13 @@ public class MissionDAL {
         	criteriaList.add(consultantLastNameCondition);	
         }
         
-
+        
     	Predicate AllValidatedMissions = criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), "VALIDATED");
     	Predicate MyMissions = criteriaBuilder.equal(consultantJoin.get("manager"), managerId);
     	Predicate AllValidatedMissionsOrMyMissions = criteriaBuilder.or(AllValidatedMissions,MyMissions);
     	
     	criteriaList.add(AllValidatedMissionsOrMyMissions);
+    	
           
         Expression<Object> caseExpression = criteriaBuilder.selectCase()
     	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("VALIDATED")), 3)

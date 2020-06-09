@@ -86,9 +86,21 @@ public class MissionController {
 	@GetMapping("/testcriteria")
 	public ResponseEntity<?> TestAdvancedSearch()
 	{
+		/*
 		List<Mission> body;
 		body = dal.advancedSearch("","","","","France","","",1);
 		return ResponseEntity.ok(body);
+		*/
+		
+		
+		
+		List<CompleteMissionResponse> bodyComplete;
+		bodyComplete = dal.advancedSearch("","","","","France","","",1).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(bodyComplete);
+		
+		
 	}
 	
 	
