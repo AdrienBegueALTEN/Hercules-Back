@@ -1,9 +1,6 @@
 package com.alten.hercules.controller.mission;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,6 +15,7 @@ import javax.persistence.Tuple;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -65,9 +63,6 @@ import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
 import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
-
-
-
 
 @RestController
 @CrossOrigin(origins="*")
@@ -257,6 +252,7 @@ public class MissionController {
 							throw new InvalidSheetStatusException();
 						mission.changeSecret();
 						mission.setSheetStatus(ESheetStatus.VALIDATED);
+						mostRecentVersion.setVersionDate(new Date());
 						dal.save(mission);
 					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
 					return ResponseEntity.ok().build(); 
@@ -608,20 +604,20 @@ public class MissionController {
 		
 		
 		int n = elements.size();
+		PDDocument document = new PDDocument();
 		
 		for(int i = 0; i<n ; i++) {
 			try {
 				
 					if(elements.get(i).getType().equals("m")){
-						Mission mission = dal.findById(elements.get(i).getId())
-								.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-						PDFGenerator.makeMissionPDF(mission);
+						Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
+						PDFGenerator.makeMissionPDF(mission,document);
 					
 					}
 					else {
 						Project project = dal.findProjectById(elements.get(i).getId())
 								.orElseThrow(() -> new ResourceNotFoundException("Project"));
-						PDFGenerator.makeProjectPDF(project);
+						PDFGenerator.makeProjectPDF(project,document);
 					}
 				
 			} catch (ResourceNotFoundException e) {
@@ -631,7 +627,11 @@ public class MissionController {
 			} 
 		}
 		
-			
+		try {
+			PDFGenerator.saveFinalPDF(document);
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("file not saved");
+		}
 		
 		return ResponseEntity.ok("");
 	}

@@ -1,10 +1,8 @@
 package com.alten.hercules.controller.customer;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +33,8 @@ import com.alten.hercules.controller.customer.http.request.AddCustomerRequest;
 import com.alten.hercules.controller.customer.http.response.BasicCustomerResponse;
 import com.alten.hercules.controller.mission.http.response.CompleteMissionResponse;
 import com.alten.hercules.dal.CustomerDAL;
-import com.alten.hercules.dao.customer.CustomerDAO;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
-import com.alten.hercules.model.project.Project;
 import com.alten.hercules.service.StoreImage;
 
 @CrossOrigin(origins = "*")
@@ -85,6 +82,7 @@ public class CustomerController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> addCustomer(@Valid @RequestBody AddCustomerRequest request) {
 		Optional<Customer> optCustomer = dal.findByNameIgnoreCase(request.getName());
 		if (optCustomer.isPresent())
@@ -96,6 +94,7 @@ public class CustomerController {
 	}
 
 	@PutMapping
+	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> updateCustomer(@Valid @RequestBody Customer customer) {
 
 		if (this.dal.findById(customer.getId()) == null) {
@@ -112,6 +111,7 @@ public class CustomerController {
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
 		Optional<Customer> optCustomer = dal.findById(id);
 		if (!optCustomer.isPresent())
@@ -126,6 +126,7 @@ public class CustomerController {
 	}
 
 	@PostMapping("/{id}/logo")
+	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
 			Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
@@ -143,6 +144,7 @@ public class CustomerController {
 	}
 	
 	@GetMapping("/logo/{fileName:.+}")
+	@PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"logo");
@@ -164,6 +166,7 @@ public class CustomerController {
     }
 	
 	@DeleteMapping("/{id}/logo")
+	@PreAuthorize("hasAuthority('MANAGER')")
 	private ResponseEntity<?> deletePicture(@PathVariable Long id){
 		try {
 			Customer customer = this.dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer"));
@@ -173,7 +176,6 @@ public class CustomerController {
 			}
 			this.dal.save(customer);
 		} catch (ResourceNotFoundException e) {
-			// TODO Auto-generated catch block
 			return e.buildResponse();
 		}
 		return ResponseEntity.status(HttpStatus.OK).build();
