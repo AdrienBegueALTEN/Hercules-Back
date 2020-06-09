@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.Tuple;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -75,6 +76,28 @@ public class MissionController {
 	public ResponseEntity<?> getMission(@PathVariable Long id) {
 		return getMissionDetails(id, true);
 	}
+	
+	
+	@GetMapping("/testcriteria")
+	public ResponseEntity<?> TestAdvancedSearch()
+	{
+		/*
+		List<Mission> body;
+		body = dal.advancedSearch("","","","","France","","",1);
+		return ResponseEntity.ok(body);
+		*/
+		
+		
+		
+		List<CompleteMissionResponse> bodyComplete;
+		bodyComplete = dal.advancedSearch("","","","","France","","",1).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(bodyComplete);
+		
+		
+	}
+	
 	
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/anonymous")

@@ -1,7 +1,23 @@
 package com.alten.hercules.dal;
 
+import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Tuple;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Fetch;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +46,10 @@ public class MissionDAL {
 	@Autowired private ProjectDAO projectDAO;
 	@Autowired private SkillDAO skillDAO;
 	
+	@PersistenceContext
+	EntityManager em;
+	
+	
 	public Optional<Mission> findById(Long id) {
 		return missionDAO.findById(id);
 	}
@@ -54,7 +74,229 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
+	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) 
+	//public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName) 
+	
+	{
+		
+		
+		boolean queryMissionTitle = missionTitle != null && !missionTitle.equals("");
+		boolean queryCustomerName = customerName != null && !customerName.equals("");
+		boolean queryActivitySector = activitySector != null && !activitySector.equals("");
+		boolean queryMissionCity = missionCity != null && !missionCity.equals("");
+		boolean queryMissionCountry = missionCountry != null && !missionCountry.equals("");
+		boolean queryConsultantFirstName = consultantFirstName != null && !consultantFirstName.equals("");
+		boolean queryConsultantLastName = consultantLastName != null && !consultantLastName.equals("");
+		
+		
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+	    CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
+	    Root<Mission> missionRoot = criteriaQuery.from(Mission.class);
+	    //Root<MissionSheet> sheetRoot = criteriaQuery.from(MissionSheet.class);
+	    
+	    Join<Mission, Consultant> consultantJoin = missionRoot.join("consultant", JoinType.INNER);
+	    Join<Mission, Customer> customerJoin = missionRoot.join("customer", JoinType.INNER);
+	    
+	    
+	    //Join<Mission, MissionSheet> sheetJoin = missionRoot.join("mission", JoinType.LEFT);
+	    //Join<MissionSheet>
+	    
+        List<Predicate> criteriaList = new ArrayList<>();
+        
+        
+        /*
+        if(queryMissionTitle)
+        {
+        Predicate titleCondition = criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%");
+        criteriaList.add(titleCondition);
+        }
+        
+        if(queryMissionCity)
+        {
+        	 Predicate cityCondition = criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%");
+        	 criteriaList.add(cityCondition);
+        }
+        
+        if(queryMissionCountry)
+        {
+         Predicate countryCondition = criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%");
+       	 criteriaList.add(countryCondition);
+        }
+        */
+        
+        if(queryCustomerName)
+        {
+        Predicate customerNameCondition = criteriaBuilder.like(customerJoin.get("name"), "%" + customerName + "%");
+        criteriaList.add(customerNameCondition);
+        }
+        
+        if(queryActivitySector)
+        {
+        	 Predicate activitySectorCondition = criteriaBuilder.like(customerJoin.get("activitySector"), "%" + activitySector + "%");
+        	 criteriaList.add(activitySectorCondition);
+        }
+        
+        
+        
+        if(queryConsultantFirstName)
+        {
+        	Predicate consultantFirstNameCondition = criteriaBuilder.like(consultantJoin.get("firstname"), "%" + consultantFirstName + "%");
+        	criteriaList.add(consultantFirstNameCondition);
+        }
+        
+        if(queryConsultantLastName)
+        {
+        	Predicate consultantLastNameCondition = criteriaBuilder.like(consultantJoin.get("lastname"), "%" + consultantLastName + "%");
+        	criteriaList.add(consultantLastNameCondition);	
+        }
+        
+        
+    	Predicate AllValidatedMissions = criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), "VALIDATED");
+    	Predicate MyMissions = criteriaBuilder.equal(consultantJoin.get("manager"), managerId);
+    	Predicate AllValidatedMissionsOrMyMissions = criteriaBuilder.or(AllValidatedMissions,MyMissions);
+    	
+    	criteriaList.add(AllValidatedMissionsOrMyMissions);
+    	
+          
+        Expression<Object> caseExpression = criteriaBuilder.selectCase()
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("VALIDATED")), 3)
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("ON_GOING")), 2)
+    	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("ON_WAITING")), 1);
 
+     
+    	Order bySheetStatus = criteriaBuilder.asc(caseExpression);
+    	criteriaQuery = criteriaQuery.orderBy(bySheetStatus);
+        
+    	
+    	criteriaQuery.where(criteriaBuilder.and(criteriaList.toArray(new Predicate[0])));
+	    
+	   
+        
+	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
+	    
+	    
+	    
+	    
+	    return query.getResultList();
+	}
+	
+	public List<Mission> loadAllVariables2() {
+	    CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+	    CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
+	    Root<Mission> missionRoot = criteriaQuery.from(Mission.class);
+	    
+	    
+	    criteriaQuery.where(criteriaBuilder.equal(missionRoot.get("id"), 1));
+	    //In<String> inClause = criteriaBuilder.in(root.get("title"));
+	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
+	    //Join<Mission, Consultant> p = variableRoot.join("consultant_id", JoinType.INNER);
+	    
+	    //Join<Mission, Consultant> consultant = missionRoot.join("consultant", JoinType.INNER);
+	    //Join<Mission, MissionSheet> missionSheet = consultant.join("versions", JoinType.INNER);
+	    //Join<Mission, Customer> customer = missionSheet.join("customer", JoinType.INNER);
+	    
+	    
+	    //Join<Mission, Consultant> consultant = missionRoot.join("consultant", JoinType.INNER);
+	    //Join<Mission, MissionSheet> missionSheet = missionRoot.join("versions", JoinType.INNER);
+	    //Join<Mission, Customer> customer = missionRoot.join("customer", JoinType.INNER);
+	    
+	    //criteriaQuery.select(missionRoot);
+	    //return em.createQuery(criteriaQuery).getResultList();
+	    
+	    return query.getResultList();
+	}
+
+	
+	public List<Mission> searchAdvancedQuery(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName)
+	{
+
+	CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+	CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
+	Root<Mission> itemRoot = criteriaQuery.from(Mission.class);
+
+	Join<Mission, MissionSheet> sheetJoin = itemRoot.join("versions",JoinType.INNER);
+	Join<Mission, Consultant> consultantJoin = itemRoot.join("consultant",JoinType.INNER);
+	Join<Mission, Customer> customerJoin = itemRoot.join("customer",JoinType.INNER);
+	Predicate wherePredicate = criteriaBuilder.and();
+	  //Root<Mission> c = criteriaQuery.from(Mission.class);
+
+	boolean queryMissionTitle = missionTitle != null && !missionTitle.equals("");
+	boolean queryCustomerName = customerName != null && !customerName.equals("");
+	boolean queryActivitySector = activitySector != null && !activitySector.equals("");
+	boolean queryMissionCity = missionCity != null && !missionCity.equals("");
+	boolean queryMissionCountry = missionCountry != null && !missionCountry.equals("");
+	boolean queryConsultantFirstName = consultantFirstName != null && !consultantFirstName.equals("");
+	boolean queryConsultantLastName = consultantLastName != null && !consultantLastName.equals("");
+
+	if(queryMissionTitle) {
+	                wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(sheetJoin.get("title"), "%" + missionTitle + "%")
+	                );
+	}		
+					
+	if(queryCustomerName) {
+		wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(customerJoin.get("name"), "%" + customerName + "%")
+	                );	
+	}
+
+	if(queryActivitySector) {
+		
+		wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(customerJoin.get("activity_sector"), "%" + activitySector + "%")
+	                );	
+	}
+
+	if(queryMissionCity) {
+		
+		wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(sheetJoin.get("city"), "%" + missionCity + "%")
+	                );	
+	}
+
+	if(queryMissionCountry) {
+		
+		wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(sheetJoin.get("country"), "%" + missionCountry + "%")
+	                );	
+	}
+
+	if(queryConsultantFirstName)
+	{
+		wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(consultantJoin.get("firstname"), "%" + consultantFirstName + "%")
+	                );	
+		
+		
+	}
+
+	if(queryConsultantLastName)
+	{
+		wherePredicate = criteriaBuilder.and(wherePredicate,
+	                        criteriaBuilder.like(consultantJoin.get("lastname"), "%" + consultantLastName + "%")
+	                );	
+		
+		
+	}
+
+
+
+
+
+	criteriaQuery.where(wherePredicate);
+
+
+
+
+
+	List<Mission> result = em.createQuery(criteriaQuery).getResultList();
+	em.getTransaction().commit();
+	return result;
+
+
+	}
+	
+	
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
 		return sheetDAO.findMostRecentVersion(missionId);
 	}
