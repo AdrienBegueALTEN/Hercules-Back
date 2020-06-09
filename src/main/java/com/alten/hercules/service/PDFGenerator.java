@@ -33,6 +33,10 @@ import com.alten.hercules.model.skill.Skill;
 public class PDFGenerator {
 	
 	
+	
+	
+
+
 	public static void makeMissionPDF(Mission mission, PDDocument document) throws IOException {
 
         
@@ -272,7 +276,7 @@ public class PDFGenerator {
         contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText("Taille : "+mission.getLastVersion().getTeamSize().toString()),cx2);
+        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2);
         
      // Bulle durée 
         contentStream.setNonStrokingColor(white);
@@ -358,7 +362,7 @@ public class PDFGenerator {
         // en-tête
         contentStream.drawImage(layoutAlten,0,0,height,width);
         
-        if(project.getMissionSheet().getMission().getCustomer().getLogo()!=null) {
+        if(mission.getCustomer().getLogo()!=null) {
 	        PDImageXObject customerLogo = 
 	        		PDImageXObject.createFromFile("img\\logo\\"+mission.getCustomer().getLogo(), document);
 	        float optimalHeight = customerLogo.getHeight();
@@ -491,8 +495,8 @@ public class PDFGenerator {
         }
         contentStream.endText();
         
-        // Commentaire
-        contentStream.setNonStrokingColor(lightblue);
+        // photo projet
+        /*contentStream.setNonStrokingColor(lightblue);
         contentStream.beginText();
         contentStream.newLineAtOffset(60, 240);
         contentStream.setFont( font2, 15 );
@@ -507,9 +511,28 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(220, -15);
         contentStream.setFont( font2, 15 );
         contentStream.showText("»");
-        contentStream.endText();
+        contentStream.endText();*/
         
-        
+        if(project.getPicture()!=null) {
+	        PDImageXObject projectPicture = 
+	        		PDImageXObject.createFromFile("img\\proj\\"+project.getPicture(), document);
+	        float optimalHeight = projectPicture.getHeight();
+	        float optimalWidth = projectPicture.getWidth();
+	        if(projectPicture.getWidth()>projectPicture.getHeight()) {
+	        	if(projectPicture.getWidth()>=235) {
+	        		optimalHeight = projectPicture.getHeight()/(projectPicture.getWidth()/235);
+	        		optimalWidth = 235;
+	        	}
+	        }
+	        else {
+	        	if(projectPicture.getHeight()>=235) {
+	        		optimalWidth = projectPicture.getWidth()/(projectPicture.getHeight()/235);
+	        		optimalHeight = 235;
+	        	}
+	        }
+	        
+	        contentStream.drawImage(projectPicture, 60+(235-optimalWidth)/2,25+(235-optimalHeight),optimalWidth,optimalHeight); //235 max en hauteur   235 max en largeur
+        }
         
         // Note de version
         contentStream.setNonStrokingColor(black);
@@ -556,7 +579,7 @@ public class PDFGenerator {
         contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText("Taille : "+mission.getLastVersion().getTeamSize().toString()),cx2);
+        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2);
         
      // Bulle durée 
         contentStream.setNonStrokingColor(white);
