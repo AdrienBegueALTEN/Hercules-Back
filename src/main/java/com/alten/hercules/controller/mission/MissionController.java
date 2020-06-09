@@ -1,9 +1,6 @@
 package com.alten.hercules.controller.mission;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -64,9 +61,6 @@ import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
 import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
-
-
-
 
 @RestController
 @CrossOrigin(origins="*")
