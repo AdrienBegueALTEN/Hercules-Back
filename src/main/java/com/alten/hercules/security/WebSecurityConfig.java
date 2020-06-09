@@ -62,7 +62,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/hercules/auth/signin", 
 						"/hercules/customers/logo/**",
 						"/hercules/missions/projects/picture/**",
-						"/hercules/missions/projects/skills-all").permitAll()
+						"/hercules/missions/projects/skills-all",
+						
+						"/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/security",
+                        "/swagger-ui.html",
+                        "/webjars/**").permitAll()
 				.antMatchers("/hercules/missions/anonymous").anonymous()
 				.antMatchers("/hercules/missions/new-project-anonymous/**").anonymous()
 				.antMatchers("/hercules/missions/projects/anonymous/**").anonymous()

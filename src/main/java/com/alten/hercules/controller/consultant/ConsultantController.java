@@ -41,6 +41,8 @@ import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.Manager;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/hercules/consultants")
@@ -48,7 +50,8 @@ public class ConsultantController {
 
 	@Autowired
 	private ConsultantDAL dal;
-
+	
+	@ApiOperation(value = "Récupère tous les consultants.")
 	@GetMapping("")
 	public ResponseEntity<?> getAll(@RequestParam boolean enabled) {
 		return enabled ?
@@ -56,6 +59,7 @@ public class ConsultantController {
 				ResponseEntity.ok(dal.findAll());
 	}
 
+	@ApiOperation(value = "Récupère un consultant avec son id.")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Long id) {
 		try {
@@ -69,6 +73,7 @@ public class ConsultantController {
 		}
 	}
 
+	@ApiOperation(value = "Ajoute un nouveau consultant.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("")
 	public ResponseEntity<?> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
@@ -92,6 +97,7 @@ public class ConsultantController {
 		}
 	}
 
+	@ApiOperation(value = "Supprime un consultant avec son id.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
@@ -109,6 +115,7 @@ public class ConsultantController {
 		}
 	}
 
+	@ApiOperation(value = "Met à jour un champ d'un consultant.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
@@ -162,6 +169,7 @@ public class ConsultantController {
 		}
 	}
 	
+	@ApiOperation(value = "Ajoute un diplôme à un consultant.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("add-diploma")
 	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
@@ -173,6 +181,7 @@ public class ConsultantController {
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
 	}
 	
+	@ApiOperation(value = "Met à jour un champ d'un diplôme.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("update-diploma")
 	public ResponseEntity<?> updateDiploma(@Valid @RequestBody UpdateEntityRequest request) {
@@ -208,6 +217,7 @@ public class ConsultantController {
 		}
 	}
 	
+	@ApiOperation(value = "Supprime un diplome d'un consultant.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("remove-diploma")
 	public ResponseEntity<?> removeDiploma(@Valid @RequestBody RemoveDiplomaRequest request){
@@ -221,6 +231,7 @@ public class ConsultantController {
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
 	}
 	
+	@ApiOperation(value = "Récupère toutes les missions faites par un consultant.")
 	@GetMapping("/{id}/missions")
 	public ResponseEntity<?> getConsultantMissions(@PathVariable Long id){
 		return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
