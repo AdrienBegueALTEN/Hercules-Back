@@ -583,29 +583,35 @@ public class MissionController {
 		int n = elements.size();
 		PDDocument document = new PDDocument();
 		
-		for(int i = 0; i<n ; i++) {
-			try {
+		PDFGenerator pdfGenerator;
+		try {
+			pdfGenerator = new PDFGenerator(document);
+		
+		
+			for(int i = 0; i<n ; i++) {
 				
-					if(elements.get(i).getType().equals("m")){
-						Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
-						PDFGenerator.makeMissionPDF(mission,document);
 					
-					}
-					else {
-						Project project = dal.findProjectById(elements.get(i).getId())
-								.orElseThrow(() -> new ResourceNotFoundException("Project"));
-						PDFGenerator.makeProjectPDF(project,document);
-					}
+						if(elements.get(i).getType().equals("m")){
+							Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
+							pdfGenerator.makeMissionPDF(mission,document);
+						
+						}
+						else {
+							Project project = dal.findProjectById(elements.get(i).getId())
+									.orElseThrow(() -> new ResourceNotFoundException("Project"));
+							pdfGenerator.makeProjectPDF(project,document);
+						}
+					
 				
-			} catch (ResourceNotFoundException e) {
-				return e.buildResponse();
-			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
-			} 
-		}
+			}
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+		} 
 		
 		try {
-			PDFGenerator.saveFinalPDF(document);
+			pdfGenerator.saveFinalPDF(document);
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("file not saved");
 		}

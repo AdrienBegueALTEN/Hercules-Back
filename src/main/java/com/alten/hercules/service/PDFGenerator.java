@@ -33,39 +33,53 @@ import com.alten.hercules.model.skill.Skill;
 public class PDFGenerator {
 	
 	
+	// Polices utilisées
+    PDFont font1 = PDType1Font.HELVETICA;
+    PDFont font2 = PDType1Font.HELVETICA_BOLD;
+    PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
 	
-	
+    //Couleurs utilisées
+    PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
+    PDColor black = new PDColor(new float[] { 0f, 0f, 0f }, PDDeviceRGB.INSTANCE);
+    PDColor darkblue = new PDColor(new float[] { 4/255f, 57/255f, 98/255f }, PDDeviceRGB.INSTANCE);
+    PDColor lightblue = new PDColor(new float[] { 0f, 139/255f, 210/255f }, PDDeviceRGB.INSTANCE);
+    PDColor yellow = new PDColor(new float[] { 1f, 186/255f, 0f }, PDDeviceRGB.INSTANCE);
+    
+    // Images utilisées
+    PDImageXObject layoutAlten;
+    PDImageXObject blueStick;
+    PDImageXObject contractIcon;
+    PDImageXObject teamIcon;
+    PDImageXObject durationIcon;
+    PDImageXObject localizationIcon;
+    
+	public PDFGenerator(PDDocument document) throws IOException {
+		// Images utilisées
+        layoutAlten = PDImageXObject.createFromFile("src\\main\\resources\\pdflayout.png", document);
+        blueStick = PDImageXObject.createFromFile("src\\main\\resources\\bluestick.png", document);
+        contractIcon = PDImageXObject.createFromFile("src\\main\\resources\\contrat.png", document);
+        teamIcon = PDImageXObject.createFromFile("src\\main\\resources\\equipe.png", document);
+        durationIcon = PDImageXObject.createFromFile("src\\main\\resources\\duree.png", document);
+        localizationIcon = PDImageXObject.createFromFile("src\\main\\resources\\localisation.png", document);
+	}
 
+	public void makeMissionPDF(Mission mission, PDDocument document) throws IOException {
 
-	public static void makeMissionPDF(Mission mission, PDDocument document) throws IOException {
-
-        
+		float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves
+		
         PDPage page = new PDPage(PDRectangle.A4);
         page.setRotation(90);
         document.addPage( page );
 
-        // Polices utilisées
-        PDFont font1 = PDType1Font.HELVETICA;
-        PDFont font2 = PDType1Font.HELVETICA_BOLD;
-        PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
+        
         
         float height=page.getMediaBox().getHeight();
         float width= page.getMediaBox().getWidth();
         
-        // Images utilisées
-        PDImageXObject layoutAlten = PDImageXObject.createFromFile("src\\main\\resources\\pdflayout.png", document);
-        PDImageXObject blueStick = PDImageXObject.createFromFile("src\\main\\resources\\bluestick.png", document);
-        PDImageXObject contractIcon = PDImageXObject.createFromFile("src\\main\\resources\\contrat.png", document);
-        PDImageXObject teamIcon = PDImageXObject.createFromFile("src\\main\\resources\\equipe.png", document);
-        PDImageXObject durationIcon = PDImageXObject.createFromFile("src\\main\\resources\\duree.png", document);
-        PDImageXObject localizationIcon = PDImageXObject.createFromFile("src\\main\\resources\\localisation.png", document);
         
         
-        //Couleurs utilisées
-        PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
-        PDColor black = new PDColor(new float[] { 0f, 0f, 0f }, PDDeviceRGB.INSTANCE);
-        PDColor darkblue = new PDColor(new float[] { 4/255f, 57/255f, 98/255f }, PDDeviceRGB.INSTANCE);
-        PDColor lightblue = new PDColor(new float[] { 0f, 139/255f, 210/255f }, PDDeviceRGB.INSTANCE);
+        
+        
         
         PDPageContentStream contentStream = new PDPageContentStream(document, page);
         
@@ -192,21 +206,36 @@ public class PDFGenerator {
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
         contentStream.showText("Compétences mises en avant");
-        contentStream.newLineAtOffset(15, -5);
-        contentStream.setFont( font1, 10 );
-        contentStream.setNonStrokingColor(black);
+        contentStream.endText();
         
+        int cy = 223;
+    	int counter = 0;
         Set<Project> projects =  mission.getLastVersion().getProjects();
         for(Project project : projects ) {
-        	Set<Skill> skills =  project.getSkills();
-        	for(Skill skill : skills) {
+        	
+        	for(Skill skill : project.getSkills()) {
+        		
+        		contentStream.setNonStrokingColor(yellow);
+                contentStream.moveTo(588 - 2, cy);
+                contentStream.curveTo(588 - 2, cy + constantForCircleWithBezierCurve*2, 588 - constantForCircleWithBezierCurve*2, cy + 2, 588, cy + 2);
+                contentStream.curveTo(588 + constantForCircleWithBezierCurve*2, cy + 2, 588 + 2, cy + constantForCircleWithBezierCurve*2, 588 + 2, cy);
+                contentStream.curveTo(588 + 2, cy - constantForCircleWithBezierCurve*2, 588 + constantForCircleWithBezierCurve*2, cy - 2, 588, cy - 2);
+                contentStream.curveTo(588 - constantForCircleWithBezierCurve*2, cy - 2, 588 - 2, cy - constantForCircleWithBezierCurve*2, 588 - 2, cy);
+                contentStream.fill();
+                contentStream.setNonStrokingColor(black);
+                
 		        for(String line : separateLines(skill.getLabel(),font1,195,10)) {
-		        	contentStream.newLineAtOffset(0, -15);
-		        	contentStream.showText(line);
+		        	contentStream.beginText();
+	        		contentStream.setFont( font1, 10 );
+	        		contentStream.newLineAtOffset(595, 220+counter);
+			        contentStream.showText(line);
+			        contentStream.endText();
+			        cy -= 15;
+			        counter -= 15;
 		        }
         	}
         }
-        contentStream.endText();
+        
         
         // Commentaire
         contentStream.setNonStrokingColor(lightblue);
@@ -242,7 +271,7 @@ public class PDFGenerator {
         
         // Bulles
         
-        float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves 
+         
         int rayon = 28;
         int cx1 = 420;
         int cy1 = 40;
@@ -323,37 +352,21 @@ public class PDFGenerator {
         
 	}
 	
-	public static void makeProjectPDF(Project project,PDDocument document) throws IOException {
+	public void makeProjectPDF(Project project,PDDocument document) throws IOException {
 		
 		Mission mission = project.getMissionSheet().getMission();
+		
+		float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves
 		
 		PDPage page = new PDPage(PDRectangle.A4);
         page.setRotation(90);
         document.addPage( page );
 
-        // Polices utilisées
-        PDFont font1 = PDType1Font.HELVETICA;
-        PDFont font2 = PDType1Font.HELVETICA_BOLD;
-        PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
         
         float height=page.getMediaBox().getHeight();
         float width= page.getMediaBox().getWidth();
         
-        // Images utilisées
-        PDImageXObject layoutAlten = PDImageXObject.createFromFile("src\\main\\resources\\pdflayout.png", document);
-        PDImageXObject blueStick = PDImageXObject.createFromFile("src\\main\\resources\\bluestick.png", document);
-        PDImageXObject contractIcon = PDImageXObject.createFromFile("src\\main\\resources\\contrat.png", document);
-        PDImageXObject teamIcon = PDImageXObject.createFromFile("src\\main\\resources\\equipe.png", document);
-        PDImageXObject durationIcon = PDImageXObject.createFromFile("src\\main\\resources\\duree.png", document);
-        PDImageXObject localizationIcon = PDImageXObject.createFromFile("src\\main\\resources\\localisation.png", document);
-        
-        
-        //Couleurs utilisées
-        PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
-        PDColor black = new PDColor(new float[] { 0f, 0f, 0f }, PDDeviceRGB.INSTANCE);
-        PDColor darkblue = new PDColor(new float[] { 4/255f, 57/255f, 98/255f }, PDDeviceRGB.INSTANCE);
-        PDColor lightblue = new PDColor(new float[] { 0f, 139/255f, 210/255f }, PDDeviceRGB.INSTANCE);
-        
+
         PDPageContentStream contentStream = new PDPageContentStream(document, page);
         
         
@@ -483,36 +496,37 @@ public class PDFGenerator {
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
         contentStream.showText("Compétences mises en avant");
-        contentStream.newLineAtOffset(15, -5);
-        contentStream.setFont( font1, 10 );
-        contentStream.setNonStrokingColor(black);
-        
-        for(Skill skill : project.getSkills()) {
-        	for(String line : separateLines(skill.getLabel(),font1,195,10)) {
-        		contentStream.newLineAtOffset(0, -15);
-		        contentStream.showText(line);
-		    }
-        }
         contentStream.endText();
         
-        // photo projet
-        /*contentStream.setNonStrokingColor(lightblue);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(60, 240);
-        contentStream.setFont( font2, 15 );
-        contentStream.showText("«");
-        contentStream.newLineAtOffset(0, -5);
-        contentStream.setFont( font1, 10 );
-        String commentary = mission.getLastVersion().getComment();
-        for(String line : separateLines(commentary,font1,220,10)) {
-        	contentStream.newLineAtOffset(0, -15);
-        	contentStream.showText(line);
-        }
-        contentStream.newLineAtOffset(220, -15);
-        contentStream.setFont( font2, 15 );
-        contentStream.showText("»");
-        contentStream.endText();*/
         
+        int cy = 223;
+    	int counter = 0;
+        for(Skill skill : project.getSkills()) {
+        	
+        	
+        	
+        	contentStream.setNonStrokingColor(yellow);
+            contentStream.moveTo(588 - 2, cy);
+            contentStream.curveTo(588 - 2, cy + constantForCircleWithBezierCurve*2, 588 - constantForCircleWithBezierCurve*2, cy + 2, 588, cy + 2);
+            contentStream.curveTo(588 + constantForCircleWithBezierCurve*2, cy + 2, 588 + 2, cy + constantForCircleWithBezierCurve*2, 588 + 2, cy);
+            contentStream.curveTo(588 + 2, cy - constantForCircleWithBezierCurve*2, 588 + constantForCircleWithBezierCurve*2, cy - 2, 588, cy - 2);
+            contentStream.curveTo(588 - constantForCircleWithBezierCurve*2, cy - 2, 588 - 2, cy - constantForCircleWithBezierCurve*2, 588 - 2, cy);
+            contentStream.fill();
+            contentStream.setNonStrokingColor(black);
+            
+        	for(String line : separateLines(skill.getLabel(),font1,195,10)) {
+        		contentStream.beginText();
+        		contentStream.setFont( font1, 10 );
+        		contentStream.newLineAtOffset(595, 220+counter);
+		        contentStream.showText(line);
+		        contentStream.endText();
+		        cy -= 15;
+		        counter -= 15;
+		    }
+        }
+        
+        
+        // photo projet
         if(project.getPicture()!=null) {
 	        PDImageXObject projectPicture = 
 	        		PDImageXObject.createFromFile("img\\proj\\"+project.getPicture(), document);
@@ -545,7 +559,7 @@ public class PDFGenerator {
         
         // Bulles
         
-        float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves 
+         
         int rayon = 28;
         int cx1 = 420;
         int cy1 = 40;
@@ -625,7 +639,7 @@ public class PDFGenerator {
 		
 	}
 	
-	public static void saveFinalPDF(PDDocument document) throws IOException {
+	public void saveFinalPDF(PDDocument document) throws IOException {
 		document.save("..\\fichesMissionsEtProjets.pdf");
         document.close();
 	}
