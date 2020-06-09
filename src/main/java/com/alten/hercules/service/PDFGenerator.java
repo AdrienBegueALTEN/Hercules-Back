@@ -114,13 +114,13 @@ public class PDFGenerator {
         contentStream.setFont( font1, 12 );
         contentStream.setNonStrokingColor(white);
         contentStream.newLineAtOffset(75, width-70);
-        contentStream.showText(mission.getLastVersion().getTitle());
+        contentStream.showText(cutText(mission.getLastVersion().getTitle(),font1,(int) height-70-75,12));
         contentStream.newLineAtOffset(0,35);
         contentStream.setFont(font2, 18);
         contentStream.setNonStrokingColor(darkblue);
         contentStream.showText( "Mission");
         contentStream.setFont(font1, 18);
-        contentStream.showText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" " );
+        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
         contentStream.endText();
         
         // description du client
@@ -132,11 +132,11 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(85, 480);
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(mission.getCustomer().getName());
+        contentStream.showText(cutText(mission.getCustomer().getName(),font1,210,15));
         contentStream.newLineAtOffset(15, -20);
         contentStream.setFont( font3, 10 );
         contentStream.setNonStrokingColor(black);
-        contentStream.showText(mission.getCustomer().getActivitySector());
+        contentStream.showText(cutText(mission.getCustomer().getActivitySector(),font3,195,10));
         contentStream.setFont( font1, 10 );
         contentStream.newLineAtOffset(0, -5);
         
@@ -177,7 +177,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(340, 240);
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname());
+        contentStream.showText(cutText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname(),font1,210,15));
         contentStream.newLineAtOffset(15, -5);
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
@@ -215,23 +215,45 @@ public class PDFGenerator {
         	
         	for(Skill skill : project.getSkills()) {
         		
-        		contentStream.setNonStrokingColor(yellow);
-                contentStream.moveTo(588 - 2, cy);
-                contentStream.curveTo(588 - 2, cy + constantForCircleWithBezierCurve*2, 588 - constantForCircleWithBezierCurve*2, cy + 2, 588, cy + 2);
-                contentStream.curveTo(588 + constantForCircleWithBezierCurve*2, cy + 2, 588 + 2, cy + constantForCircleWithBezierCurve*2, 588 + 2, cy);
-                contentStream.curveTo(588 + 2, cy - constantForCircleWithBezierCurve*2, 588 + constantForCircleWithBezierCurve*2, cy - 2, 588, cy - 2);
-                contentStream.curveTo(588 - constantForCircleWithBezierCurve*2, cy - 2, 588 - 2, cy - constantForCircleWithBezierCurve*2, 588 - 2, cy);
-                contentStream.fill();
-                contentStream.setNonStrokingColor(black);
+        		
+        		if(counter<20 && counter>=10) {
+        			int cx = 588+115;
+        			int cyBis  = cy + 150;
+	        		contentStream.setNonStrokingColor(yellow);
+	                contentStream.moveTo(cx - 2, cyBis);
+	                contentStream.curveTo(cx - 2, cyBis + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cyBis + 2, cx, cyBis + 2);
+	                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cyBis + 2, cx + 2, cyBis + constantForCircleWithBezierCurve*2, cx + 2, cyBis);
+	                contentStream.curveTo(cx + 2, cyBis - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cyBis - 2, cx, cyBis - 2);
+	                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cyBis - 2, cx - 2, cyBis - constantForCircleWithBezierCurve*2, cx - 2, cyBis);
+	                contentStream.fill();
+	                contentStream.setNonStrokingColor(black);
+        		}
+        		else if(counter<10) {
+        			int cx = 588;
+        			contentStream.setNonStrokingColor(yellow);
+	                contentStream.moveTo(cx - 2, cy);
+	                contentStream.curveTo(cx - 2, cy + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cy + 2, cx, cy + 2);
+	                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cy + 2, cx + 2, cy + constantForCircleWithBezierCurve*2, cx + 2, cy);
+	                contentStream.curveTo(cx + 2, cy - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cy - 2, cx, cy - 2);
+	                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cy - 2, cx - 2, cy - constantForCircleWithBezierCurve*2, cx - 2, cy);
+	                contentStream.fill();
+	                contentStream.setNonStrokingColor(black);
+
+        		}
                 
-		        for(String line : separateLines(skill.getLabel(),font1,195,10)) {
-		        	contentStream.beginText();
-	        		contentStream.setFont( font1, 10 );
-	        		contentStream.newLineAtOffset(595, 220+counter);
-			        contentStream.showText(line);
-			        contentStream.endText();
-			        cy -= 15;
-			        counter -= 15;
+		        for(String line : separateLines(skill.getLabel(),font1,95,10)) {
+		        	if(counter<20) {
+			        	contentStream.beginText();
+		        		contentStream.setFont( font1, 10 );
+		        		if(counter>=10)
+		        			contentStream.newLineAtOffset(595+115, 220+(counter-10)*(-15));
+		        		else if(counter<10)
+		        			contentStream.newLineAtOffset(595, 220+counter*(-15));
+				        contentStream.showText(line);
+				        contentStream.endText();
+				        cy -= 15;
+				        counter += 1;
+		        	}
 		        }
         	}
         }
@@ -401,16 +423,16 @@ public class PDFGenerator {
         contentStream.setFont( font1, 12 );
         contentStream.setNonStrokingColor(white);
         contentStream.newLineAtOffset(75, width-70);
-        contentStream.showText(project.getTitle());
+        contentStream.showText(cutText(project.getTitle(),font1,(int) height-70-75,12));
         contentStream.newLineAtOffset(0,35);
         contentStream.setFont(font2, 18);
         contentStream.setNonStrokingColor(darkblue);
         contentStream.showText( "Projet");
         contentStream.setFont(font1, 18);
-        contentStream.showText( " « "+ project.getMissionSheet().getConsultantRole()+
+        contentStream.showText(cutText( " « "+ project.getMissionSheet().getConsultantRole()+
         						" » chez "+ mission.getCustomer().getName()+ 
         						" par "+ mission.getConsultant().getFirstname()+
-        						" "+mission.getConsultant().getLastname()+" " );
+        						" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
         contentStream.endText();
         
         // description du client
@@ -422,11 +444,11 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(85, 480);
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(mission.getCustomer().getName());
+        contentStream.showText(cutText(mission.getCustomer().getName(),font1,210,15));
         contentStream.newLineAtOffset(15, -20);
         contentStream.setFont( font3, 10 );
         contentStream.setNonStrokingColor(black);
-        contentStream.showText(mission.getCustomer().getActivitySector());
+        contentStream.showText(cutText(mission.getCustomer().getActivitySector(),font3,195,10));
         contentStream.setFont( font1, 10 );
         contentStream.newLineAtOffset(0, -5);
         
@@ -467,7 +489,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(340, 240);
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname());
+        contentStream.showText(cutText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname(),font1,210,15));
         contentStream.newLineAtOffset(15, -5);
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
@@ -503,25 +525,44 @@ public class PDFGenerator {
     	int counter = 0;
         for(Skill skill : project.getSkills()) {
         	
-        	
-        	
-        	contentStream.setNonStrokingColor(yellow);
-            contentStream.moveTo(588 - 2, cy);
-            contentStream.curveTo(588 - 2, cy + constantForCircleWithBezierCurve*2, 588 - constantForCircleWithBezierCurve*2, cy + 2, 588, cy + 2);
-            contentStream.curveTo(588 + constantForCircleWithBezierCurve*2, cy + 2, 588 + 2, cy + constantForCircleWithBezierCurve*2, 588 + 2, cy);
-            contentStream.curveTo(588 + 2, cy - constantForCircleWithBezierCurve*2, 588 + constantForCircleWithBezierCurve*2, cy - 2, 588, cy - 2);
-            contentStream.curveTo(588 - constantForCircleWithBezierCurve*2, cy - 2, 588 - 2, cy - constantForCircleWithBezierCurve*2, 588 - 2, cy);
-            contentStream.fill();
-            contentStream.setNonStrokingColor(black);
+        	if(counter<20 && counter>=10) {
+    			int cx = 588+115;
+    			int cyBis  = cy + 150;
+        		contentStream.setNonStrokingColor(yellow);
+                contentStream.moveTo(cx - 2, cyBis);
+                contentStream.curveTo(cx - 2, cyBis + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cyBis + 2, cx, cyBis + 2);
+                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cyBis + 2, cx + 2, cyBis + constantForCircleWithBezierCurve*2, cx + 2, cyBis);
+                contentStream.curveTo(cx + 2, cyBis - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cyBis - 2, cx, cyBis - 2);
+                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cyBis - 2, cx - 2, cyBis - constantForCircleWithBezierCurve*2, cx - 2, cyBis);
+                contentStream.fill();
+                contentStream.setNonStrokingColor(black);
+    		}
+    		else if(counter<10) {
+    			int cx = 588;
+    			contentStream.setNonStrokingColor(yellow);
+                contentStream.moveTo(cx - 2, cy);
+                contentStream.curveTo(cx - 2, cy + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cy + 2, cx, cy + 2);
+                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cy + 2, cx + 2, cy + constantForCircleWithBezierCurve*2, cx + 2, cy);
+                contentStream.curveTo(cx + 2, cy - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cy - 2, cx, cy - 2);
+                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cy - 2, cx - 2, cy - constantForCircleWithBezierCurve*2, cx - 2, cy);
+                contentStream.fill();
+                contentStream.setNonStrokingColor(black);
+
+    		}
             
-        	for(String line : separateLines(skill.getLabel(),font1,195,10)) {
-        		contentStream.beginText();
-        		contentStream.setFont( font1, 10 );
-        		contentStream.newLineAtOffset(595, 220+counter);
-		        contentStream.showText(line);
-		        contentStream.endText();
-		        cy -= 15;
-		        counter -= 15;
+        	for(String line : separateLines(skill.getLabel(),font1,95,10)) {
+        		if(counter<20) {
+	        		contentStream.beginText();
+	        		contentStream.setFont( font1, 10 );
+	        		if(counter>=10)
+	        			contentStream.newLineAtOffset(595+115, 220+(counter-10)*(-15));
+	        		else if(counter<10)
+	        			contentStream.newLineAtOffset(595, 220+counter*(-15));
+			        contentStream.showText(line);
+			        contentStream.endText();
+			        cy -= 15;
+			        counter += 1;
+        		}
 		    }
         }
         
@@ -665,9 +706,17 @@ public class PDFGenerator {
         		end2 = text.length();
         	float size = fontSize*font.getStringWidth(text.substring(0, end2))/1000;
         	if(size>maxWidth) {
-        		if(end1<0)
+        		int end3 = end2;
+        		if(end1<0) {
         			end1 = end2;
-        		lines.add(text.substring(0, end1));
+        			while(size>maxWidth) {
+            			end3 -= 1;
+            			size = fontSize*font.getStringWidth(text.substring(0, end3))/1000;
+            		}
+        			lines.add(text.substring(0, end3-3)+"...");
+        		}
+        		else
+        			lines.add(text.substring(0, end1));
         		text = text.substring(end1).trim();
         		end1 = -1;
         		
@@ -685,7 +734,7 @@ public class PDFGenerator {
 	}
     
 	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx) throws IOException {
-		List<String> lines = separateLines(text,PDType1Font.HELVETICA,42,8);
+		List<String> lines = separateLines(text,PDType1Font.HELVETICA,55,8);
 		int count = 0;
 		for(String line : lines) {
 			float size = 8*PDType1Font.HELVETICA.getStringWidth(line)/1000;
@@ -696,6 +745,21 @@ public class PDFGenerator {
 			count ++;
 		}
 		
+	}
+	
+	private static String cutText(String text, PDFont font, int maxWidth, int fontSize) throws IOException {
+		
+		int end = text.length();
+		float size = fontSize*font.getStringWidth(text.substring(0, end))/1000;
+		while(size>maxWidth) {
+			end -= 1;
+			size = fontSize*font.getStringWidth(text.substring(0, end))/1000;
+		}
+		
+		if(end==text.length())
+			return text.substring(0,end);
+		else
+			return text.substring(0,end-3)+"...";
 	}
 	
 	private static String modifyText(String text) {
