@@ -78,26 +78,28 @@ public class MissionController {
 	}
 	
 	
-	@GetMapping("/testcriteria")
-	public ResponseEntity<?> TestAdvancedSearch()
+	@GetMapping("/advancedSearch")
+	public ResponseEntity<?> AdvancedSearch(@RequestParam Optional<Long> manager)
 	{
-		/*
-		List<Mission> body;
-		body = dal.advancedSearch("","","","","France","","",1);
-		return ResponseEntity.ok(body);
-		*/
-		
-		
 		
 		List<CompleteMissionResponse> bodyComplete;
+		
+		if (manager.isEmpty()) {
 		bodyComplete = dal.advancedSearch("","","","","France","","",1).stream()
-				.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.map(mission -> new CompleteMissionResponse(mission, true, true))
 				.collect(Collectors.toList());
+		}
+		else
+		{
+			bodyComplete = dal.advancedSearch("","","","","France","","",1).stream()
+					.map(mission -> new CompleteMissionResponse(mission, true, true))
+					.collect(Collectors.toList());
+		}
 		return ResponseEntity.ok(bodyComplete);
 		
 		
+		
 	}
-	
 	
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/anonymous")
