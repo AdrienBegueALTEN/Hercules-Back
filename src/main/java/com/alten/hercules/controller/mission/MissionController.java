@@ -228,6 +228,7 @@ public class MissionController {
 							throw new InvalidSheetStatusException();
 						mission.changeSecret();
 						mission.setSheetStatus(ESheetStatus.VALIDATED);
+						mostRecentVersion.setVersionDate(new Date());
 						dal.save(mission);
 					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
 					return ResponseEntity.ok().build(); 

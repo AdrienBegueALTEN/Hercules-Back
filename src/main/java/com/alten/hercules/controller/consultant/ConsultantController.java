@@ -75,7 +75,7 @@ public class ConsultantController {
 
 	@ApiOperation(value = "Ajoute un nouveau consultant.")
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@PostMapping("")
+	@PostMapping
 	public ResponseEntity<?> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
 		Optional<Consultant> optConsultant = dal.findByEmail(req.getEmail());
 		if (optConsultant.isPresent())
