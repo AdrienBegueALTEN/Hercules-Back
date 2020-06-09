@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -580,20 +581,20 @@ public class MissionController {
 		
 		
 		int n = elements.size();
+		PDDocument document = new PDDocument();
 		
 		for(int i = 0; i<n ; i++) {
 			try {
 				
 					if(elements.get(i).getType().equals("m")){
-						Mission mission = dal.findById(elements.get(i).getId())
-								.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-						PDFGenerator.makeMissionPDF(mission);
+						Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
+						PDFGenerator.makeMissionPDF(mission,document);
 					
 					}
 					else {
 						Project project = dal.findProjectById(elements.get(i).getId())
 								.orElseThrow(() -> new ResourceNotFoundException("Project"));
-						PDFGenerator.makeProjectPDF(project);
+						PDFGenerator.makeProjectPDF(project,document);
 					}
 				
 			} catch (ResourceNotFoundException e) {
@@ -603,7 +604,11 @@ public class MissionController {
 			} 
 		}
 		
-			
+		try {
+			PDFGenerator.saveFinalPDF(document);
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("file not saved");
+		}
 		
 		return ResponseEntity.ok("");
 	}

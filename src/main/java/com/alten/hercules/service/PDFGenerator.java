@@ -33,10 +33,9 @@ import com.alten.hercules.model.skill.Skill;
 public class PDFGenerator {
 	
 	
-	public static void makeMissionPDF(Mission mission) throws IOException {
+	public static void makeMissionPDF(Mission mission, PDDocument document) throws IOException {
 
         
-        PDDocument document = new PDDocument();
         PDPage page = new PDPage(PDRectangle.A4);
         page.setRotation(90);
         document.addPage( page );
@@ -314,16 +313,18 @@ public class PDFGenerator {
         
         contentStream.close();
         
-        document.save("..\\"+mission.getLastVersion().getTitle()+".pdf");
+        
+	}
+	
+	public static void makeProjectPDF(Project project,PDDocument document) throws FileNotFoundException, MalformedURLException {
+		
+		
+	}
+	
+	public static void saveFinalPDF(PDDocument document) throws IOException {
+		document.save("..\\fichesMissionsEtProjets.pdf");
         document.close();
 	}
-	
-	public static void makeProjectPDF(Project project) throws FileNotFoundException, MalformedURLException {
-		
-		
-	}
-	
-	
 	 
 	/**
 	 * Fonction qui va prendre en argument un String text et le découper en plusieurs lignes de façon à ce que chaque ligne soit de longueur inférieure à maxWidth avec la police font.
