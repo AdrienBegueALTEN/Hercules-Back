@@ -1,8 +1,10 @@
 package com.alten.hercules.controller.user;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -20,9 +22,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.user.http.request.manager.AddManagerRequest;
-import com.alten.hercules.controller.user.http.request.manager.UpdateManagerRequest;
-import com.alten.hercules.dal.AuthenticationDAL;
+import com.alten.hercules.dal.ManagerDAL;
+import com.alten.hercules.model.exception.EntityDeletionException;
+import com.alten.hercules.model.exception.InvalidFieldnameException;
+import com.alten.hercules.model.exception.InvalidValueException;
+import com.alten.hercules.model.exception.ResourceNotFoundException;
+import com.alten.hercules.model.exception.ResponseEntityException;
+import com.alten.hercules.model.exception.UnavailableEmailException;
+import com.alten.hercules.model.user.EManagerFieldName;
 import com.alten.hercules.model.user.Manager;
 
 @RestController
@@ -30,93 +39,151 @@ import com.alten.hercules.model.user.Manager;
 @RequestMapping("/hercules/managers")
 public class ManagerController {
 	
-	@Autowired private AuthenticationDAL dal;
+	@Autowired private ManagerDAL dal;
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Object> getManager(@PathVariable Long id) {
-		Optional<Manager> manager = dal.findManagerById(id);
-		if (!manager.isPresent())
-			return ResponseEntity.notFound().build();
-		return ResponseEntity.ok(manager.get());
-	}
+	public ResponseEntity<?> getManager(@PathVariable Long id) {
+		try {
+			Manager manager = dal.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("manager"));
+			Map <String, Object> body = 
+					new ManagerResponseBodyBuilder(manager)
+						.id()
+						.firstname()
+						.lastname()
+						.email()
+						.admin()
+						.consultants()
+						.build();
+			return ResponseEntity.ok(body);
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
+	 }
 	
 	@GetMapping
 	public ResponseEntity<Object> getAll() {
-		List<Manager> managers = dal.findAllManagers();
-		return ResponseEntity.ok(managers);
+		return ResponseEntity.ok(dal.findAll());
 	}
 	
 	@PreAuthorize("hasAuthority('ADMIN')")
-	@PostMapping("")
+	@PostMapping
 	public ResponseEntity<Object> addManager(@Valid @RequestBody AddManagerRequest request) {
-		if (dal.userExistsByEmail(request.getEmail()))
+		if (!dal.emailIsAvailable(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		Manager manager = request.buildUser();
-		manager = dal.saveManager(manager);
+		manager = dal.save(manager);
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
 				.body(manager.getId());
 	}
 	 
 	@PreAuthorize("hasAuthority('ADMIN')")
-	@PutMapping("")
-	public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateManagerRequest request) {
-		Optional<Manager> optManager = dal.findManagerById(request.getId());
-		
-		if (!optManager.isPresent())
-			return ResponseEntity.notFound().build();
-			
-		Manager manager = optManager.get();
-		
-		
-		if (request.getEmail() != null) {
-			if (dal.userExistsByEmail(request.getEmail()) && !manager.getEmail().equals(request.getEmail()))
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			manager.setEmail(request.getEmail());
+	@PutMapping
+	public ResponseEntity<?> updateManager(@Valid @RequestBody UpdateEntityRequest request) {
+		try {
+			Manager manager = dal.findById(request.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("manager"));
+			EManagerFieldName fieldName;
+			try { fieldName = EManagerFieldName.valueOf(request.getFieldName()); }
+			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
+			switch(fieldName) {
+				case firstname :
+					manager.setFirstname((String)request.getValue());
+					break;
+				case lastname :
+					manager.setLastname((String)request.getValue());
+					break;
+				case email :
+					String email = (String)request.getValue();
+					if (!dal.emailIsAvailable(email))
+						throw new UnavailableEmailException();
+					manager.setEmail(email);
+					break;
+				case releaseDate:
+					try {
+						manager.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
+					} catch (ParseException e) {
+						throw new InvalidValueException();
+					}
+					break;
+				case isAdmin:
+					manager.setAdmin((Boolean)request.getValue());
+					break;
+				default: throw new InvalidFieldnameException();
+			}
+			dal.save(manager);
+			return ResponseEntity.ok().build();
+		} catch (ResponseEntityException e) { 
+			return e.buildResponse();
+		} catch (ClassCastException | NullPointerException e) {
+			return new InvalidValueException().buildResponse();
 		}
-		
-		/*if (request.getPassword() != null)
-			manager.setPassword(request.getPassword());*/
-		
-		if (request.getFirstname() != null)
-			manager.setFirstname(request.getFirstname());
-		
-		if (request.getLastname() != null)
-			manager.setLastname(request.getLastname());
-		
-		if (request.getReleaseDate() != null) {
-			
-			manager.setReleaseDate(request.getReleaseDate());
-		}
-
-		manager.setAdmin(request.isAdmin());
-		
-		if (request.getRevive()) {
-			manager.setReleaseDate(null);
-		}
-		
-		
-		dal.saveManager(manager);
-		
-		URI location = URI.create(String.format("/managers/%s", manager.getId()));
-		
-		return ResponseEntity.created(location).build();
 	}
 	 
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		Optional<Manager> optManager = dal.findManagerById(id);
-		
-		if (optManager.isPresent()) {
-			Manager manager = optManager.get();
-			
+		try {
+			Manager manager = dal.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
 			if (!manager.getConsultants().isEmpty())
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-	
-			dal.deleteManager(manager);
-			return ResponseEntity.ok().build();
+				throw new EntityDeletionException("The manager is linked to one or more consultants.");
+			return ResponseEntity.ok(manager);
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
 		}
-		 return ResponseEntity.notFound().build();
+	}
+	
+	private class ManagerResponseBodyBuilder{
+		Manager manager;
+		Map <String, Object> body = new HashMap<String, Object>();
+		
+		ManagerResponseBodyBuilder(Manager manager){
+			this.manager = manager;
+		}
+		
+		ManagerResponseBodyBuilder id() {
+			body.put("id", manager.getId());
+			return this;
+		}
+		
+		ManagerResponseBodyBuilder firstname() {
+			body.put("firstname", manager.getFirstname());
+			return this;
+		}
+		
+		ManagerResponseBodyBuilder lastname() {
+			body.put("lastname", manager.getLastname());
+			return this;
+		}
+		
+		ManagerResponseBodyBuilder email() {
+			body.put("email", manager.getEmail());
+			return this;
+		}
+
+		ManagerResponseBodyBuilder admin() {
+			body.put("admin", manager.isAdmin());
+			return this;
+		}
+		
+		ManagerResponseBodyBuilder consultants() {
+			body.put("consultants", manager.getConsultants().stream()
+					.map(consultant -> {
+						Map <String, Object> map = new HashMap<String, Object>();
+						map.put("id", consultant.getId());
+						map.put("firstname", consultant.getFirstname());
+						map.put("lastname", consultant.getLastname());
+						map.put("email", consultant.getEmail());
+						return map;
+					})
+					.collect(Collectors.toList()));
+			return this;
+		}
+		
+		Map <String, Object> build() {
+			return body;
+		}
 	}
 }

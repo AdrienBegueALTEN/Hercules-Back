@@ -109,6 +109,12 @@ public class RecruitementOfficerController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getRecruitementOfficerById(@PathVariable Long id) {
-		return ResponseEntity.ok(dal.findById(id));
+		try {
+			RecruitmentOfficer recruitmentOfficer = dal.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
+			return ResponseEntity.ok(recruitmentOfficer);
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
 	 }
 }
