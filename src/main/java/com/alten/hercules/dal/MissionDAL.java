@@ -74,7 +74,7 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
-	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) 
+	public List<Mission> advancedSearchQuery(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) 
 	//public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName) 
 	
 	{
