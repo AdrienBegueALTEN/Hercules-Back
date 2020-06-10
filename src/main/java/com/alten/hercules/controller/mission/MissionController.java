@@ -630,13 +630,13 @@ public class MissionController {
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
 		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("the file could not be created");
 		} 
 		
 		try {
 			pdfGenerator.saveFinalPDF(document);
 		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("file not saved");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
 		}
 		
 		return ResponseEntity.ok("");
