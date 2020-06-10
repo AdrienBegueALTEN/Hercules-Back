@@ -313,7 +313,7 @@ public class PDFGenerator {
         contentStream.drawImage(contractIcon,411,45,contractIcon.getWidth()/3,contractIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1);
+        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1,35);
         
         
         // Bulle équipe 
@@ -327,7 +327,7 @@ public class PDFGenerator {
         contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2);
+        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2,35);
         
      // Bulle durée 
         contentStream.setNonStrokingColor(white);
@@ -354,7 +354,7 @@ public class PDFGenerator {
         	
         }
         
-        showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3);
+        showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3,35);
         
      // Bulle localisation
         contentStream.setNonStrokingColor(white);
@@ -367,7 +367,7 @@ public class PDFGenerator {
         contentStream.drawImage(localizationIcon,709,45,localizationIcon.getWidth()/3,localizationIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4);
+        showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4,35);
         
         contentStream.close();
         
@@ -588,6 +588,12 @@ public class PDFGenerator {
 	        
 	        contentStream.drawImage(projectPicture, 60+(235-optimalWidth)/2,25+(235-optimalHeight),optimalWidth,optimalHeight); //235 max en hauteur   235 max en largeur
         }
+        else {
+        	contentStream.setNonStrokingColor(black);
+            contentStream.setFont( font1, 8 );
+            showCenteredText(contentStream,"aucune photo disponible",175,140);
+            
+        }
         
         // Note de version
         contentStream.setNonStrokingColor(black);
@@ -620,7 +626,7 @@ public class PDFGenerator {
         contentStream.drawImage(contractIcon,411,45,contractIcon.getWidth()/3,contractIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1);
+        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1,35);
         
         
         // Bulle équipe 
@@ -634,7 +640,7 @@ public class PDFGenerator {
         contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2);
+        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2,35);
         
      // Bulle durée 
         contentStream.setNonStrokingColor(white);
@@ -661,7 +667,7 @@ public class PDFGenerator {
         	
         
         
-        showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3);
+        showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3,35);
         
      // Bulle localisation
         contentStream.setNonStrokingColor(white);
@@ -674,7 +680,7 @@ public class PDFGenerator {
         contentStream.drawImage(localizationIcon,709,45,localizationIcon.getWidth()/3,localizationIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4);
+        showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4,35);
         
         contentStream.close();
 		
@@ -733,13 +739,13 @@ public class PDFGenerator {
         return lines;
 	}
     
-	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx) throws IOException {
+	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx,int cy) throws IOException {
 		List<String> lines = separateLines(text,PDType1Font.HELVETICA,55,8);
 		int count = 0;
 		for(String line : lines) {
 			float size = 8*PDType1Font.HELVETICA.getStringWidth(line)/1000;
 			contentStream.beginText();
-			contentStream.newLineAtOffset(cx-size/2, 35-10*count);
+			contentStream.newLineAtOffset(cx-size/2, cy-10*count);
 			contentStream.showText(line);
 			contentStream.endText();
 			count ++;
