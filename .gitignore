@@ -12,4 +12,5 @@ target/*
 .settings/org.eclipse.m2e.core.prefs
 .sts4-cache/classpath-data.json
 img/*
+pdf/*
 src/main/resources/application.properties
