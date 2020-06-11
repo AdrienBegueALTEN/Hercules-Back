@@ -83,10 +83,13 @@ public class MissionController {
 	{
 		
 		List<CompleteMissionResponse> bodyComplete;
-		List<Mission> body;
-		bodyComplete = dal.advancedSearchQuery("","","","","France","","",1).stream()
-				.map(mission -> new CompleteMissionResponse(mission, false, true))
+		
+		
+		bodyComplete = dal.advancedSearchQuery("","","","","France","","",manager).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, manager.isPresent()))
+				//.map(mission -> new CompleteMissionResponse(mission, false, true))
 				.collect(Collectors.toList());
+		
 		
 		/*
 		
