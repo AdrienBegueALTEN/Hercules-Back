@@ -81,26 +81,65 @@ public class MissionController {
 	}
 	
 	
-	@GetMapping("/testcriteria")
-	public ResponseEntity<?> TestAdvancedSearch()
+	@GetMapping("/advancedSearch")
+	public ResponseEntity<?> AdvancedSearch(@RequestParam Optional<Long> manager)
 	{
-		/*
-		List<Mission> body;
-		body = dal.advancedSearch("","","","","France","","",1);
-		return ResponseEntity.ok(body);
-		*/
-		
-		
 		
 		List<CompleteMissionResponse> bodyComplete;
-		bodyComplete = dal.advancedSearch("","","","","France","","",1).stream()
+		
+		
+		bodyComplete = dal.advancedSearchQuery("","","","","France","","",manager).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, manager.isPresent()))
+				//.map(mission -> new CompleteMissionResponse(mission, false, true))
+				.collect(Collectors.toList());
+		
+		
+		/*
+		
+		if (manager.isEmpty()) {
+		bodyComplete = dal.advancedSearchQuery("","","","","France","","",1).stream()
 				.map(mission -> new CompleteMissionResponse(mission, false, true))
 				.collect(Collectors.toList());
+		}
+		else
+		{
+			bodyComplete = dal.advancedSearchQuery("","","","","France","","",1).stream()
+					.map(mission -> new CompleteMissionResponse(mission, false, true))
+					.collect(Collectors.toList());
+		}
+		
+		*/
 		return ResponseEntity.ok(bodyComplete);
+		
+		//return ResponseEntity.ok(body);
 		
 		
 	}
 	
+	
+	/*
+	@GetMapping("/advancedSearch")
+	
+	//public ResponseEntity<?> advancedSearch(@RequestParam String missionTitle, @RequestParam String customerName, @RequestParam String activitySector, @RequestParam String missionCity, @RequestParam String missionCountry, @RequestParam String consultantFirstName, @RequestParam String consultantLastName, long managerId)
+	
+	//public ResponseEntity<?> advancedSearch(@RequestParam String missionTitle, @RequestParam String customerName, @RequestParam String activitySector, @RequestParam String missionCity, @RequestParam String missionCountry, @RequestParam String consultantFirstName, @RequestParam String consultantLastName, long managerId)
+	{
+		
+		List<CompleteMissionResponse> bodyComplete;
+		//
+		
+		bodyComplete = dal.advancedSearchQuery(missionTitle,customerName,activitySector,missionCity,missionCountry,consultantFirstName,consultantLastName,1).stream()
+				.map(mission -> new CompleteMissionResponse(mission, true, true))
+				.collect(Collectors.toList());
+		
+		
+		return ResponseEntity.ok(bodyComplete);
+		
+		
+		
+	}
+	
+	*/
 	
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/anonymous")

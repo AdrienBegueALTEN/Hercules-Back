@@ -27,6 +27,7 @@ import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.mission.MissionSheetDAO;
 import com.alten.hercules.dao.project.ProjectDAO;
 import com.alten.hercules.dao.skill.SkillDAO;
+import com.alten.hercules.dao.user.ManagerDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
@@ -45,6 +46,7 @@ public class MissionDAL {
 	@Autowired private CustomerDAO customerDAO;
 	@Autowired private ProjectDAO projectDAO;
 	@Autowired private SkillDAO skillDAO;
+	@Autowired private ManagerDAO managerDAO;
 	
 	@PersistenceContext
 	EntityManager em;
@@ -74,8 +76,8 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 
-	public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, long managerId) 
-	//public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName) 
+	public List<Mission> advancedSearchQuery(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, Optional<Long> manager) 
+	//public List<Mission> advancedSearch(String missionTitle, String customerName, String activitySector, String missionCity, String missionCountry, String consultantFirstName, String consultantLastName, Long manager) 
 	
 	{
 		
@@ -98,8 +100,7 @@ public class MissionDAL {
 	    Join<Mission, Customer> customerJoin = missionRoot.join("customer", JoinType.INNER);
 	    
 	    
-	    //Join<Mission, MissionSheet> sheetJoin = missionRoot.join("mission", JoinType.LEFT);
-	    //Join<MissionSheet>
+	    Join<Mission, MissionSheet> sheetJoin = missionRoot.join("versions", JoinType.INNER);
 	    
         List<Predicate> criteriaList = new ArrayList<>();
         
@@ -151,12 +152,21 @@ public class MissionDAL {
         }
         
         
+        
+        if(manager.isPresent())
+        //if(manager!=null)
+        {
     	Predicate AllValidatedMissions = criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), "VALIDATED");
-    	Predicate MyMissions = criteriaBuilder.equal(consultantJoin.get("manager"), managerId);
+    	Predicate MyMissions = criteriaBuilder.equal(consultantJoin.get("manager"),managerDAO.getOne(manager.get()));
     	Predicate AllValidatedMissionsOrMyMissions = criteriaBuilder.or(AllValidatedMissions,MyMissions);
     	
     	criteriaList.add(AllValidatedMissionsOrMyMissions);
-    	
+        }
+        else {
+        	Predicate AllValidatedMissions = criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), "VALIDATED");
+        	criteriaList.add(AllValidatedMissions);
+        	
+        }
           
         Expression<Object> caseExpression = criteriaBuilder.selectCase()
     	    	.when(criteriaBuilder.equal(missionRoot.get("sheetStatus").as(String.class), criteriaBuilder.literal("VALIDATED")), 3)
@@ -364,5 +374,11 @@ public class MissionDAL {
 	public List<Skill> findAllSkills(){
 		return this.skillDAO.findAll();
 	}
+
+
+	
+
+
+
 
 }
