@@ -100,8 +100,7 @@ public class MissionDAL {
 	    Join<Mission, Customer> customerJoin = missionRoot.join("customer", JoinType.INNER);
 	    
 	    
-	    //Join<Mission, MissionSheet> sheetJoin = missionRoot.join("mission", JoinType.LEFT);
-	    //Join<MissionSheet>
+	    Join<Mission, MissionSheet> sheetJoin = missionRoot.join("versions", JoinType.INNER);
 	    
         List<Predicate> criteriaList = new ArrayList<>();
         
