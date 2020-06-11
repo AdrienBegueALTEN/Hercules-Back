@@ -166,7 +166,7 @@ public class CustomerController {
 	
 	@DeleteMapping("/{id}/logo")
 	@PreAuthorize("hasAuthority('MANAGER')")
-	private ResponseEntity<?> deletePicture(@PathVariable Long id){
+	public ResponseEntity<?> deleteLogo(@PathVariable Long id){
 		try {
 			Customer customer = this.dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer"));
 			if(customer.getLogo()!=null) {
