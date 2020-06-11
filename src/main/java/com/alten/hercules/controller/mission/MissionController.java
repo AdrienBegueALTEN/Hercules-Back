@@ -7,11 +7,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.Tuple;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -61,6 +61,9 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.EProjectFieldname;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
+import com.alten.hercules.model.user.AppUser;
+import com.alten.hercules.model.user.EAuthorities;
+import com.alten.hercules.model.user.Manager;
 import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
 
@@ -79,14 +82,12 @@ public class MissionController {
 	
 	
 	@GetMapping("/advancedSearch")
-	public ResponseEntity<?> AdvancedSearch(@RequestParam Optional<Long> manager)
-	{
+	public ResponseEntity<?> AdvancedSearch(@RequestParam Map<String, String> criteria) {
+		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
 		
-		List<CompleteMissionResponse> bodyComplete;
-		
-		
-		bodyComplete = dal.advancedSearchQuery("","","","","France","","",manager).stream()
-				.map(mission -> new CompleteMissionResponse(mission, false, manager.isPresent()))
+		List<CompleteMissionResponse> bodyComplete = dal.advancedSearchQuery(criteria, optManagerId).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, optManagerId.isPresent()))
 				//.map(mission -> new CompleteMissionResponse(mission, false, true))
 				.collect(Collectors.toList());
 		
@@ -106,7 +107,7 @@ public class MissionController {
 		}
 		
 		*/
-		return ResponseEntity.ok(bodyComplete);
+		return ResponseEntity.ok(null);
 		
 		//return ResponseEntity.ok(body);
 		
