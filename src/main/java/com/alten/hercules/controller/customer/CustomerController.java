@@ -144,7 +144,6 @@ public class CustomerController {
 	}
 	
 	@GetMapping("/logo/{fileName:.+}")
-	@PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"logo");
@@ -167,7 +166,7 @@ public class CustomerController {
 	
 	@DeleteMapping("/{id}/logo")
 	@PreAuthorize("hasAuthority('MANAGER')")
-	private ResponseEntity<?> deletePicture(@PathVariable Long id){
+	public ResponseEntity<?> deleteLogo(@PathVariable Long id){
 		try {
 			Customer customer = this.dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer"));
 			if(customer.getLogo()!=null) {

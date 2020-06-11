@@ -54,6 +54,7 @@ public class ManagerController {
 						.email()
 						.admin()
 						.consultants()
+						.releaseDate()
 						.build();
 			return ResponseEntity.ok(body);
 		} catch (ResponseEntityException e) {
@@ -129,6 +130,8 @@ public class ManagerController {
 				.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
 			if (!manager.getConsultants().isEmpty())
 				throw new EntityDeletionException("The manager is linked to one or more consultants.");
+			else
+				dal.delete(manager);
 			return ResponseEntity.ok(manager);
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -165,6 +168,11 @@ public class ManagerController {
 
 		ManagerResponseBodyBuilder admin() {
 			body.put("admin", manager.isAdmin());
+			return this;
+		}
+		
+		ManagerResponseBodyBuilder releaseDate() {
+			body.put("releaseDate", manager.getReleaseDate());
 			return this;
 		}
 		
