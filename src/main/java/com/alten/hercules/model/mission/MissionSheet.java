@@ -34,7 +34,7 @@ public class MissionSheet {
 	@Column(nullable = false, columnDefinition = "VARCHAR(255) default ''")
 	private String comment = "";
 
-	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
+	@Column(nullable = false, columnDefinition = "VARCHAR(50) default ''")
 	private String consultantRole = "";
 	
 	@Min(0)
@@ -65,7 +65,7 @@ public class MissionSheet {
 	@Min(1)
 	private Integer teamSize;
 	
-	@Column(nullable = false, columnDefinition = "VARCHAR(255) default ''")
+	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String title = "";
 	
 	private Date versionDate;
