@@ -1,8 +1,7 @@
 package com.alten.hercules.service;
 
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Period;
@@ -10,7 +9,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -697,7 +696,7 @@ public class PDFGenerator {
 	}
 	
 	public void saveFinalPDF(PDDocument document) throws IOException {
-		document.save("..\\fichesMissionsEtProjets.pdf");
+		document.save("pdf\\fichesMissionsEtProjets.pdf");
         document.close();
 	}
 	 

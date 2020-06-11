@@ -1,6 +1,9 @@
 package com.alten.hercules.controller.mission;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,6 +20,7 @@ import javax.validation.Valid;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -679,7 +683,20 @@ public class MissionController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
 		}
 		
-		return ResponseEntity.ok("");
+		Path path = Paths.get("pdf\\fichesMissionsEtProjets.pdf");
+		byte[] data;
+		try {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
+		}
+        ByteArrayResource resource = new ByteArrayResource(data);
+		
+        return ResponseEntity.ok()
+        		.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=pdf\\fichesMissionsEtProjets.pdf")
+        		.contentType(MediaType.APPLICATION_PDF) 
+                .contentLength(data.length) 
+                .body(resource);
 	}
 	
 	
