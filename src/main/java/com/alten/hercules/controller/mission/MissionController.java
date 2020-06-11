@@ -1,6 +1,10 @@
 package com.alten.hercules.controller.mission;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,8 +19,10 @@ import javax.persistence.Tuple;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,6 +39,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -639,7 +646,23 @@ public class MissionController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
 		}
 		
-		return ResponseEntity.ok("");
+		Path path = Paths.get("..\\fichesMissionsEtProjets.pdf");
+		byte[] data;
+		try {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
+		}
+        ByteArrayResource resource = new ByteArrayResource(data);
+		
+        return ResponseEntity.ok()
+                // Content-Disposition
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=..\\fichesMissionsEtProjets.pdf")
+                // Content-Type
+                .contentType(MediaType.APPLICATION_PDF) //
+                // Content-Lengh
+                .contentLength(data.length) //
+                .body(resource);
 	}
 	
 	
