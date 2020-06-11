@@ -93,7 +93,6 @@ public class MissionDAL {
 	    sheetJoin.on(builder.equal(subQuery, sheetJoin.get("versionDate")));
 
         List<Predicate> criteriaList = new ArrayList<>();
-	    
         String key = "title";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
         	criteriaList.add(builder.like(builder.lower(sheetJoin.get("title")), ("%" + criteria.get(key) + "%").toLowerCase()));
