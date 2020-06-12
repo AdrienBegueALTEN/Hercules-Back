@@ -79,13 +79,13 @@ public class MissionDAL {
 	
 	
 	//The following function uses Criteria API to create a query. 
-	//It is used here to manage the optional parameters for the advanced search.
+	//It is used to manage the optional parameters of the advanced search.
 	public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
 		
 		CriteriaBuilder builder = em.getCriteriaBuilder();
 	    CriteriaQuery<Mission> query = builder.createQuery(Mission.class);
 	    
-	    
+	    //Gets the whole mission table
 	    Root<Mission> root = query.from(Mission.class);
 	    
 	    //Joints are used to join tables together using objects of the root class (ie Mission.class)
@@ -125,6 +125,7 @@ public class MissionDAL {
         } catch (NumberFormatException ignored) {}
 
         
+        //Searches the location of the mission using country or city rows
         //Two ways lower case make the searched string case insensitive
         key = "location";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
@@ -163,32 +164,6 @@ public class MissionDAL {
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
 
 	    return em.createQuery(query).getResultList();
-	}
-	
-	public List<Mission> loadAllVariables2() {
-	    CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-	    CriteriaQuery<Mission> criteriaQuery = criteriaBuilder.createQuery(Mission.class);
-	    Root<Mission> missionRoot = criteriaQuery.from(Mission.class);
-	    
-	    
-	    criteriaQuery.where(criteriaBuilder.equal(missionRoot.get("id"), 1));
-	    //In<String> inClause = criteriaBuilder.in(root.get("title"));
-	    TypedQuery<Mission> query = em.createQuery(criteriaQuery);
-	    //Join<Mission, Consultant> p = variableRoot.join("consultant_id", JoinType.INNER);
-	    
-	    //Join<Mission, Consultant> consultant = missionRoot.join("consultant", JoinType.INNER);
-	    //Join<Mission, MissionSheet> missionSheet = consultant.join("versions", JoinType.INNER);
-	    //Join<Mission, Customer> customer = missionSheet.join("customer", JoinType.INNER);
-	    
-	    
-	    //Join<Mission, Consultant> consultant = missionRoot.join("consultant", JoinType.INNER);
-	    //Join<Mission, MissionSheet> missionSheet = missionRoot.join("versions", JoinType.INNER);
-	    //Join<Mission, Customer> customer = missionRoot.join("customer", JoinType.INNER);
-	    
-	    //criteriaQuery.select(missionRoot);
-	    //return em.createQuery(criteriaQuery).getResultList();
-	    
-	    return query.getResultList();
 	}
 	
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
