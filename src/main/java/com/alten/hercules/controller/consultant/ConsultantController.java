@@ -152,10 +152,15 @@ public class ConsultantController {
 						throw new InvalidValueException();
 					break;
 				case releaseDate:
-					try {
-						consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
-					} catch (ParseException e) {
-						throw new InvalidValueException();
+					if(req.getValue()==null) {
+						consultant.setReleaseDate(null);
+					}
+					else {
+						try {
+							consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
+						} catch (ParseException e) {
+							throw new InvalidValueException();
+						}
 					}
 					break;
 				default: throw new InvalidFieldnameException();

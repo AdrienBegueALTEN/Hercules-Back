@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.alten.hercules.controller.user.RecruitementOfficerController;
 import com.alten.hercules.dal.ConsultantDAL;
+import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
@@ -27,6 +28,8 @@ public class MainApp implements CommandLineRunner  {
 	public void run(String... arg) throws Exception {
 		this.storeImage.deleteAll();
 		this.storeImage.init();
+		PDFGenerator.deleteAll();
+		PDFGenerator.init();
 	}
 
 }

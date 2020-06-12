@@ -1,6 +1,7 @@
 INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur informatique imagerie', 'UTBM Belfort', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
 INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur informatique', 'Polytech Nancy', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
 INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Master Ingénierie Système & Logiciel', 'UFR ST Besançon', 'BAC +5', 2020) ON CONFLICT DO NOTHING;
+INSERT INTO DIPLOMA(entitled, establishment, level, year) VALUES('Ingénieur informatique image IA', 'Telecom Saint-Etienne', 'BAC+5', 2020) ON CONFLICT DO NOTHING;
 
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'admin.admin@alten.com', 'Admin', 'Admin', '$2y$10$3Txsc9hKbTHAcC6INizp/uSvPw.TfLvFuUiIYWRQR5BZivzfAB2fO', true) ON CONFLICT DO NOTHING;
 INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALUES('Manager', 'manager.manager@alten.com', 'Manager', 'Manager', '$2y$10$3Txsc9hKbTHAcC6INizp/uSvPw.TfLvFuUiIYWRQR5BZivzfAB2fO', false) ON CONFLICT DO NOTHING;
@@ -9,10 +10,12 @@ INSERT INTO APP_USER(dtype, email, firstname, lastname, password, is_admin) VALU
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('julien.baudot@alten.com', 'Julien', 'Baudot', 7, 2) ON CONFLICT DO NOTHING;
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('adrien.begue@alten.com', 'Adrien', 'Bègue', 1, 1) ON CONFLICT DO NOTHING;
 INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('robin.jesson@alten.com', 'Robin', 'Jesson', 7, 1) ON CONFLICT DO NOTHING;
+INSERT INTO CONSULTANT(email, firstname, lastname, experience, manager_id) VALUES('maxime.foltz@alten.com', 'Maxime', 'Foltz', 1, 1) ON CONFLICT DO NOTHING;
 
 INSERT INTO CONSULTANT_DIPLOMAS(consultant_id,diplomas_id) VALUES(3,1) ON CONFLICT DO NOTHING;
 INSERT INTO CONSULTANT_DIPLOMAS(consultant_id,diplomas_id) VALUES(1,2) ON CONFLICT DO NOTHING;
 INSERT INTO CONSULTANT_DIPLOMAS(consultant_id,diplomas_id) VALUES(2,3) ON CONFLICT DO NOTHING;
+INSERT INTO CONSULTANT_DIPLOMAS(consultant_id,diplomas_id) VALUES(4,4) ON CONFLICT DO NOTHING;
 
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('TESLA', 'Automobile') ON CONFLICT DO NOTHING;
 INSERT INTO CUSTOMER(name, activity_sector) VALUES('ALTEN', 'Consulting technologique') ON CONFLICT DO NOTHING;

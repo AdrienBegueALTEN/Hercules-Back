@@ -2,6 +2,9 @@ package com.alten.hercules.service;
 
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Period;
@@ -21,6 +24,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
+import org.springframework.util.FileSystemUtils;
 
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.mission.Mission;
@@ -30,6 +34,9 @@ import com.alten.hercules.model.skill.Skill;
 
 
 public class PDFGenerator {
+	
+	private final static Path pdfFolder = Paths.get("pdf");
+	
 	
 	
 	// Polices utilisées
@@ -52,6 +59,11 @@ public class PDFGenerator {
     PDImageXObject durationIcon;
     PDImageXObject localizationIcon;
     
+    /**
+     * Constructor that takes a PDDocument from PDFBox and initializes the used pictures
+     * @param document PDDocument from PDFBox that represents the pdf document
+     * @throws IOException
+     */
 	public PDFGenerator(PDDocument document) throws IOException {
 		// Images utilisées
         layoutAlten = PDImageXObject.createFromFile("src\\main\\resources\\pdflayout.png", document);
@@ -61,7 +73,32 @@ public class PDFGenerator {
         durationIcon = PDImageXObject.createFromFile("src\\main\\resources\\duree.png", document);
         localizationIcon = PDImageXObject.createFromFile("src\\main\\resources\\localisation.png", document);
 	}
-
+	
+	/**
+	 * Function that creates the folder pdf in the root of the project if it is not created
+	 */
+	public static void init() {
+		try {
+			if(!Files.exists(pdfFolder))
+				Files.createDirectories(pdfFolder);
+		} catch (IOException e) {
+			throw new RuntimeException("Could not initialize folder for upload!");
+		}
+	}
+	
+	/**
+	 * Function that cleans everything into the pdf folder
+	 */
+	public static void deleteAll() {
+	    FileSystemUtils.deleteRecursively(pdfFolder.toFile());
+	}
+	
+	/**
+	 * Function that manages the generation of a PDF page for a mission
+	 * @param mission object Mission that contains the necessary information for the page
+	 * @param document PDDocument from PDFBox that represents the pdf document
+	 * @throws IOException
+	 */
 	public void makeMissionPDF(Mission mission, PDDocument document) throws IOException {
 
 		float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves
@@ -378,6 +415,12 @@ public class PDFGenerator {
         
 	}
 	
+	/**
+	 * Function that manages the generation of a pdf page for a project
+	 * @param project object Project that contains the necessary information for the page
+	 * @param document PDDocument from PDFBox that represents the pdf document
+	 * @throws IOException
+	 */
 	public void makeProjectPDF(Project project,PDDocument document) throws IOException {
 		
 		Mission mission = project.getMissionSheet().getMission();
@@ -695,17 +738,24 @@ public class PDFGenerator {
 		
 	}
 	
+	/**
+	 * Function that takes a PDFBox document and saves it as a pdf file
+	 * @param document  PDDocument from PDFBox that represents a pdf document
+	 * @throws IOException
+	 */
 	public void saveFinalPDF(PDDocument document) throws IOException {
 		document.save("pdf\\fichesMissionsEtProjets.pdf");
         document.close();
 	}
 	 
+	
 	/**
-	 * Fonction qui va prendre en argument un String text et le découper en plusieurs lignes de façon à ce que chaque ligne soit de longueur inférieure à maxWidth avec la police font.
-	 * @param text String contenant le texte à découper
-	 * @param font PDFont utilisé pour le texte
-	 * @param maxWidth longueur maximale d'une ligne
-	 * @return Une List<String> contenant le texte donné en argument où chaque ligne
+	 * Function that takes a String as argument and slice it in several lines so that each line has a length inferior to maxWidth  with the given font
+	 * @param text String that contains the text to slice
+	 * @param font PDFont used for the text
+	 * @param maxWidth maximal length of a line
+	 * @param fontSize size of the font
+	 * @return a List<String> that contains the sliced parts of the text
 	 * @throws IOException
 	 */
 	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize ) throws IOException{
@@ -748,6 +798,14 @@ public class PDFGenerator {
         return lines;
 	}
     
+	/**
+	 * Function that displays a given text using the stream of a pdf page centered on the point c(cx, cy)
+	 * @param contentStream PDPageContentStream of the pdf page
+	 * @param text text to display
+	 * @param cx x coordinate from c
+	 * @param cy y coordinate from c
+	 * @throws IOException
+	 */
 	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx,int cy) throws IOException {
 		List<String> lines = separateLines(text,PDType1Font.HELVETICA,55,8);
 		int count = 0;
@@ -762,6 +820,16 @@ public class PDFGenerator {
 		
 	}
 	
+	
+	/**
+	 * Function that takes a String and given its characteristics, shortens it so that it doesn't exceed a given length
+	 * @param text text to shorten
+	 * @param font PDFont used for the font
+	 * @param maxWidth maximal length of the text
+	 * @param fontSize size of the font
+	 * @return the shortened String if it's too long with ... at the end
+	 * @throws IOException
+	 */
 	private static String cutText(String text, PDFont font, int maxWidth, int fontSize) throws IOException {
 		
 		int end = text.length();
@@ -777,6 +845,11 @@ public class PDFGenerator {
 			return text.substring(0,end-3)+"...";
 	}
 	
+	/**
+	 * Function that modifies a String by replacing it by a corresponding one
+	 * @param text text to replace
+	 * @return
+	 */
 	private static String modifyText(String text) {
 		if(text.equals("technical_assistance")) {
 			return "Assistance technique";
@@ -791,6 +864,13 @@ public class PDFGenerator {
 			return text;
 	}
 	
+	/**
+	 * Function that given a duration in days, months and years will choose the more appropriate String for it
+	 * @param days duration in days
+	 * @param months duration in months
+	 * @param years duration in years
+	 * @return a string that gives the duration with the appropriate unit
+	 */
 	private static String durationToText(Integer days, Integer months, Integer years) {
 		if(days<7) {
 			if(days == 0 || days==1 )
