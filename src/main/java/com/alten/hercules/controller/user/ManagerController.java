@@ -102,10 +102,15 @@ public class ManagerController {
 					manager.setEmail(email);
 					break;
 				case releaseDate:
-					try {
-						manager.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
-					} catch (ParseException e) {
-						throw new InvalidValueException();
+					if(request.getValue()==null) {
+						manager.setReleaseDate(null);
+					}
+					else {
+						try {
+							manager.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
+						} catch (ParseException e) {
+							throw new InvalidValueException();
+						}
 					}
 					break;
 				case isAdmin:

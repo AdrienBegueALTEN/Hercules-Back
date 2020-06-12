@@ -75,10 +75,15 @@ public class RecruitementOfficerController {
 					recruitmentOfficer.setEmail(email);
 					break;
 				case releaseDate:
-					try {
-						recruitmentOfficer.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
-					} catch (ParseException e) {
-						throw new InvalidValueException();
+					if(request.getValue()==null) {
+						recruitmentOfficer.setReleaseDate(null);
+					}
+					else {
+						try {
+							recruitmentOfficer.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
+						} catch (ParseException e) {
+							throw new InvalidValueException();
+						}
 					}
 					break;
 				default: throw new InvalidFieldnameException();
