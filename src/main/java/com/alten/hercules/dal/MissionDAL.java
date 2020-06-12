@@ -88,7 +88,7 @@ public class MissionDAL {
 	    //Gets the whole mission table
 	    Root<Mission> root = query.from(Mission.class);
 	    
-	    //Joints are used to join tables together using objects of the root class (ie Mission.class)
+	    //Joints are used to join tables together using objects of the root class (i.e Mission.class)
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);

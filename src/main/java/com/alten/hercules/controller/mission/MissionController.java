@@ -83,6 +83,10 @@ public class MissionController {
 		return getMissionDetails(id, true);
 	}
 	
+	//Gets all missions from the database
+	//The retrieved missions are then mapped to the consultant, customer and missionSheet tables
+	//If the user is authenticated, the manager id exists and the user gets the latest version of the mission sheet
+	//If the user is a guest, the manager id doesn't exist and the user gets the latest version of the mission sheet without the sheet status
 	@GetMapping("/advancedSearch")
 	public ResponseEntity<?> advancedSearch(@RequestParam Map<String, String> criteria) {
 		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
@@ -132,6 +136,12 @@ public class MissionController {
 		}
 	}
 	
+	
+	
+	//Gets all missions from the database
+	//The retrieved missions are then mapped to the consultant, customer and missionSheet tables
+	//If the user is authenticated, the manager id exists and the user gets the latest version of the mission sheet
+    //If the user is a guest, the manager id doesn't exist and the user gets the latest version of the sheet without the mission sheet status
 	
 	@GetMapping
 	public ResponseEntity<?> getAll() {
