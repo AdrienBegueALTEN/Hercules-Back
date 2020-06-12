@@ -101,22 +101,14 @@ public class MissionDAL {
             key = "customer";
 	        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
 	        	criteriaList.add(builder.equal(customerJoin.get("id"), Long.parseLong(criteria.get(key))));
-        } catch (NumberFormatException e) {
-        	criteriaList.add(builder.like(builder.lower(customerJoin.get("name")), ("%" + criteria.get(key) + "%").toLowerCase()));
-        }
+        } catch (NumberFormatException ignored) {}
 	        
         try {
 	        key = "consultant";
 	        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
 	        	criteriaList.add(builder.equal(consultantJoin.get("id"), Long.parseLong(criteria.get(key))));
-        } catch (NumberFormatException e) {
-        	final String pattern = ("%" + criteria.get(key) + "%").toLowerCase();
-        	criteriaList.add(builder.or(
-        			builder.like(builder.lower(consultantJoin.get("firstname")), pattern),
-        			builder.like(builder.lower(consultantJoin.get("lastname")), pattern)));
-        }
+        } catch (NumberFormatException ignored) {}
 
-        
         key = "location";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
         	final String pattern = ("%" + criteria.get(key) + "%").toLowerCase();
