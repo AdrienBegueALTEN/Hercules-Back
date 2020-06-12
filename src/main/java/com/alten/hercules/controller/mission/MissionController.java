@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +67,11 @@ import com.alten.hercules.model.user.Manager;
 import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @CrossOrigin(origins="*")
 @RequestMapping("/hercules/missions")
@@ -78,23 +80,32 @@ public class MissionController {
 	@Autowired private MissionDAL dal;
 	@Autowired private StoreImage storeImage;
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getMission(@PathVariable Long id) {
-		return getMissionDetails(id, true);
+	@ApiOperation(
+			value = "Get a mission.",
+			notes = "Return all informations related to the mission and all his sheets.\n"
+					+ "The sheets are sorted from the most recent to the oldest."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 404, message="Mission not found.")
+	})
+	@GetMapping("/{missionId}")
+	public ResponseEntity<?> getMission(
+			@ApiParam("Mission identifier.")
+			@PathVariable Long missionId) {
+		return getMissionDetails(missionId, true);
 	}
 	
-	@GetMapping("/advancedSearch")
-	public ResponseEntity<?> advancedSearch(@RequestParam Map<String, String> criteria) {
-		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
-		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
-		
-		List<CompleteMissionResponse> bodyComplete = dal.advancedSearchQuery(criteria, optManagerId).stream()
-				.map(mission -> new CompleteMissionResponse(mission, false, optManagerId.isPresent()))
-				.collect(Collectors.toList());
-		
-		return ResponseEntity.ok(bodyComplete);
-	}
-	
+	@ApiOperation(
+			value = "Get a mission (anonymous user).",
+			notes = "Return the informations related to the mission and his most recent sheet.\n"
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 404, message="Mission not found.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/anonymous")
 	public ResponseEntity<?> getMissionFromToken() {
@@ -114,15 +125,49 @@ public class MissionController {
 		}
 	}
 	
+	@ApiOperation(
+			value = "Advanced search within missions.",
+			notes = "Return all missions which has the status 'validated' and which correspond to the set of criteria.\n"
+					+ "If the user is a manager, also return the missions linked to his consultants which has other status (and also correspond to the set of criteria).\n"
+					+ "In this second case, the mission are sorted according to their status : first 'on waiting' then 'on doing' then 'validated'.\n"
+					+ "Only the most recent sheet (last version) is returned for each mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+	})
+	@GetMapping("/advancedSearch")
+	public ResponseEntity<?> advancedSearch(
+			@ApiParam(value="Research criteria associated to their value.")
+			@RequestParam Map<String, String> criteria) {
+		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
+		
+		List<CompleteMissionResponse> bodyComplete = dal.advancedSearchQuery(criteria, optManagerId).stream()
+				.map(mission -> new CompleteMissionResponse(mission, false, optManagerId.isPresent()))
+				.collect(Collectors.toList());
+		
+		return ResponseEntity.ok(bodyComplete);
+	}
 	
+	@ApiOperation("Delete a mission.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Mission deleted."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager."),
+		@ApiResponse(code = 404, message="Mission not found."),
+		@ApiResponse(code = 409, message="Mission is versioned.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteMission(@PathVariable Long id) {
+	@DeleteMapping("/{missionId}")
+	public ResponseEntity<?> deleteMission(
+			@ApiParam("Mission identifier.")
+			@PathVariable Long missionId) {
 		try {
-			Mission mission = dal.findById(id)
+			Mission mission = dal.findById(missionId)
 				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-			if (!(mission.getLastVersion().getVersionDate()==null)&&!(mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)))
-				throw new EntityDeletionException("The mission is not on waiting and has a last version date");
+			if (!(mission.getLastVersion().getVersionDate()==null))
+				throw new EntityDeletionException("The mission is not on waiting and has a last version date.");
 			dal.delete(mission);
 			return ResponseEntity
 					.ok()
@@ -132,7 +177,17 @@ public class MissionController {
 		}
 	}
 	
-	
+	@ApiOperation(
+			value = "Get missions.",
+			notes = "Return all missions which has the status 'validated'.\n"
+					+ "If the user is a manager, also return the missions linked to his consultants which has other status.\n"
+					+ "In this second case, the mission are sorted according to their status : first 'on waiting' then 'on doing' then 'validated'.\n"
+					+ "Only the most recent sheet (last version) is returned for each mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token.")
+	})
 	@GetMapping
 	public ResponseEntity<?> getAll() {
 		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
@@ -150,7 +205,16 @@ public class MissionController {
 		return ResponseEntity.ok(body);
 	}
 
-
+	@ApiOperation(
+			value="Create a mission.",
+			notes="Create a mission linked to a consultant and a client."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="Mission created.", response=Long.class),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager."),
+		@ApiResponse(code = 404, message="Consultant/customer not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
 	public ResponseEntity<?> addMission(@Valid @RequestBody AddMissionRequest request) {
@@ -168,9 +232,22 @@ public class MissionController {
 		}
 	}
 	
+	@ApiOperation(
+			value="New version",
+			notes="Create a new versioned sheet for a mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="New version created."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager or mission isn't validated."),
+		@ApiResponse(code = 404, message="Mission not found."),
+		@ApiResponse(code = 409, message="Today's version already exists.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-version/{missionId}")
-	public ResponseEntity<?> newVersion(@PathVariable Long missionId) {
+	public ResponseEntity<?> newVersion(
+			@ApiParam("Mission identifier.")
+			@PathVariable Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
 					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
@@ -190,28 +267,50 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
+	@ApiOperation(
+			value="Update a mission's field.",
+			notes="Update the value of one of the fields of a mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Mission's field updated."),
+		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager or mission has status 'validated'."),
+		@ApiResponse(code = 404, message="Mission not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
-	public ResponseEntity<?> putMission(@Valid @RequestBody UpdateEntityRequest req) {
-		return updateMission(req.getId(), req.getFieldName(), req.getValue());
+	public ResponseEntity<?> putMission(@Valid @RequestBody UpdateEntityRequest request) {
+		return updateMission(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
+	@ApiOperation(
+			value="Update a mission's field (anonymous user).",
+			notes="Update the value of one of the fields of a mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Mission's field updated."),
+		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="Mission has status 'validated'."),
+		@ApiResponse(code = 404, message="Mission not found.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PutMapping("/anonymous")
-	public ResponseEntity<?> putMissionFromToken(@RequestBody UpdateEntityRequest req) {
+	public ResponseEntity<?> putMissionFromToken(@RequestBody UpdateEntityRequest request) {
 		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
-		if (req.getFieldName() == null)
+		if (request.getFieldName() == null)
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
 					.build();
-		return updateMission(id, req.getFieldName(), req.getValue());
+		return updateMission(id, request.getFieldName(), request.getValue());
 	}
 	
 	private ResponseEntity<?> updateMission(Long id, String key, Object value) {
 		try {
-			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Sheet"));
-			Mission mission = dal.findById(id).get();
+			Mission mission = dal.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id).get();
 			
 			EMissionFieldname fieldname;
 			try { fieldname = EMissionFieldname.valueOf(key); }
@@ -250,7 +349,7 @@ public class MissionController {
 							throw new InvalidSheetStatusException();
 						mission.changeSecret();
 						mission.setSheetStatus(ESheetStatus.VALIDATED);
-						mostRecentVersion.setVersionDate(new Date());
+						mostRecentVersion.setVersionDate(LocalDate.now());
 						dal.save(mission);
 					} catch (IllegalArgumentException e) { throw new InvalidValueException(); }
 					return ResponseEntity.ok().build(); 
@@ -272,58 +371,102 @@ public class MissionController {
 		}
 	}
 	
+	@ApiOperation(
+			value="Create project.",
+			notes="Create a new empty project for the most recent sheet of a mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="New project created."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager or mission has status 'validated' or projects limit reached for the sheet."),
+		@ApiResponse(code = 404, message="Mission not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-project/{missionId}")
-	public ResponseEntity<?> NewProject(@PathVariable Long missionId) {
-		try { newProject(missionId); }
+	public ResponseEntity<?> newProject(
+			@ApiParam("Mission identifier.")
+			@PathVariable Long missionId) {
+		try { _newProject(missionId); }
 		catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
+	@ApiOperation(
+			value="Create project (anonymous user).",
+			notes="Create a new empty project for the most recent sheet of a mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="New project created."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="Mission has status 'validated' or projects limit reached for the sheet."),
+		@ApiResponse(code = 404, message="Mission not found.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/new-project-anonymous")
-	public ResponseEntity<?> newProjectFromToken() {
+	public ResponseEntity<?> newProjectAnonymous() {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
-		try { newProject(missionId); }
+		try { _newProject(missionId); }
 		catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	private void newProject(Long missionId) throws ResponseEntityException {
+	private void _newProject(Long missionId) throws ResponseEntityException {
 		Mission mission = dal.findById(missionId)
 				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
-			if (mission.isValidated())
-				throw new InvalidSheetStatusException();
-			MissionSheet lastVersion = mission.getLastVersion();
-			if (!(lastVersion.getProjects().size() < 5))
-				throw new ProjectsBoundsException();
-			Project newProject = new Project(lastVersion);
-			dal.addProjectForSheet(lastVersion, newProject);
+		if (mission.isValidated())
+			throw new InvalidSheetStatusException();
+		MissionSheet lastVersion = mission.getLastVersion();
+		if (!(lastVersion.getProjects().size() < 5))
+			throw new ProjectsBoundsException();
+		Project newProject = new Project(lastVersion);
+		dal.addProjectForSheet(lastVersion, newProject);
 	}
 	
+	@ApiOperation(
+			value="Update a project's field.",
+			notes="Update the value of one of the fields of a project."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Project's field updated."),
+		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager or mission linked to the project has status 'validated' or project isn't linked to the most recent sheet of the mission."),
+		@ApiResponse(code = 404, message="Project not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("projects")
-	public ResponseEntity<?> putProject(@Valid @RequestBody UpdateEntityRequest req) {
-		return updateProject(req.getId(), req.getFieldName(), req.getValue());
+	public ResponseEntity<?> putProject(@Valid @RequestBody UpdateEntityRequest request) {
+		return updateProject(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
+	@ApiOperation(
+			value="Update a project's field (anonymous user).",
+			notes="Update the value of one of the fields of a project."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Project's field updated."),
+		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="Mission linked to the project has status 'validated' or project isn't linked to the most recent sheet of the mission."),
+		@ApiResponse(code = 404, message="Project not found.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PutMapping("projects/anonymous")
-	public ResponseEntity<?> putProjectFromToken(@Valid @RequestBody UpdateEntityRequest req) {
+	public ResponseEntity<?> putProjectFromToken(@Valid @RequestBody UpdateEntityRequest request) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
-			Project project = dal.findProjectById(req.getId())
+			Project project = dal.findProjectById(request.getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Project"));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
 		}
-		return updateProject(req.getId(), req.getFieldName(), req.getValue());
+		return updateProject(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
 	private ResponseEntity<?> updateProject(Long id, String key, Object value){
@@ -344,10 +487,10 @@ public class MissionController {
 				project.setDescription((String)value);
 				break;
 			case beginDate:
-				project.setBeginDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)value));
+				project.setBeginDate(LocalDate.parse((String)value));
 				break;
 			case endDate:
-				project.setEndDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)value));
+				project.setEndDate(LocalDate.parse((String)value));
 				break;
 			default: 
 				throw new InvalidFieldnameException();
@@ -357,14 +500,24 @@ public class MissionController {
 			return ResponseEntity.ok(null);
 		} catch (ResponseEntityException e) { 
 			return e.buildResponse();
-		} catch (ClassCastException | NullPointerException | ParseException e) {
+		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
 		}
 	}
 	
+	@ApiOperation(value="Delete project.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Project deleted."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager or mission linked to the project has status 'validated' "
+				+ "or project isn't linked to the most recent sheet of the mission or only projet linked to the sheet."),
+		@ApiResponse(code = 404, message="Project not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("projects/{projectId}")
-	public ResponseEntity<?> deleteProject(@PathVariable Long projectId) {
+	public ResponseEntity<?> deleteProject(
+			@ApiParam("Project identifier.")
+			@PathVariable Long projectId) {
 		try { projectDeletion(projectId); }
 		catch (ResponseEntityException e) {
 			return e.buildResponse();
@@ -372,9 +525,19 @@ public class MissionController {
 		return ResponseEntity.ok(null);
 	}
 	
+	@ApiOperation(value="Delete project (anonymous user).")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Project deleted."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="Mission linked to the project has status 'validated' "
+				+ "or project isn't linked to the most recent sheet of the mission or only projet linked to the sheet."),
+		@ApiResponse(code = 404, message="Project not found.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@DeleteMapping("projects/anonymous/{projectId}")
-	public ResponseEntity<?> deleteProjectFromToken(@PathVariable Long projectId) {
+	public ResponseEntity<?> deleteProjectFromToken(
+			@ApiParam("Project identifier.")
+			@PathVariable Long projectId) {
 		try {
 			Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 			Project project = dal.findProjectById(projectId)
@@ -423,13 +586,11 @@ public class MissionController {
 		}
 	}
 	
-	private boolean isToday(Date date) {
-		Calendar todayCalendar = Calendar.getInstance();
-		Calendar lastVersionCalendar = Calendar.getInstance();
-		lastVersionCalendar.setTime(date);
+	private boolean isToday(LocalDate date) {
+		LocalDate today = LocalDate.now();
 		
-		return todayCalendar.get(Calendar.DAY_OF_YEAR) == lastVersionCalendar.get(Calendar.DAY_OF_YEAR) 
-				&& todayCalendar.get(Calendar.YEAR) == lastVersionCalendar.get(Calendar.YEAR);
+		return today.getDayOfYear() == date.getDayOfYear() 
+				&& today.getYear() == date.getYear();
 	}
 	
 	

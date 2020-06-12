@@ -1,6 +1,6 @@
 package com.alten.hercules.model.mission;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,6 +21,7 @@ import javax.validation.constraints.Min;
 
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.project.Project;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -68,18 +69,19 @@ public class MissionSheet {
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String title = "";
 	
-	private Date versionDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@Column(nullable = true)
+	private LocalDate versionDate;
 	
 	public MissionSheet() {}
 	
 	public MissionSheet(Mission mission) {
 		this.mission = mission;
-		//this.versionDate = new Date();
 	}
 	
 	public MissionSheet(MissionSheet sheet) throws InvalidValueException {
 		setMission(sheet.mission);
-		setVersionDate(new Date());
+		setVersionDate(LocalDate.now());
 		setTitle(sheet.getTitle());
 		setDescription(sheet.getDescription());
 		setComment(sheet.getComment());
@@ -137,8 +139,8 @@ public class MissionSheet {
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
 
-	public Date getVersionDate() { return versionDate; }
-	public void setVersionDate(Date versionDate) { this.versionDate = versionDate; }
+	public LocalDate getVersionDate() { return versionDate; }
+	public void setVersionDate(LocalDate versionDate) { this.versionDate = versionDate; }
 	
 	public void addProject(Project project) {
 		projects.add(project);

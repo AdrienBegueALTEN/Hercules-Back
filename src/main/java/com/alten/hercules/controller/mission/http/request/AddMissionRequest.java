@@ -2,11 +2,15 @@ package com.alten.hercules.controller.mission.http.request;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class AddMissionRequest {
 	
+	@ApiModelProperty("Customer identifier.")
 	@NotNull
 	private Long customer;
 	
+	@ApiModelProperty("Consultant identifier.")
 	@NotNull
 	private Long consultant;
 

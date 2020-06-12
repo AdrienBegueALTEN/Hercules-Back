@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 
 import com.alten.hercules.model.consultant.EConsultantFieldname;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 
  * Represent the content of an entity update request.
@@ -21,18 +23,20 @@ public class UpdateEntityRequest {
      * @see UpdateEntityRequest#setId(Long)
      * 
      */
-	@NotNull(message="'id' must be provided")
+	@ApiModelProperty("Entity identifier.")
+	@NotNull
 	private Long id;
 
     /**
-     * Name of the database field to be changed.
+     * Name of the database field to update.
      * 
      * @see UpdateEntityRequest#getFieldName()
      * @see UpdateEntityRequest#setFieldName(String)
      * @see EConsultantFieldname
      * 
      */
-	@NotBlank(message="'fieldname' must be provided")
+	@ApiModelProperty("Name of field to update.")
+	@NotBlank
 	private String fieldName;
 
     /**
@@ -42,6 +46,7 @@ public class UpdateEntityRequest {
      * @see UpdateEntityRequest#setValue(Object)
      * 
      */
+	@ApiModelProperty("New value of field.")
 	private Object value;
 
     /**

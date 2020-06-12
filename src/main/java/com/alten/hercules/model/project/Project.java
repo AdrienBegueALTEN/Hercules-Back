@@ -1,6 +1,6 @@
 package com.alten.hercules.model.project;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.skill.Skill;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -34,11 +35,13 @@ public class Project {
 	@Column(nullable = false, columnDefinition = "VARCHAR(1000) default ''")
 	private String description = "";
 	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(nullable = true)
-	private Date beginDate = null;
+	private LocalDate beginDate = null;
 	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(nullable = true)
-	private Date endDate = null;
+	private LocalDate endDate = null;
 
 	@Column(nullable = true)
 	private String picture = null;
@@ -72,11 +75,11 @@ public class Project {
 	public String getDescription() { return description; }
 	public void setDescription(String description) { this.description = description; }
 
-	public Date getBeginDate() { return beginDate; }
-	public void setBeginDate(Date beginDate) { this.beginDate = beginDate; }
+	public LocalDate getBeginDate() { return beginDate; }
+	public void setBeginDate(LocalDate beginDate) { this.beginDate = beginDate; }
 
-	public Date getEndDate() { return endDate; }
-	public void setEndDate(Date endDate) { this.endDate = endDate; }
+	public LocalDate getEndDate() { return endDate; }
+	public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
 	public String getPicture() { return picture; }
 	public void setPicture(String picture) { this.picture = picture; }
