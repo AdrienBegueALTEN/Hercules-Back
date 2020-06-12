@@ -47,6 +47,8 @@ public class MissionDAL {
 	@Autowired private SkillDAO skillDAO;
 	@Autowired private ManagerDAO managerDAO;
 	
+	
+	//The entity manager is used for the Criteria API function below
 	@PersistenceContext
 	EntityManager em;
 	
@@ -74,27 +76,40 @@ public class MissionDAL {
 		projectDAO.save(project);
 	}
 	
+	
+	
+	//The following function uses Criteria API to create a query. 
+	//It is used here to manage the optional parameters for the advanced search.
 	public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
+		
 		CriteriaBuilder builder = em.getCriteriaBuilder();
 	    CriteriaQuery<Mission> query = builder.createQuery(Mission.class);
+	    
+	    
 	    Root<Mission> root = query.from(Mission.class);
 	    
+	    //Joints are used to join tables together using objects of the root class (ie Mission.class)
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
 	    
-	    //Sub query to get last version's date
+	    //Sub query to get last version's date. 
 	    Subquery<Date> subQuery = query.subquery(Date.class);
 	    Root<MissionSheet> subRoot = subQuery.from(MissionSheet.class);
 	    subQuery.select(builder.greatest(subRoot.get("versionDate")))
 	    .where(builder.equal(root.get("id"), subRoot.get("mission")));
 	    
-	    //Join only the last version
+	    //Only joins the latest version
 	    sheetJoin.on(builder.equal(subQuery, sheetJoin.get("versionDate")));
 
+	    //Contains the criteria used to create the final query
         List<Predicate> criteriaList = new ArrayList<>();
+        
+       
+        //It checks if the title is here. If it's present, the criterion is added to the criteriaList
         String key = "title";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
+        
         	criteriaList.add(builder.like(builder.lower(sheetJoin.get("title")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
         try {
@@ -109,6 +124,8 @@ public class MissionDAL {
 	        	criteriaList.add(builder.equal(consultantJoin.get("id"), Long.parseLong(criteria.get(key))));
         } catch (NumberFormatException ignored) {}
 
+        
+        //Two ways lower case make the searched string case insensitive
         key = "location";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
         	final String pattern = ("%" + criteria.get(key) + "%").toLowerCase();
@@ -121,19 +138,28 @@ public class MissionDAL {
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
         	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
+        
+        
         Predicate AllValidatedMissions = builder.equal(root.get("sheetStatus").as(String.class), ESheetStatus.VALIDATED.name());
+        
+        //If the user is authenticated, the manager long exists and the query retrieves all of his missions and all validated missions of other managers
+        //If the user is a guest, he only gets the validated missions
         if (manager.isPresent())
 	    	criteriaList.add(builder.or(
 	    			AllValidatedMissions,
 	    			builder.equal(consultantJoin.get("manager"), managerDAO.getOne(manager.get()))));
         else criteriaList.add(AllValidatedMissions);
           
+        
+        //caseExpression watches the sheetStatus and sorts the mission by their status
         Expression<Object> caseExpression = builder.selectCase()
     	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("VALIDATED")), 3)
     	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("ON_GOING")), 2)
     	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("ON_WAITING")), 1);
      
     	query = query.orderBy(builder.asc(caseExpression));
+    	
+    	//Query is created using the criteriaList
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
 
 	    return em.createQuery(query).getResultList();
