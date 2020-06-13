@@ -386,8 +386,7 @@ public class PDFGenerator {
         int durationYear = 0;
         for(Project project : projects ) {
         	if(project.getBeginDate()!=null && project.getEndDate()!=null) {
-	        	Period period = Period.between(project.getBeginDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-	        			                       project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+	        	Period period = Period.between(project.getBeginDate(), project.getEndDate());
 	        	durationDay +=  period.getDays();
 	        	durationMonth += period.getMonths();
 	        	durationYear += period.getYears();
@@ -710,8 +709,7 @@ public class PDFGenerator {
         int durationYear = 0;
         
         if(project.getBeginDate()!=null && project.getEndDate()!=null) {
-	        Period period = Period.between(project.getBeginDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-	        			                       project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+	        Period period = Period.between(project.getBeginDate(), project.getEndDate());
 	        durationDay =  period.getDays();
 	        durationMonth = period.getMonths();
 	        durationYear = period.getYears();
