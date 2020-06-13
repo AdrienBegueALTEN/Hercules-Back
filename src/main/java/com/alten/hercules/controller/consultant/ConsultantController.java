@@ -148,19 +148,13 @@ public class ConsultantController {
 							.orElseThrow(() -> new ResourceNotFoundException("manager"));
 						consultant.setManager(manager);
 					}
-					else
-						throw new InvalidValueException();
+					else throw new InvalidValueException();
 					break;
 				case releaseDate:
-					if(req.getValue()==null) {
-						consultant.setReleaseDate(null);
-					}
-					else {
-						try {
-							consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
-						} catch (ParseException e) {
-							throw new InvalidValueException();
-						}
+					try {
+						consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
+					} catch (ParseException e) {
+						throw new InvalidValueException();
 					}
 					break;
 				default: throw new InvalidFieldnameException();
