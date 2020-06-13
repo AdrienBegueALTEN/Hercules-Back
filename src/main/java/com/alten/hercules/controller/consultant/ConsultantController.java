@@ -1,7 +1,6 @@
 package com.alten.hercules.controller.consultant;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -151,11 +150,7 @@ public class ConsultantController {
 					else throw new InvalidValueException();
 					break;
 				case releaseDate:
-					try {
-						consultant.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)req.getValue()));
-					} catch (ParseException e) {
-						throw new InvalidValueException();
-					}
+					consultant.setReleaseDate((LocalDate)req.getValue());
 					break;
 				default: throw new InvalidFieldnameException();
 			}

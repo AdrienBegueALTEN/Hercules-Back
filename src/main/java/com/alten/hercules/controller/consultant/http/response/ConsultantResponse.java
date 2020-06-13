@@ -1,6 +1,6 @@
 package com.alten.hercules.controller.consultant.http.response;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.diploma.Diploma;
@@ -15,7 +15,7 @@ public class ConsultantResponse {
 	private String firstname;
 	private String lastname;
 	private int experience;
-	private Date releaseDate;
+	private LocalDate releaseDate;
 	@JsonIgnoreProperties(value = {"consultants", "email"})
 	private Manager manager;
 	private Set<Diploma> diplomas;
@@ -36,7 +36,7 @@ public class ConsultantResponse {
 	public String getFirstname() { return firstname; }
 	public String getLastname() { return lastname; }
 	public int getExperience() { return experience; }
-	public Date getReleaseDate() { return releaseDate; }
+	public LocalDate getReleaseDate() { return releaseDate; }
 	public Manager getManager() { return manager; }
 	public Set<Diploma> getDiplomas() { return diplomas; }
 }

@@ -1,7 +1,7 @@
 package com.alten.hercules.controller.user;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,16 +75,7 @@ public class RecruitementOfficerController {
 					recruitmentOfficer.setEmail(email);
 					break;
 				case releaseDate:
-					if(request.getValue()==null) {
-						recruitmentOfficer.setReleaseDate(null);
-					}
-					else {
-						try {
-							recruitmentOfficer.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
-						} catch (ParseException e) {
-							throw new InvalidValueException();
-						}
-					}
+					recruitmentOfficer.setReleaseDate((LocalDate)request.getValue());
 					break;
 				default: throw new InvalidFieldnameException();
 			}
