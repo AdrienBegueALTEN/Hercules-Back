@@ -41,6 +41,8 @@ import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.Manager;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -50,7 +52,15 @@ public class ConsultantController {
 	@Autowired
 	private ConsultantDAL dal;
 	
-	@ApiOperation(value = "Récupère tous les consultants.")
+	/**
+	 * Returns a list of all or only enabled consultants.
+	 * @param enabled  Boolean asking for enabled consultants
+	 * @return 200 with the consultants list
+	 */
+	@ApiOperation(value="List of all consultants.", notes = "Get a list of all consultants or only those still active.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK.")
+	})
 	@GetMapping("")
 	public ResponseEntity<?> getAll(@RequestParam boolean enabled) {
 		return enabled ?
@@ -58,7 +68,16 @@ public class ConsultantController {
 				ResponseEntity.ok(dal.findAll());
 	}
 
-	@ApiOperation(value = "Récupère un consultant avec son id.")
+	/**
+	 * Returns a consultant object corresponding to the given ID.
+	 * @param id  Number of the consultant
+	 * @return 200 with a consultant object<br>404 when none is found
+	 */
+	@ApiOperation(value="Details of a consultant.", notes = "Get the details of a consultant by giving his ID number.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 404, message="Consultant not found.")
+	})
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Long id) {
 		try {
@@ -72,7 +91,12 @@ public class ConsultantController {
 		}
 	}
 
-	@ApiOperation(value = "Ajoute un nouveau consultant.")
+	/**
+	 * Create a new consultant. Checks first if the manager of the new consultant or if a consultant with same email address exists.
+	 * @param req  object that provides the new consultant informations.
+	 * @return 201 if the consultant is added<br>404 if the manager is not found<br>202 if the consultant already exists with the given email
+	 */
+	@ApiOperation(value="Creation of a consultant.", notes = "Create a new consultant by providing his identity, his email address and his manager's ID. ")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
 	public ResponseEntity<?> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
@@ -96,7 +120,12 @@ public class ConsultantController {
 		}
 	}
 
-	@ApiOperation(value = "Supprime un consultant avec son id.")
+	/**
+	 * Delete a consultant. It checks if the consultant's ID can be found and if the consultant is not linked to any missions.
+	 * @param id  the consultant's id
+	 * @return 404 if the id doesn't correspond to any consultant<br>200 if the deletion is done
+	 */
+	@ApiOperation(value="Deletion of a consultant.", notes = "Delete a consultant if he exists given his id, and if he is not linked to a mission.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
@@ -114,7 +143,12 @@ public class ConsultantController {
 		}
 	}
 
-	@ApiOperation(value = "Met à jour un champ d'un consultant.")
+	/**
+	 * Update a single field of a consultant given the id of the consultant, the field name to be updated and the new value.
+	 * @param req  object containing the id of the consultant, the field name to update, and the new value.
+	 * @return 404 if the consultant cannot be found<br>400 if the field name cannot be found or the value is of wrong type<br>200 if update is done
+	 */
+	@ApiOperation(value="Update a fiald of a consultant.", notes = "Update a field of the consultant corresponding to the ID in the request if he exists.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
@@ -163,7 +197,12 @@ public class ConsultantController {
 		}
 	}
 	
-	@ApiOperation(value = "Ajoute un diplôme à un consultant.")
+	/**
+	 * Create then add a new diploma to a consultant if he exists. The request object provides the consultant's id and the diploma informations.
+	 * @param request object provides the consultant's id and the diploma informations
+	 * @return 404 if the consultant is not found<br>200 if the diploma is created and added to the consultant
+	 */
+	@ApiOperation(value="Create a new diploma of a consultant.", notes = "Create and add a new diploma object to the consultant. The request provides the consultant's ID and the diploma details.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("add-diploma")
 	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
@@ -175,7 +214,12 @@ public class ConsultantController {
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
 	}
 	
-	@ApiOperation(value = "Met à jour un champ d'un diplôme.")
+	/**
+	 * Update a single field of diploma, given the diploma id, the filed to be updated and the new value.
+	 * @param request object containing the id of the diploma, the field name to update, and the new value
+	 * @return  404 if the diploma cannot be found<br>400 if the field name cannot be found or the value is of wrong type<br>200 if update is done
+	 */
+	@ApiOperation(value="Update a field of a diploma.", notes = "Update a field of the diploma corresponding to the diploma ID in the request if it exists.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("update-diploma")
 	public ResponseEntity<?> updateDiploma(@Valid @RequestBody UpdateEntityRequest request) {
@@ -211,7 +255,12 @@ public class ConsultantController {
 		}
 	}
 	
-	@ApiOperation(value = "Supprime un diplome d'un consultant.")
+	/**
+	 * Deletes from the database a diploma associated to a consultant. It also removes it from the consultant list of diploma.
+	 * @param request  the request object (consultant's ID and diploma ID)
+	 * @return 200 if the diploma is deleted<br>404 if the consultant or diploma are not found
+	 */
+	@ApiOperation(value="Deletion of a diploma.", notes = "Delete a diploma and remove it from a consultant. The request provides the consultant's ID and the diploma ID.")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("remove-diploma")
 	public ResponseEntity<?> removeDiploma(@Valid @RequestBody RemoveDiplomaRequest request){
@@ -225,7 +274,12 @@ public class ConsultantController {
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
 	}
 	
-	@ApiOperation(value = "Récupère toutes les missions faites par un consultant.")
+	/**
+	 * Returns the list of the missions associated to a consultant.
+	 * @param id  the ID of the consultant
+	 * @return 200 with the list of the missions of a consultant.
+	 */
+	@ApiOperation(value = "List of the missions of a consultant.", notes = "Get all missions of a consultant given the consultant's ID.")
 	@GetMapping("/{id}/missions")
 	public ResponseEntity<?> getConsultantMissions(@PathVariable Long id){
 		return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
