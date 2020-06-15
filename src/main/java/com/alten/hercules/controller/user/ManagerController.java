@@ -2,6 +2,7 @@ package com.alten.hercules.controller.user;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.user.http.request.manager.AddManagerRequest;
 import com.alten.hercules.dal.ManagerDAL;
+import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.exception.EntityDeletionException;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;
@@ -106,6 +108,12 @@ public class ManagerController {
 					break;
 				case releaseDate:
 					manager.setReleaseDate(LocalDate.parse((String)request.getValue()));
+					manager.setAdmin(false);
+					manager.setConsultants(new HashSet<>());
+					/*for(Consultant consultant : manager.getConsultants()) {
+						consultant.setManager(manager);
+					}*/
+					
 					break;
 				case isAdmin:
 					manager.setAdmin((Boolean)request.getValue());
