@@ -786,19 +786,12 @@ public class MissionController {
 							missionIndex.add(i);
 						
 						}
-						/*else {
-							Project project = dal.findProjectById(elements.get(i).getId())
-									.orElseThrow(() -> new ResourceNotFoundException("Project"));
-							pdfGenerator.makeProjectPDF(project,document);
-						}*/
-					
-				
 			}
 			
-			
+			Set<Project> projects = new HashSet<Project>();
 			for(Integer index : missionIndex) {
 				
-				List<Project> projects = new ArrayList<Project>();
+				
 				Long id = elements.get(index).getId();
 				PDPage missionToMove = document.getPage(0);
 				document.removePage(0);
@@ -808,7 +801,9 @@ public class MissionController {
 						Project project = dal.findProjectById(elements.get(i).getId())
 								.orElseThrow(() -> new ResourceNotFoundException("Project"));
 						if(project.getMissionSheet().getMission().getId()==id) {
-							pdfGenerator.makeProjectPDF(project,document);
+							if(!projects.contains(project)) {
+								pdfGenerator.makeProjectPDF(project,document);
+							}
 						}
 						else {
 							projects.add(project);
@@ -816,10 +811,12 @@ public class MissionController {
 						
 					}
 				}
-				for(Project project : projects) {
-					pdfGenerator.makeProjectPDF(project,document);
-				}
 				
+				
+			}
+			
+			for(Project project : projects) {
+				pdfGenerator.makeProjectPDF(project,document);
 			}
 			
 		} catch (ResourceNotFoundException e) {

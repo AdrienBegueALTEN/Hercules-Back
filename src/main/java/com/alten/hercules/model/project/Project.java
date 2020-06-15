@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+
+import com.alten.hercules.controller.mission.http.request.GeneratePDFRequest;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.skill.Skill;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -88,5 +90,20 @@ public class Project {
 	public void setSkills(Set<Skill> skills) { this.skills = skills; }
 
 	public MissionSheet getMissionSheet() { return missionSheet; }
+	
+	@Override
+	public int hashCode() {
+		return this.id.intValue();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (obj == null) return false;
+	    if (!(obj instanceof Project))
+	        return false;
+	    if (obj == this)
+	        return true;
+	    return this.getId() == ((Project) obj).getId();
+	}
 	
 }

@@ -38,4 +38,6 @@ public class GeneratePDFRequest {
 		this.type = type;
 	}
 	
+	
+	
 }

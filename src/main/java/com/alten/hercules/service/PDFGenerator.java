@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -327,7 +328,7 @@ public class PDFGenerator {
 	        contentStream.newLineAtOffset(10, 10);
 	        contentStream.setFont( font1, 10 );
 	        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); 
-	        contentStream.showText(dateFormat.format(mission.getLastVersion().getVersionDate()));
+	        contentStream.showText(mission.getLastVersion().getVersionDate().format(DateTimeFormatter.ofPattern("dd MM yyyy")));
 	        contentStream.endText();
         }
         
@@ -652,7 +653,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(10, 10);
         contentStream.setFont( font1, 10 );
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); 
-        contentStream.showText(dateFormat.format(mission.getLastVersion().getVersionDate()));
+        contentStream.showText(mission.getLastVersion().getVersionDate().format(DateTimeFormatter.ofPattern("dd MM yyyy")));
         contentStream.endText();
         
         // Bulles
