@@ -109,11 +109,6 @@ public class ManagerController {
 				case releaseDate:
 					manager.setReleaseDate(LocalDate.parse((String)request.getValue()));
 					manager.setAdmin(false);
-					manager.setConsultants(new HashSet<>());
-					/*for(Consultant consultant : manager.getConsultants()) {
-						consultant.setManager(manager);
-					}*/
-					
 					break;
 				case isAdmin:
 					manager.setAdmin((Boolean)request.getValue());
