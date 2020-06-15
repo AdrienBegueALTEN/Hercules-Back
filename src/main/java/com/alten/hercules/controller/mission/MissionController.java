@@ -99,7 +99,7 @@ public class MissionController {
 	
 	@ApiOperation(
 			value = "Get a mission (anonymous user).",
-			notes = "Return the informations related to the mission and his most recent sheet.\n"
+			notes = "Return the informations related to the mission and its most recent sheet.\n"
 	)
 	@ApiResponses({
 		@ApiResponse(code = 200, message="OK."),
@@ -127,8 +127,8 @@ public class MissionController {
 	
 	@ApiOperation(
 			value = "Advanced search within missions.",
-			notes = "Return all missions which has the status 'validated' and which correspond to the set of criteria.\n"
-					+ "If the user is a manager, also return the missions linked to his consultants which has other status (and also correspond to the set of criteria).\n"
+			notes = "Return all missions which has the status 'validated' and which match with the set of criteria.\n"
+					+ "If the user is a manager, also return the missions linked to his consultants which has other status (and also match with the set of criteria).\n"
 					+ "In this second case, the mission are sorted according to their status : first 'on waiting' then 'on doing' then 'validated'.\n"
 					+ "Only the most recent sheet (last version) is returned for each mission."
 	)
@@ -179,7 +179,7 @@ public class MissionController {
 	
 	@ApiOperation(
 			value = "Get missions.",
-			notes = "Return all missions which has the status 'validated'.\n"
+			notes = "Return all missions which have the status 'validated'.\n"
 					+ "If the user is a manager, also return the missions linked to his consultants which has other status.\n"
 					+ "In this second case, the mission are sorted according to their status : first 'on waiting' then 'on doing' then 'validated'.\n"
 					+ "Only the most recent sheet (last version) is returned for each mission."
