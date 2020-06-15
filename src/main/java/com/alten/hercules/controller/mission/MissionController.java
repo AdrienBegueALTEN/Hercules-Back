@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -603,6 +605,7 @@ public class MissionController {
 		
 		int n = elements.size();
 		PDDocument document = new PDDocument();
+		List<Integer> missionIndex = new ArrayList<Integer>();
 		
 		PDFGenerator pdfGenerator;
 		try {
@@ -615,16 +618,45 @@ public class MissionController {
 						if(elements.get(i).getType().equals("m")){
 							Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
 							pdfGenerator.makeMissionPDF(mission,document);
+							missionIndex.add(i);
 						
 						}
-						else {
+						/*else {
 							Project project = dal.findProjectById(elements.get(i).getId())
 									.orElseThrow(() -> new ResourceNotFoundException("Project"));
 							pdfGenerator.makeProjectPDF(project,document);
-						}
+						}*/
 					
 				
 			}
+			
+			
+			for(Integer index : missionIndex) {
+				
+				List<Project> projects = new ArrayList<Project>();
+				Long id = elements.get(index).getId();
+				PDPage missionToMove = document.getPage(0);
+				document.removePage(0);
+				document.addPage(missionToMove);
+				for(int i = 0; i<n ; i++) {
+					if(elements.get(i).getType().equals("p")) {
+						Project project = dal.findProjectById(elements.get(i).getId())
+								.orElseThrow(() -> new ResourceNotFoundException("Project"));
+						if(project.getMissionSheet().getMission().getId()==id) {
+							pdfGenerator.makeProjectPDF(project,document);
+						}
+						else {
+							projects.add(project);
+						}
+						
+					}
+				}
+				for(Project project : projects) {
+					pdfGenerator.makeProjectPDF(project,document);
+				}
+				
+			}
+			
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
 		} catch (IOException e) {
@@ -636,6 +668,10 @@ public class MissionController {
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
 		}
+		
+		
+		
+		
 		
 		Path path = Paths.get("pdf\\fichesMissionsEtProjets.pdf");
 		byte[] data;
