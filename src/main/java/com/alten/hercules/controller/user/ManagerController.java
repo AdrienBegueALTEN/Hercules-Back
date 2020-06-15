@@ -1,7 +1,6 @@
 package com.alten.hercules.controller.user;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -102,16 +101,7 @@ public class ManagerController {
 					manager.setEmail(email);
 					break;
 				case releaseDate:
-					if(request.getValue()==null) {
-						manager.setReleaseDate(null);
-					}
-					else {
-						try {
-							manager.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String)request.getValue()));
-						} catch (ParseException e) {
-							throw new InvalidValueException();
-						}
-					}
+					manager.setReleaseDate((LocalDate)request.getValue());
 					break;
 				case isAdmin:
 					manager.setAdmin((Boolean)request.getValue());

@@ -1,6 +1,6 @@
 package com.alten.hercules.model.user;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -40,7 +40,7 @@ public abstract class AppUser implements UserDetails {
 	private String lastname;
 	
 	@Column(nullable = true)
-	private Date releaseDate;
+	private LocalDate releaseDate;
 	
 	public AppUser() {}
 	
@@ -68,8 +68,8 @@ public abstract class AppUser implements UserDetails {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 
-	public Date getReleaseDate() { return releaseDate; }
-	public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
+	public LocalDate getReleaseDate() { return releaseDate; }
+	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
 
 	@JsonIgnore
 	@Override
