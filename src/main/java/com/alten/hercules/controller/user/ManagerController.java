@@ -101,7 +101,7 @@ public class ManagerController {
 					manager.setEmail(email);
 					break;
 				case releaseDate:
-					manager.setReleaseDate((LocalDate)request.getValue());
+					manager.setReleaseDate(LocalDate.parse((String)request.getValue()));
 					break;
 				case isAdmin:
 					manager.setAdmin((Boolean)request.getValue());

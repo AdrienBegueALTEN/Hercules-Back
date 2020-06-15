@@ -150,7 +150,7 @@ public class ConsultantController {
 					else throw new InvalidValueException();
 					break;
 				case releaseDate:
-					consultant.setReleaseDate((LocalDate)req.getValue());
+					consultant.setReleaseDate(LocalDate.parse((String)req.getValue()));
 					break;
 				default: throw new InvalidFieldnameException();
 			}

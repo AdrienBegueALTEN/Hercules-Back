@@ -75,7 +75,7 @@ public class RecruitementOfficerController {
 					recruitmentOfficer.setEmail(email);
 					break;
 				case releaseDate:
-					recruitmentOfficer.setReleaseDate((LocalDate)request.getValue());
+					recruitmentOfficer.setReleaseDate(LocalDate.parse((String)request.getValue()));
 					break;
 				default: throw new InvalidFieldnameException();
 			}
