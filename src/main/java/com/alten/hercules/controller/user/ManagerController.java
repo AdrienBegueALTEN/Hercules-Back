@@ -2,7 +2,7 @@ package com.alten.hercules.controller.user;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
@@ -62,8 +63,11 @@ public class ManagerController {
 	 }
 	
 	@GetMapping
-	public ResponseEntity<Object> getAll() {
-		return ResponseEntity.ok(dal.findAll());
+	public ResponseEntity<Object> getAll(@RequestParam boolean enabled) {
+		if(enabled)
+			return ResponseEntity.ok(dal.findAll().stream().filter(m -> m.getReleaseDate()==null).collect(Collectors.toList()));
+		else
+			return ResponseEntity.ok(dal.findAll());
 	}
 	
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -101,7 +105,7 @@ public class ManagerController {
 					manager.setEmail(email);
 					break;
 				case releaseDate:
-					manager.setReleaseDate((LocalDate)request.getValue());
+					manager.setReleaseDate(LocalDate.parse((String)request.getValue()));
 					break;
 				case isAdmin:
 					manager.setAdmin((Boolean)request.getValue());
