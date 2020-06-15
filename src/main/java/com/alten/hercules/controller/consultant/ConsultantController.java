@@ -184,7 +184,10 @@ public class ConsultantController {
 					else throw new InvalidValueException();
 					break;
 				case releaseDate:
-					consultant.setReleaseDate(LocalDate.parse((String)req.getValue()));
+					if(req.getValue()==null) 
+						consultant.setReleaseDate(null);
+					else
+						consultant.setReleaseDate(LocalDate.parse((String)req.getValue()));
 					break;
 				default: throw new InvalidFieldnameException();
 			}
