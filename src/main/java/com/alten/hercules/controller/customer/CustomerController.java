@@ -37,6 +37,8 @@ import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.service.StoreImage;
 
+import io.swagger.annotations.ApiOperation;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/hercules/customers")
@@ -48,7 +50,10 @@ public class CustomerController {
 	@Autowired
 	private StoreImage storeImage;
 
-	@GetMapping("")
+	@ApiOperation(value = "List of all customers", notes = "Return a list of all customer present is the database. "
+			+ "Two format can be chosen : basic or normal. Normal formal returns all field and basic format returns only the id, "
+			+ "the name and the activity sector.")
+	@GetMapping
 	public ResponseEntity<Object> getAllCustomer(@RequestParam(required = false) Boolean basic) {
 		if (basic == null || !basic)
 			return ResponseEntity.ok(dal.findAll());
@@ -61,6 +66,7 @@ public class CustomerController {
 		return ResponseEntity.ok(customers);
 	}
 
+	@ApiOperation(value = "Detail of a customer", notes = "Return the details of a customer provided by the id as parameters.")
 	@GetMapping("/{id}")
 	public ResponseEntity<Optional<Customer>> getCustomerById(@PathVariable Long id) {
 
@@ -74,6 +80,7 @@ public class CustomerController {
 
 	}
 	
+	@ApiOperation(value = "List of all missions of a customer", notes = "Provide the missions linked to a customer (given by the id as parameter).")
 	@GetMapping("/{id}/missions")
 	public ResponseEntity<?> getAllByCustomer(@PathVariable Long id){
 		return ResponseEntity.ok(this.dal.findMissionsByCustomer(id).stream()
@@ -81,6 +88,8 @@ public class CustomerController {
 				.collect(Collectors.toList()));
 	}
 
+	@ApiOperation(value = "Create a new customer", notes = "Create a new customer in the database. It needs a request with the name, the activity sector "
+			+ "and the description (not mandatory).")
 	@PostMapping
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> addCustomer(@Valid @RequestBody AddCustomerRequest request) {
@@ -93,6 +102,7 @@ public class CustomerController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(customer.getId());
 	}
 
+	@ApiOperation(value = "Update a field of a customer", notes = "ddd")
 	@PutMapping
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> updateCustomer(@Valid @RequestBody Customer customer) {
@@ -110,6 +120,8 @@ public class CustomerController {
 
 	}
 
+	@ApiOperation(value = "Delete a customer", notes = "Delete a customer from the database. It checks if the given id is a customer id, then if the "
+			+ "consultant is not linked to some missions, it delete the customer, otherwise it won't do the deletion.")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
@@ -125,6 +137,8 @@ public class CustomerController {
 		return ResponseEntity.ok().build();
 	}
 
+	@ApiOperation(value = "Link a logo to a customer", notes = "Upload the image file in the server and link the file name to the customer given as parameter "
+			+ "if the id is a customer id. ")
 	@PostMapping("/{id}/logo")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
@@ -143,6 +157,7 @@ public class CustomerController {
 		}
 	}
 	
+	@ApiOperation(value = "Dowload a logo file", notes = "Provide the logo as a file with the file name as parameter.")
 	@GetMapping("/logo/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
@@ -164,6 +179,8 @@ public class CustomerController {
         
     }
 	
+	@ApiOperation(value = "Delete a logo from a consultant", notes = "If the customer is found, it set to null the value of the logo and "
+			+ "delete the file from the server.")
 	@DeleteMapping("/{id}/logo")
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> deleteLogo(@PathVariable Long id){
