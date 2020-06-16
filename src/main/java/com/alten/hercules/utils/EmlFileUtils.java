@@ -62,10 +62,11 @@ public class EmlFileUtils {
 		final String customer = mission.getCustomer().getName();
 		final String subject = "Fiche mission '" + customer + "' à compléter";
 		final String manager = mission.getConsultant().getManager().getFirstname() + " " + mission.getConsultant().getManager().getLastname();
+		final String link = AppConst.MISSION_SHEET_URL + JwtUtils.generateMissionToken(mission);
 		final String body =
 				"<p>Bonjour,</p>" +
 				"<p>Merci de bien vouloir renseigner les informations relatives à votre dernière mission chez '" + customer + "' via cette page :</p>" +
-				"<p>" + AppConst.MISSION_SHEET_URL + JwtUtils.generateMissionToken(mission) + "</p>" +
+				"<a href=\"" + link + "\">" + link + "</a>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + manager + ".</p>";
 		final String fileName = 
@@ -78,10 +79,11 @@ public class EmlFileUtils {
 		final String from = loggedUser.getEmail();
 		final String to =  targetedUser.getEmail();
 		final String subject = "Activation de votre compte Hercules";
+		final String link = AppConst.LOGIN_URL + JwtUtils.generatePasswordCreationToken(targetedUser);
 		final String body =
 				"<p>Bonjour,</p>" +
 				"<p>Voici le lien d'activation de votre compte Hercules :</p>" +
-				"<p>" + AppConst.LOGIN_URL + JwtUtils.generatePasswordCreationToken(targetedUser) + "</p>" +
+				"<a href=\"" + link + "\">" + link + "</a>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + loggedUser.getFirstname() + " " + loggedUser.getLastname() + ".</p>";
 		final String fileName = 
