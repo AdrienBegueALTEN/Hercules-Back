@@ -898,87 +898,99 @@ public class MissionController {
 	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
 		
 		
-		int n = elements.size();
-		PDDocument document = new PDDocument();
-		List<Integer> missionIndex = new ArrayList<Integer>();
+			int n = elements.size();
 		
-		PDFGenerator pdfGenerator;
-		try {
-			pdfGenerator = new PDFGenerator(document);
-		
-		
-			for(int i = 0; i<n ; i++) {
-				
-					
-						if(elements.get(i).getType().equals("m")){
-							Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
-							pdfGenerator.makeMissionPDF(mission,document);
-							missionIndex.add(i);
-						
-						}
-			}
+			PDDocument document = new PDDocument();
+			List<Integer> missionIndex = new ArrayList<Integer>();
 			
-			Set<Project> projects = new HashSet<Project>();
-			for(Integer index : missionIndex) {
-				
-				
-				Long id = elements.get(index).getId();
-				PDPage missionToMove = document.getPage(0);
-				document.removePage(0);
-				document.addPage(missionToMove);
+			PDFGenerator pdfGenerator;
+			try {
+				pdfGenerator = new PDFGenerator(document);
+			
+			
 				for(int i = 0; i<n ; i++) {
-					if(elements.get(i).getType().equals("p")) {
-						Project project = dal.findProjectById(elements.get(i).getId())
-								.orElseThrow(() -> new ResourceNotFoundException("Project"));
-						if(project.getMissionSheet().getMission().getId()==id) {
-							if(!projects.contains(project)) {
-								pdfGenerator.makeProjectPDF(project,document);
-							}
-						}
-						else {
-							projects.add(project);
-						}
+					
 						
-					}
+							if(elements.get(i).getType().equals("m")){
+								Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
+								pdfGenerator.makeMissionPDF(mission,document);
+								missionIndex.add(i);
+							
+							}
 				}
 				
 				
+				if(missionIndex.size()<=0) {
+					Set<Project> projects = new HashSet<Project>();
+					for(Integer index : missionIndex) {
+						
+						
+						Long id = elements.get(index).getId();
+						PDPage missionToMove = document.getPage(0);
+						document.removePage(0);
+						document.addPage(missionToMove);
+						for(int i = 0; i<n ; i++) {
+							if(elements.get(i).getType().equals("p")) {
+								Project project = dal.findProjectById(elements.get(i).getId())
+										.orElseThrow(() -> new ResourceNotFoundException("Project"));
+								if(project.getMissionSheet().getMission().getId()==id) {
+									if(!projects.contains(project)) {
+										pdfGenerator.makeProjectPDF(project,document);
+									}
+								}
+								else {
+									projects.add(project);
+								}
+							}
+						}
+					}
+					
+					for(Project project : projects) {
+						pdfGenerator.makeProjectPDF(project,document);
+					}
+				}
+				else {
+					for(int i = 0; i<n ; i++) {
+						
+						if(elements.get(i).getType().equals("p")){
+							Project project = dal.findProjectById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Project"));
+							pdfGenerator.makeProjectPDF(project,document);
+						}
+					}
+				}
+				
+			} catch (ResourceNotFoundException e) {
+				return e.buildResponse();
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("the file could not be created");
+			} 
+			
+			try {
+				pdfGenerator.saveFinalPDF(document);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
 			}
 			
-			for(Project project : projects) {
-				pdfGenerator.makeProjectPDF(project,document);
-			}
 			
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("the file could not be created");
-		} 
+			
+			
+			
+			Path path = Paths.get("pdf\\fichesMissionsEtProjets.pdf");
+			byte[] data;
+			try {
+				data = Files.readAllBytes(path);
+			} catch (IOException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
+			}
+	        ByteArrayResource resource = new ByteArrayResource(data);
+			
+	        return ResponseEntity.status(HttpStatus.CREATED)
+	        		.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=pdf\\fichesMissionsEtProjets.pdf")
+	        		.contentType(MediaType.APPLICATION_PDF) 
+	                .contentLength(data.length) 
+	                .body(resource);
 		
-		try {
-			pdfGenerator.saveFinalPDF(document);
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
-		}
 		
-		
-		
-		
-		
-		Path path = Paths.get("pdf\\fichesMissionsEtProjets.pdf");
-		byte[] data;
-		try {
-			data = Files.readAllBytes(path);
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
-		}
-        ByteArrayResource resource = new ByteArrayResource(data);
-		
-        return ResponseEntity.ok()
-        		.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=pdf\\fichesMissionsEtProjets.pdf")
-        		.contentType(MediaType.APPLICATION_PDF) 
-                .contentLength(data.length) 
-                .body(resource);
 	}
 	
 	
