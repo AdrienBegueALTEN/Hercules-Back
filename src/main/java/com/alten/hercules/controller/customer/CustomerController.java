@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,9 @@ import com.alten.hercules.controller.mission.http.response.CompleteMissionRespon
 import com.alten.hercules.dal.CustomerDAL;
 import com.alten.hercules.model.customer.Customer;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
+import com.alten.hercules.model.mission.ESheetStatus;
+import com.alten.hercules.model.user.AppUser;
+import com.alten.hercules.model.user.Manager;
 import com.alten.hercules.service.StoreImage;
 
 import io.swagger.annotations.ApiOperation;
@@ -83,9 +87,17 @@ public class CustomerController {
 	@ApiOperation(value = "List of all missions of a customer", notes = "Provide the missions linked to a customer (given by the id as parameter).")
 	@GetMapping("/{id}/missions")
 	public ResponseEntity<?> getAllByCustomer(@PathVariable Long id){
-		return ResponseEntity.ok(this.dal.findMissionsByCustomer(id).stream()
+		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
+		if(optManagerId.isPresent())
+			return ResponseEntity.ok(this.dal.findMissionsByCustomer(id).stream()
 				.map(mission -> new CompleteMissionResponse(mission, false, true))
 				.collect(Collectors.toList()));
+		else
+			return ResponseEntity.ok(this.dal.findMissionsByCustomer(id).stream()
+					.filter(mission -> mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
+					.map(mission -> new CompleteMissionResponse(mission, false, false))
+					.collect(Collectors.toList()));
 	}
 
 	@ApiOperation(value = "Create a new customer", notes = "Create a new customer in the database. It needs a request with the name, the activity sector "

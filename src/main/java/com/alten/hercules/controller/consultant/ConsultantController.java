@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,8 @@ import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.exception.UnavailableEmailException;
+import com.alten.hercules.model.mission.ESheetStatus;
+import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.model.user.Manager;
 
 import io.swagger.annotations.ApiOperation;
@@ -285,8 +288,16 @@ public class ConsultantController {
 	@ApiOperation(value = "List of the missions of a consultant.", notes = "Get all missions of a consultant given the consultant's ID.")
 	@GetMapping("/{id}/missions")
 	public ResponseEntity<?> getConsultantMissions(@PathVariable Long id){
-		return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
-				.map(mission -> new CompleteMissionResponse(mission, false, true))
-				.collect(Collectors.toList()));
+		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
+		if(optManagerId.isPresent())
+			return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
+					.map(mission -> new CompleteMissionResponse(mission, false, true))
+					.collect(Collectors.toList()));
+		else
+			return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
+					.filter(mission -> mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
+					.map(mission -> new CompleteMissionResponse(mission, false, false))
+					.collect(Collectors.toList()));
 	}
 }
