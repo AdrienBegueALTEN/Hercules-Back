@@ -600,18 +600,53 @@ public class MissionController {
 	}
 	
 	
+	@ApiOperation(
+			value = "Link an image to a project.",
+			notes = "It takes a file in the body, then copies it in the server in the img/proj folder eand add the name to the "
+					+ "projet in the database. The request must be asked by a manager."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 200, message="Image is uploaded and project line is modified with the new image name in database.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/upload-picture")
 	public ResponseEntity<?> uploadLogoManager(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		return this.uploadPicture(file, id);
 	}
 	
+	@ApiOperation(
+			value = "Link an image to a project by anonymous token.",
+			notes = "It takes a file in the body, then copies it in the server in the img/proj folder eand add the name to the "
+					+ "projet in the database. The request must be asked by an anonymous user with a valid token."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid  token."),
+		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 200, message="Image is uploaded and project line is modified with the new image name in database.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PostMapping("/projects/anonymous/{id}/upload-picture")
 	public ResponseEntity<?> uploadLogoToken(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		try {
+			Project project = dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+			if (project.getMissionSheet().getMission().getId() != missionId)
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (ResourceNotFoundException e) {
+			return e.buildResponse();
+		}
 		return this.uploadPicture(file, id);
 	}
 	
+	/**
+	 * Upload a project picture on server side and and the file name to the project.
+	 * @param file  project picture (weight is less than 1 Mo)
+	 * @param id  project id
+	 * @return 404 if the project is not found<br>200 if the image is added
+	 */
 	private ResponseEntity<?> uploadPicture(MultipartFile file, Long id){
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -628,12 +663,32 @@ public class MissionController {
 		}
 	}
 	
+	@ApiOperation(
+			value = "Delete an image from a project (manager user).",
+			notes = "It sets to null the picture value in the line of the project in the database, and delete from the server the picture file. "
+					+ "The request must be done by an anonymous user."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 200, message="Image is deleted and project line is modified with null value in database.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/projects/{id}/delete-picture")
 	public ResponseEntity<?> deletePictureManager(@PathVariable Long id) {
 		return this.deletePicture(id);
 	}
 	
+	@ApiOperation(
+			value = "Delete an image from a project (anonymous user).",
+			notes = "It sets to null the picture value in the line of the project in the database, and delete from the server the picture file. "
+					+ "The request must be done by a manager."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 200, message="Image is deleted and project line is modified with null value in database.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@DeleteMapping("/projects/anonymous/{id}/delete-picture")
 	public ResponseEntity<?> deletePictureToken(@PathVariable Long id) {
@@ -649,6 +704,11 @@ public class MissionController {
 		return this.deletePicture(id);
 	}
 	
+	/**
+	 * Delete the picture linked to a project  from server. It also sets to null the name of file in the database.
+	 * @param projectId project id
+	 * @return 200 if deletion is done<br>404 if project is not found
+	 */
 	private ResponseEntity<?> deletePicture(Long projectId){
 		try {
 			Project proj = this.dal.findProjectById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -664,6 +724,15 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
+	@ApiOperation(
+			value = "Get a project image.",
+			notes = "The picture name is passed as a parameter and the file is returned."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="No image is found with this name"),
+		@ApiResponse(code = 200, message="An image is found and returned")
+	})
 	@GetMapping("/projects/picture/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
@@ -691,12 +760,34 @@ public class MissionController {
                 .body(resource);
     }
 	
+	@ApiOperation(
+			value = "Add skills to a project (manager user).",
+			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
+					+ "If none is found, a new skill is created."
+					+ "The request must be done by a manager."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 200, message="Skills are created and added to the project.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/skills")
 	public ResponseEntity<?> addSkillToProjectManager(@PathVariable Long id, @RequestBody String... labels) {
 		return this.addSkillToProject(id, labels);
 	}
 	
+	@ApiOperation(
+			value = "Add skills to a project (anonymous user).",
+			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
+					+ "If none is found, a new skill is created."
+					+ "The request must be done by an anonymous user."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 200, message="Image is deleted and project line is modified with null value in database.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PostMapping("/projects/anonymous/{id}/skills")
 	public ResponseEntity<?> addSkillToProjectToken(@PathVariable Long id, @RequestBody String... labels) {
@@ -712,6 +803,12 @@ public class MissionController {
 		return this.addSkillToProject(id, labels);
 	}
 	
+	/**
+	 * Add skills to a project. It creates if needed the skills, or else it find the existing one to use it.
+	 * @param id  project id
+	 * @param labels  array of skill labels
+	 * @return 404 if the project is not found<br>200 if all skills are added to the project
+	 */
 	private ResponseEntity<?> addSkillToProject(Long id, String... labels) {
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -725,12 +822,34 @@ public class MissionController {
 		}
 	}
 	
+	@ApiOperation(
+			value = "Delete a skill from a project (manager user).",
+			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
+					+ "If none is found, a new skill is created."
+					+ "The request must be done by a manager."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="Project is not found or skill is not found"),
+		@ApiResponse(code = 200, message="Skills are created and added to the project.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/projects/{id}/skills")
 	public ResponseEntity<?> removeSkillFromProjectManager(@PathVariable Long id, @RequestBody Skill skill) {
 		return this.removeSkillFromProject(id, skill);
 	}
 	
+	@ApiOperation(
+			value = "Delete a skill from a project (anonymous user).",
+			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
+					+ "If none is found, a new skill is created."
+					+ "The request must be done by an anonymous user."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 404, message="Project is not found or skill is not found"),
+		@ApiResponse(code = 200, message="Skills are created and added to the project.")
+	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@DeleteMapping("/projects/anonymous/{id}/skills")
 	public ResponseEntity<?> removeSkillFromProjectToken(@PathVariable Long id, @RequestBody Skill skill) {
@@ -746,6 +865,12 @@ public class MissionController {
 		return this.removeSkillFromProject(id, skill);
 	}
 	
+	/**
+	 * Delete a skill from  a project. If the skill is no longer attached to a project, it will be also deleted.
+	 * @param id  project id
+	 * @param skill  skill object
+	 * @return 404 if the project or the skill is not found<br>200 if the deletion is done
+	 */
 	private ResponseEntity<?> removeSkillFromProject(Long id, Skill skill) {
 		try {
 			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
@@ -758,6 +883,11 @@ public class MissionController {
 		}
 	}
 	
+	@ApiOperation(value = "Find all skills.")
+	@ApiResponses({
+		@ApiResponse(code = 401, message="Invalid token."),
+		@ApiResponse(code = 200, message="List of skills can be returned.")
+	})
 	@GetMapping("/projects/skills-all")
 	public ResponseEntity<?> getAllSkills() {
 		return ResponseEntity.ok(this.dal.findAllSkills());
