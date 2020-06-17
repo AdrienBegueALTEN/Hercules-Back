@@ -118,7 +118,7 @@ public class MissionController {
 	private ResponseEntity<?> getMissionDetails(Long missionId, boolean complete) {
 		try {
 			Mission mission = dal.findById(missionId)
-					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+					.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 			return ResponseEntity.ok(complete ? 
 					new CompleteMissionResponse(mission, true, true) :
 					new RefinedMissionResponse(mission));
@@ -167,7 +167,7 @@ public class MissionController {
 			@PathVariable Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
-				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 			if (!(mission.getLastVersion().getVersionDate()==null))
 				throw new EntityDeletionException("The mission is not on waiting and has a last version date.");
 			dal.delete(mission);
@@ -227,9 +227,9 @@ public class MissionController {
 			@Valid @RequestBody AddMissionRequest request) {
 		try {
 			Consultant consultant = dal.findConsultantById(request.getConsultant())
-					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			Customer customer = dal.findCustomerById(request.getCustomer())
-					.orElseThrow(() -> new ResourceNotFoundException("Customer"));
+					.orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 			Mission mission = dal.save(new Mission(consultant, customer));
 			MissionSheet firstVersion = dal.saveSheet(new MissionSheet(mission));
 			dal.saveProject(new Project(firstVersion));
@@ -257,7 +257,7 @@ public class MissionController {
 			@PathVariable Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
-					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+					.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 				if (!mission.isValidated())
 					throw new InvalidSheetStatusException();
 				MissionSheet lastVersion = dal.findMostRecentVersion(mission.getId()).get();;
@@ -275,11 +275,11 @@ public class MissionController {
 	}
 	
 	@ApiOperation(
-			value="Update a mission's field.",
+			value="Update a mission's field value.",
 			notes="Update the value of one of the fields of a mission."
 	)
 	@ApiResponses({
-		@ApiResponse(code = 200, message="Mission's field updated."),
+		@ApiResponse(code = 200, message="Mission's field value updated."),
 		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
 		@ApiResponse(code = 401, message="Invalid authentification token."),
 		@ApiResponse(code = 403, message="User isn't a manager or mission is validated."),
@@ -290,7 +290,7 @@ public class MissionController {
 	public ResponseEntity<?> putMission(
 			@ApiParam(
 					"id : mission's identifier;\n"
-					+ "fieldName : mission's fieldname to update;\n"
+					+ "fieldName : field's name to update;\n"
 					+ "value : field's new value."
 			)
 			@Valid @RequestBody UpdateEntityRequest request) {
@@ -328,7 +328,7 @@ public class MissionController {
 	private ResponseEntity<?> updateMission(Long id, String key, Object value) {
 		try {
 			Mission mission = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id).get();
 			
 			EMissionFieldname fieldname;
@@ -435,7 +435,7 @@ public class MissionController {
 	
 	private void _newProject(Long missionId) throws ResponseEntityException {
 		Mission mission = dal.findById(missionId)
-				.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 		if (mission.isValidated())
 			throw new InvalidSheetStatusException();
 		MissionSheet lastVersion = mission.getLastVersion();
@@ -491,7 +491,7 @@ public class MissionController {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(request.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} catch (ResourceNotFoundException e) {
@@ -503,7 +503,7 @@ public class MissionController {
 	private ResponseEntity<?> updateProject(Long id, String key, Object value){
 		try {
 			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().isValidated())
 				throw new InvalidSheetStatusException();
 			checkIfProjectOfLastVersion(project);
@@ -572,7 +572,7 @@ public class MissionController {
 		try {
 			Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 			Project project = dal.findProjectById(projectId)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			projectDeletion(projectId);
@@ -584,7 +584,7 @@ public class MissionController {
 	
 	private void projectDeletion(Long id) throws ResponseEntityException {
 			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().isValidated())
 				throw new InvalidSheetStatusException();
 			if (!(project.getMissionSheet().getMission().getLastVersion().getProjects().size() > 1))
@@ -657,7 +657,7 @@ public class MissionController {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} catch (ResourceNotFoundException e) {
@@ -674,7 +674,7 @@ public class MissionController {
 	 */
 	private ResponseEntity<?> uploadPicture(MultipartFile file, Long id){
 		try {
-			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if(proj.getPicture()!=null) {
 				this.storeImage.delete("img/proj/"+proj.getPicture());
 				proj.setPicture(null);
@@ -720,7 +720,7 @@ public class MissionController {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} catch (ResourceNotFoundException e) {
@@ -736,7 +736,8 @@ public class MissionController {
 	 */
 	private ResponseEntity<?> deletePicture(Long projectId){
 		try {
-			Project proj = this.dal.findProjectById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Project proj = this.dal.findProjectById(projectId)
+				.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if(proj.getPicture()!=null) {
 				this.storeImage.delete("img/proj/"+proj.getPicture());
 				proj.setPicture(null);
@@ -818,7 +819,7 @@ public class MissionController {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} catch (ResourceNotFoundException e) {
@@ -835,7 +836,8 @@ public class MissionController {
 	 */
 	private ResponseEntity<?> addSkillToProject(Long id, String... labels) {
 		try {
-			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Project proj = this.dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			for(int i=0;i<labels.length;i++) {
 				Skill s = this.dal.findSkillByLabel(labels[i]).orElse(new Skill(labels[i]));
 				this.dal.addSkillToProject(proj, s);
@@ -880,7 +882,7 @@ public class MissionController {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} catch (ResourceNotFoundException e) {
@@ -897,10 +899,11 @@ public class MissionController {
 	 */
 	private ResponseEntity<?> removeSkillFromProject(Long id, Skill skill) {
 		try {
-			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException("Project"));
+			Project project = this.dal.findProjectById(id)
+					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			Skill s = this.dal.findSkillByLabel(skill.getLabel())
-					.orElseThrow(() -> new ResourceNotFoundException("Project"));
-			this.dal.removeSkillFromProject(proj, s);
+					.orElseThrow(() -> new ResourceNotFoundException(Skill.class));
+			this.dal.removeSkillFromProject(project, s);
 			return ResponseEntity.ok().build();
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
@@ -936,7 +939,8 @@ public class MissionController {
 					
 						
 							if(elements.get(i).getType().equals("m")){
-								Mission mission = dal.findById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Mission"));
+								Mission mission = dal.findById(elements.get(i).getId())
+										.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 								pdfGenerator.makeMissionPDF(mission,document);
 								missionIndex.add(i);
 							
@@ -956,7 +960,7 @@ public class MissionController {
 						for(int i = 0; i<n ; i++) {
 							if(elements.get(i).getType().equals("p")) {
 								Project project = dal.findProjectById(elements.get(i).getId())
-										.orElseThrow(() -> new ResourceNotFoundException("Project"));
+										.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 								if(project.getMissionSheet().getMission().getId()==id) {
 									if(!projects.contains(project)) {
 										pdfGenerator.makeProjectPDF(project,document);
@@ -977,7 +981,8 @@ public class MissionController {
 					for(int i = 0; i<n ; i++) {
 						
 						if(elements.get(i).getType().equals("p")){
-							Project project = dal.findProjectById(elements.get(i).getId()).orElseThrow(() -> new ResourceNotFoundException("Project"));
+							Project project = dal.findProjectById(elements.get(i).getId())
+									.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 							pdfGenerator.makeProjectPDF(project,document);
 						}
 					}
@@ -995,10 +1000,6 @@ public class MissionController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be saved");
 			}
 			
-			
-			
-			
-			
 			Path path = Paths.get("pdf\\fichesMissionsEtProjets.pdf");
 			byte[] data;
 			try {
@@ -1013,11 +1014,5 @@ public class MissionController {
 	        		.contentType(MediaType.APPLICATION_PDF) 
 	                .contentLength(data.length) 
 	                .body(resource);
-		
-		
 	}
-	
-	
-	
-	
 }

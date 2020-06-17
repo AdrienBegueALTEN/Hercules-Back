@@ -158,7 +158,7 @@ public class AuthentificationController {
 		ResponseEntity<?> response = null;
 		try {
 			Mission mission = dal.findMissionById(missionId)
-					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
+					.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 			AppUser loggedUser = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 			if (mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
 				throw new InvalidSheetStatusException();
@@ -196,7 +196,7 @@ public class AuthentificationController {
 		ResponseEntity<?> response = null;
 		try {
 			AppUser user = dal.findUserById(userId)
-					.orElseThrow(() -> new ResourceNotFoundException("User"));
+					.orElseThrow(() -> new ResourceNotFoundException(AppUser.class));
 			file = EmlFileUtils.genereateEmlFileWithPasswordCreationLink(user).orElseThrow();
 			response = buildEmlFileResponse(file);
 			dal.saveUser(user);

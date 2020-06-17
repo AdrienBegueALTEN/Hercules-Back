@@ -5,8 +5,8 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 
 public class AddRecruitmentOfficerRequest extends AddUserRequest {
 	
-	public AddRecruitmentOfficerRequest(String email, String password, String firstname, String lastname) {
-		super(email, password, firstname, lastname);
+	public AddRecruitmentOfficerRequest(String email, String firstname, String lastname) {
+		super(email, firstname, lastname);
 	}
 
 	@Override

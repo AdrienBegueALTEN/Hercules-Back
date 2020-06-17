@@ -3,6 +3,7 @@ package com.alten.hercules.controller.user;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -34,6 +35,11 @@ import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.EManagerFieldName;
 import com.alten.hercules.model.user.Manager;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @CrossOrigin(origins="*")
 @RequestMapping("/hercules/managers")
@@ -41,11 +47,24 @@ public class ManagerController {
 	
 	@Autowired private ManagerDAL dal;
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getManager(@PathVariable Long id) {
+	@ApiOperation(
+			value = "Get a manager.",
+			notes = "Return all informations related to the manager."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't an administrator."),
+		@ApiResponse(code = 404, message="Manager not found.")
+	})
+	@PreAuthorize("hasAuthority('ADMIN')")
+	@GetMapping("/{managerId}")
+	public ResponseEntity<?> getManager(
+			@ApiParam("Manager's identifier.")
+			@PathVariable Long managerId) {
 		try {
-			Manager manager = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("manager"));
+			Manager manager = dal.findById(managerId)
+				.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
 			Map <String, Object> body = 
 					new ManagerResponseBodyBuilder(manager)
 						.id()
@@ -57,41 +76,84 @@ public class ManagerController {
 						.releaseDate()
 						.build();
 			return ResponseEntity.ok(body);
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
+	 }
+	
+	@ApiOperation(
+			value = "Get all managers.",
+			notes = "Return the list of all the managers."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't a manager.")
+	})
+	@PreAuthorize("hasAuthority('MANAGER')")
+	@GetMapping
+	public ResponseEntity<?> getAll(
+			@ApiParam("Indicates if only active managers should be returned.\n"
+					+ "False if isn't specified.")
+			@RequestParam Optional<Boolean> onlyActive) {
+		return ResponseEntity.ok(onlyActive.orElse(false) ? dal.findAllActive() : dal.findAll());
+	}
+	
+	@ApiOperation(
+			value = "Create a manager.",
+			notes = "Add a new manager user in database."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="Manager created."),
+		@ApiResponse(code = 400, message="Wrong format for the firstname, lastname or email."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't an administrator."),
+		@ApiResponse(code = 404, message="Manager not found."),
+		@ApiResponse(code = 409, message="Email isn't available.")
+	})
+	@PreAuthorize("hasAuthority('ADMIN')")
+	@PostMapping
+	public ResponseEntity<?> addManager(
+			@ApiParam(
+				"email : user's email;\n"
+				+ "firstname : user's firstname;\n"
+				+ "lastname : user's lastname;\n"
+				+ "isAdmin : indicates if the manager has the admin rights."
+			)
+			@Valid @RequestBody AddManagerRequest request) {
+		try {
+			if (!dal.emailIsAvailable(request.getEmail())) throw new UnavailableEmailException();
+			return ResponseEntity
+					.status(HttpStatus.CREATED)
+					.body(dal.save(request.buildUser()).getId());
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}
-	 }
-	
-	@GetMapping
-	public ResponseEntity<Object> getAll(@RequestParam boolean enabled) {
-		if(enabled)
-			return ResponseEntity.ok(dal.findAll().stream().filter(m -> m.getReleaseDate()==null).collect(Collectors.toList()));
-		else
-			return ResponseEntity.ok(dal.findAll());
-	}
-	
-	@PreAuthorize("hasAuthority('ADMIN')")
-	@PostMapping
-	public ResponseEntity<Object> addManager(@Valid @RequestBody AddManagerRequest request) throws InvalidValueException {
-		if (!dal.emailIsAvailable(request.getEmail()))
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		Manager manager = request.buildUser();
-		manager = dal.save(manager);
-		return ResponseEntity
-				.status(HttpStatus.CREATED)
-				.body(manager.getId());
 	}
 	 
+	@ApiOperation(
+			value="Update a manager's field value.",
+			notes="Update the value of one of the fields of a manager."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Manager's field value updated."),
+		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't an administrator."),
+		@ApiResponse(code = 404, message="Manager not found."),
+		@ApiResponse(code = 409, message="Email isn't available.")
+	})
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PutMapping
-	public ResponseEntity<?> updateManager(@Valid @RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> updateManager(
+			@ApiParam(
+					"id : manager's identifier;\n"
+					+ "fieldName : field's name to update;\n"
+					+ "value : field's new value."
+			)
+			@Valid @RequestBody UpdateEntityRequest request) {
 		try {
 			Manager manager = dal.findById(request.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("manager"));
-			EManagerFieldName fieldName;
-			try { fieldName = EManagerFieldName.valueOf(request.getFieldName()); }
-			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
-			switch(fieldName) {
+					.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
+			switch(EManagerFieldName.valueOf(request.getFieldName())) {
 				case firstname :
 					manager.setFirstname((String)request.getValue());
 					break;
@@ -123,20 +185,34 @@ public class ManagerController {
 			return e.buildResponse();
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
+		} catch (IllegalArgumentException e) {
+			return new InvalidFieldnameException().buildResponse();
 		}
 	}
-	 
+	
+	@ApiOperation(
+			value = "Delete a manager.",
+			notes = "Delete a manager user in database."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Manager deleted."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 403, message="User isn't an administrator."),
+		@ApiResponse(code = 404, message="Manager not found."),
+		@ApiResponse(code = 409, message="Manager linked to one or more consultants.")
+	})
 	@PreAuthorize("hasAuthority('ADMIN')")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+	@DeleteMapping("/{managerId}")
+	public ResponseEntity<?> deleteUser(
+			@ApiParam("Manager's identifier.")
+			@PathVariable Long managerId) {
 		try {
-			Manager manager = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
+			Manager manager = dal.findById(managerId)
+				.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
 			if (!manager.getConsultants().isEmpty())
 				throw new EntityDeletionException("The manager is linked to one or more consultants.");
-			else
-				dal.delete(manager);
-			return ResponseEntity.ok(manager);
+			dal.delete(manager);
+			return ResponseEntity.ok(null);
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();
 		}

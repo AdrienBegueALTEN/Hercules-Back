@@ -57,7 +57,7 @@ public class RecruitementOfficerController {
 	public ResponseEntity<?> updateRecruitementOfficer(@Valid @RequestBody UpdateEntityRequest request) {
 		try {
 			RecruitmentOfficer recruitmentOfficer = dal.findById(request.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
+					.orElseThrow(() -> new ResourceNotFoundException(RecruitmentOfficer.class));
 			ERecruitmentOfficerFieldName fieldName;
 			try { fieldName = ERecruitmentOfficerFieldName.valueOf(request.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
@@ -95,7 +95,7 @@ public class RecruitementOfficerController {
 	public ResponseEntity<?> deleteRecruitementOfficer(@PathVariable Long id) {
 		try {
 			RecruitmentOfficer recruitmentOfficer = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
+				.orElseThrow(() -> new ResourceNotFoundException(RecruitmentOfficer.class));
 			dal.delete(recruitmentOfficer);
 			return ResponseEntity
 					.ok()
@@ -110,7 +110,7 @@ public class RecruitementOfficerController {
 	public ResponseEntity<?> getRecruitementOfficerById(@PathVariable Long id) {
 		try {
 			RecruitmentOfficer recruitmentOfficer = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("recruitment officer"));
+				.orElseThrow(() -> new ResourceNotFoundException(RecruitmentOfficer.class));
 			return ResponseEntity.ok(recruitmentOfficer);
 		} catch (ResponseEntityException e) {
 			return e.buildResponse();

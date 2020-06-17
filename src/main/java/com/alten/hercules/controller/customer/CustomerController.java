@@ -155,7 +155,7 @@ public class CustomerController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
-			Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("customer"));
+			Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 			if(customer.getLogo()!=null) {
 				this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
 				customer.setLogo(null);
@@ -197,7 +197,7 @@ public class CustomerController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> deleteLogo(@PathVariable Long id){
 		try {
-			Customer customer = this.dal.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer"));
+			Customer customer = this.dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 			if(customer.getLogo()!=null) {
 				this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
 				customer.setLogo(null);

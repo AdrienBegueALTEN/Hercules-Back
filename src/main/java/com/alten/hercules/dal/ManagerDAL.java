@@ -35,6 +35,10 @@ public class ManagerDAL {
 		return managerDAO.findAll();
 	}
 	
+	public List<Manager> findAllActive() {
+		return managerDAO.findByReleaseDateIsNull();
+	}
+	
 	public Optional<Manager> findById(Long id){
 		return managerDAO.findById(id);
 	}

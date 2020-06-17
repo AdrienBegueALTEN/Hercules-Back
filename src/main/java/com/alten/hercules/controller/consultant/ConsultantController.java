@@ -85,7 +85,7 @@ public class ConsultantController {
 	public ResponseEntity<?> getById(@PathVariable Long id) {
 		try {
 			Consultant consultant = dal.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			return ResponseEntity.ok(new ConsultantResponse(consultant));
 		} catch (ResourceNotFoundException e) {
 			return ResponseEntity
@@ -112,7 +112,7 @@ public class ConsultantController {
 			if (!dal.emailIsAvailable(req.getEmail()))
 				throw new UnavailableEmailException();
 			Manager manager = dal.findEnabledManager(req.getManager())
-					.orElseThrow(() -> new ResourceNotFoundException("manager"));
+					.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
 			Consultant consultant = new Consultant(req.getEmail(), req.getFirstname(), req.getLastname(), manager);
 			dal.save(consultant);
 			return ResponseEntity
@@ -134,7 +134,7 @@ public class ConsultantController {
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
 		try {
 			Consultant consultant = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("consultant"));
+				.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			if (!consultant.getMissions().isEmpty())
 				throw new EntityDeletionException("The consultant is linked to one or more missions.");
 			dal.delete(consultant);
@@ -157,7 +157,7 @@ public class ConsultantController {
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
 		try {
 			Consultant consultant = dal.findById(req.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			EConsultantFieldname fieldName;
 			try { fieldName = EConsultantFieldname.valueOf(req.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
@@ -181,7 +181,7 @@ public class ConsultantController {
 					if(req.getValue() instanceof Integer || req.getValue() instanceof Long) {
 						int id = (Integer)req.getValue();
 						Manager manager = dal.findEnabledManager(Long.valueOf(id))
-							.orElseThrow(() -> new ResourceNotFoundException("manager"));
+							.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
 						consultant.setManager(manager);
 					}
 					else throw new InvalidValueException();
@@ -214,7 +214,7 @@ public class ConsultantController {
 	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
 		try {
 			Consultant consultant = dal.findById(request.getConsultant())
-					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			Diploma diploma = dal.addDiplomaForConsultant(request.buildDiploma(), consultant);
 			return ResponseEntity.ok(diploma.getId());
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }
@@ -233,7 +233,7 @@ public class ConsultantController {
 			if (request.getValue() == null)
 				throw new InvalidValueException();
 			Diploma diploma = dal.findDiplomaById(request.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Diploma"));
+					.orElseThrow(() -> new ResourceNotFoundException(Diploma.class));
 			EDiplomaFieldname fieldName;
 			try { fieldName = EDiplomaFieldname.valueOf(request.getFieldName()); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
@@ -272,9 +272,9 @@ public class ConsultantController {
 	public ResponseEntity<?> removeDiploma(@Valid @RequestBody RemoveDiplomaRequest request){
 		try {
 			Diploma diploma = dal.findDiplomaById(request.getDiploma())
-					.orElseThrow(() -> new ResourceNotFoundException("Diploma"));
+					.orElseThrow(() -> new ResourceNotFoundException(Diploma.class));
 			Consultant consultant = dal.findById(request.getConsultant())
-					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
+					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			dal.removeDiplomaForConsultant(diploma, consultant);
 			return ResponseEntity.ok(null);
 		} catch (ResourceNotFoundException e) { return e.buildResponse(); }

@@ -8,8 +8,8 @@ public class AddManagerRequest extends AddUserRequest {
 
 	private boolean isAdmin;
 	
-	public AddManagerRequest(String email, String password, String firstname, String lastname, boolean isAdmin) {
-		super(email, password, firstname, lastname);
+	public AddManagerRequest(String email, String firstname, String lastname, boolean isAdmin) {
+		super(email, firstname, lastname);
 		this.isAdmin = isAdmin;
 	}
 	

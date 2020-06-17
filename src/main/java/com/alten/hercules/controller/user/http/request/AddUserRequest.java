@@ -13,27 +13,18 @@ public abstract class AddUserRequest {
 	@Pattern(regexp = AppConst.EMAIL_PATTERN)
 	protected String email;
 	
+	@NotNull protected String firstname;
 	
-	protected String password;
+	@NotNull protected String lastname;
 	
-	@NotNull
-	protected String firstname;
-	
-	@NotNull
-	protected String lastname;
-	
-	public AddUserRequest(String email, String password, String firstname, String lastname) {
+	public AddUserRequest(String email, String firstname, String lastname) {
 		this.email = email;
-		this.password = password;
 		this.firstname = firstname;
 		this.lastname = lastname;
 	}
 	
 	public void setEmail(String email) { this.email = email; }
 	public String getEmail() { return this.email; }
-	
-	public void setPassword(String password) { this.email = password; }
-	public String getPassword() { return password; }
 	
 	public String getFirstname() { return firstname; }
 	public void setFirstname(String firstname) { this.firstname = firstname; }
