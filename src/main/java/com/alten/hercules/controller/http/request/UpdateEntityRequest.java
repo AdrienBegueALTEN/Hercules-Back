@@ -30,14 +30,14 @@ public class UpdateEntityRequest {
     /**
      * Name of the database field to update.
      * 
-     * @see UpdateEntityRequest#getFieldName()
-     * @see UpdateEntityRequest#setFieldName(String)
+     * @see UpdateEntityRequest#getFieldname()
+     * @see UpdateEntityRequest#setFieldname(String)
      * @see EConsultantFieldname
      * 
      */
 	@ApiModelProperty("Name of field to update.")
 	@NotBlank
-	private String fieldName;
+	private String fieldname;
 
     /**
      * New value of the database field.
@@ -59,21 +59,21 @@ public class UpdateEntityRequest {
      * Constructor.
      * 
      * @see UpdateEntityRequest#id
-     * @see UpdateEntityRequest#fieldName
+     * @see UpdateEntityRequest#fieldname
      * @see UpdateEntityRequest#value
      * 
      */
-	public UpdateEntityRequest(Long id, String fieldName, Object value) {
+	public UpdateEntityRequest(Long id, String fieldname, Object value) {
 		this.id = id;
-		this.fieldName = fieldName;
+		this.fieldname = fieldname;
 		this.value = value;
 	}
 
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
 
-	public String getFieldName() { return fieldName; }
-	public void setFieldName(String fieldName) { this.fieldName = fieldName; }
+	public String getFieldName() { return fieldname; }
+	public void setFieldname(String fieldname) { this.fieldname = fieldname; }
 
 	public Object getValue() { return value; }
 	public void setValue(Object value) { this.value = value; }

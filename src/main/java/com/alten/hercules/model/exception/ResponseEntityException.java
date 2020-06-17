@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public abstract class ResponseEntityException extends IOException {
-	
 	protected HttpStatus status;
 
 	ResponseEntityException(String message, HttpStatus status) {
