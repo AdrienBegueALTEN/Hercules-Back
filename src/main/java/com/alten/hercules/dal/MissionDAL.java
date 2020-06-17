@@ -92,8 +92,8 @@ public class MissionDAL {
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
-	    /*Join<MissionSheet, Project> projectsJoin = sheetJoin.join("projects");
-	    Join<Project, Skill> skillsJoin = projectsJoin.join("skills");*/
+	    Join<MissionSheet, Project> projectsJoin = sheetJoin.join("projects", JoinType.INNER);
+	    //Join<Project, Skill> skillsJoin = projectsJoin.join("skills", JoinType.INNER);
 	    
 	    //Sub query to get last version's date. 
 	    Subquery<Date> subQuery = query.subquery(Date.class);
@@ -141,13 +141,16 @@ public class MissionDAL {
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
         	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
-        /*key = "skills";
+        key = "skills";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
         	String[] skills = criteria.get(key).split(",");
+        	Predicate[] skillPredicates = new Predicate[skills.length];
         	for(int i=0;i<skills.length;i++) {
-        		criteriaList.add(builder.like(builder.lower(skillsJoin.get("label")), ("%" + skills[i] + "%").toLowerCase()));
+        		//skillPredicates[i] = builder.like(builder.lower(skillsJoin.get("label")), ("%" + skills[i] + "%").toLowerCase());
         	}
-        }*/
+        	if(skillPredicates.length>0)
+        		criteriaList.add(builder.or(skillPredicates));
+        }
         
         
         
