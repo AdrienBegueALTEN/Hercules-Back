@@ -92,7 +92,7 @@ public class MissionDAL {
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
-	    Join<MissionSheet, Project> projectsJoin = sheetJoin.join("projects", JoinType.INNER);
+	    //Join<MissionSheet, Project> projectsJoin = sheetJoin.join("projects", JoinType.INNER);
 	    //Join<Project, Skill> skillsJoin = projectsJoin.join("skills", JoinType.INNER);
 	    
 	    //Sub query to get last version's date. 
