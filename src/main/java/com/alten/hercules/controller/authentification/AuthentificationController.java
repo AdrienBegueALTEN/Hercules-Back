@@ -100,7 +100,7 @@ public class AuthentificationController {
 	@PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
 	@PutMapping("/change-password-anonymous")
 	public ResponseEntity<?> changePasswordAnonymous(
-			@ApiParam("user's new password.")
+			@ApiParam("User's new password.")
 			@RequestBody String newPassword) {
 		try {
 			AppUser user = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
