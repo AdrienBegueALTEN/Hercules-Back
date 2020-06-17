@@ -72,7 +72,7 @@ public class ManagerController {
 	
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping
-	public ResponseEntity<Object> addManager(@Valid @RequestBody AddManagerRequest request) {
+	public ResponseEntity<Object> addManager(@Valid @RequestBody AddManagerRequest request) throws InvalidValueException {
 		if (!dal.emailIsAvailable(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		Manager manager = request.buildUser();

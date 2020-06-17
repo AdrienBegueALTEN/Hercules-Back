@@ -61,8 +61,11 @@ public abstract class AppUser implements UserDetails {
 	
 	public String getPassword() { return password; }
 	public void setPassword(String password) throws InvalidValueException {
-		if (password.equals("")) throw new InvalidValueException();
-		this.password = new BCryptPasswordEncoder().encode(password);
+		if (password == null) this.password = null;
+		else {
+			if (password.equals("")) throw new InvalidValueException();
+			this.password = new BCryptPasswordEncoder().encode(password);
+		}
 	}
 	
 	public String getFirstname() { return firstname; }

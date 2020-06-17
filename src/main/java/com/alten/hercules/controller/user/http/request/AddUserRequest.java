@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.AppConst;
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.user.AppUser;
 
 public abstract class AddUserRequest {
@@ -40,6 +41,6 @@ public abstract class AddUserRequest {
 	public String getLastname() { return lastname; }
 	public void setLastname(String lastname) { this.lastname = lastname; }
 	
-	public abstract AppUser buildUser();
+	public abstract AppUser buildUser() throws InvalidValueException;
 	
 }
