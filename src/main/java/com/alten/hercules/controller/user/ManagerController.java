@@ -2,8 +2,7 @@ package com.alten.hercules.controller.user;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;import java.util.stream.Collector;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alten.hercules.controller.http.request.UpdateEntityRequest;
 import com.alten.hercules.controller.user.http.request.manager.AddManagerRequest;
 import com.alten.hercules.dal.ManagerDAL;
-import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.exception.EntityDeletionException;
 import com.alten.hercules.model.exception.InvalidFieldnameException;
 import com.alten.hercules.model.exception.InvalidValueException;

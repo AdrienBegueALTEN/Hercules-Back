@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -98,7 +94,7 @@ public class MissionController {
 	})
 	@GetMapping("/{missionId}")
 	public ResponseEntity<?> getMission(
-			@ApiParam("Mission identifier.")
+			@ApiParam("Mission's identifier.")
 			@PathVariable Long missionId) {
 		return getMissionDetails(missionId, true);
 	}
@@ -115,13 +111,13 @@ public class MissionController {
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/anonymous")
 	public ResponseEntity<?> getMissionFromToken() {
-		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
-		return getMissionDetails(id, false);
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		return getMissionDetails(missionId, false);
 	}
 	
-	private ResponseEntity<?> getMissionDetails(Long id, boolean complete) {
+	private ResponseEntity<?> getMissionDetails(Long missionId, boolean complete) {
 		try {
-			Mission mission = dal.findById(id)
+			Mission mission = dal.findById(missionId)
 					.orElseThrow(() -> new ResourceNotFoundException("Mission"));
 			return ResponseEntity.ok(complete ? 
 					new CompleteMissionResponse(mission, true, true) :
@@ -167,7 +163,7 @@ public class MissionController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/{missionId}")
 	public ResponseEntity<?> deleteMission(
-			@ApiParam("Mission identifier.")
+			@ApiParam("Mission's identifier.")
 			@PathVariable Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
@@ -223,7 +219,12 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
-	public ResponseEntity<?> addMission(@Valid @RequestBody AddMissionRequest request) {
+	public ResponseEntity<?> addMission(
+			@ApiParam(
+					"consulant : consulant's identifier;\n"
+					+ "customer : customer's identifier."
+			)
+			@Valid @RequestBody AddMissionRequest request) {
 		try {
 			Consultant consultant = dal.findConsultantById(request.getConsultant())
 					.orElseThrow(() -> new ResourceNotFoundException("Consultant"));
@@ -252,7 +253,7 @@ public class MissionController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-version/{missionId}")
 	public ResponseEntity<?> newVersion(
-			@ApiParam("Mission identifier.")
+			@ApiParam("Mission's identifier.")
 			@PathVariable Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
@@ -281,12 +282,18 @@ public class MissionController {
 		@ApiResponse(code = 200, message="Mission's field updated."),
 		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
 		@ApiResponse(code = 401, message="Invalid authentification token."),
-		@ApiResponse(code = 403, message="User isn't a manager or mission has status 'validated'."),
+		@ApiResponse(code = 403, message="User isn't a manager or mission is validated."),
 		@ApiResponse(code = 404, message="Mission not found.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
-	public ResponseEntity<?> putMission(@Valid @RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> putMission(
+			@ApiParam(
+					"id : mission's identifier;\n"
+					+ "fieldName : mission's fieldname to update;\n"
+					+ "value : field's new value."
+			)
+			@Valid @RequestBody UpdateEntityRequest request) {
 		return updateMission(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
@@ -297,13 +304,19 @@ public class MissionController {
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Mission's field updated."),
 		@ApiResponse(code = 400, message="Inexistant fieldname or invalid value."),
-		@ApiResponse(code = 401, message="Invalid authentification token."),
-		@ApiResponse(code = 403, message="Mission has status 'validated'."),
+		@ApiResponse(code = 401, message="Invalid access token."),
+		@ApiResponse(code = 403, message="Mission is validated."),
 		@ApiResponse(code = 404, message="Mission not found.")
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PutMapping("/anonymous")
-	public ResponseEntity<?> putMissionFromToken(@RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> putMissionFromToken(
+			@ApiParam(
+					"id : mission's identifier (unused because contained into the token);\n"
+					+ "fieldName : mission's fieldname to update;\n"
+					+ "value : field's new value."
+			)
+			@RequestBody UpdateEntityRequest request) {
 		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		if (request.getFieldName() == null)
 			return ResponseEntity
@@ -445,7 +458,13 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("projects")
-	public ResponseEntity<?> putProject(@Valid @RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> putProject(
+			@ApiParam(
+					"id : project's identifier;\n"
+					+ "fieldName : project fieldname to update;\n"
+					+ "value : field's new value."
+			)
+			@Valid @RequestBody UpdateEntityRequest request) {
 		return updateProject(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
@@ -462,7 +481,13 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PutMapping("projects/anonymous")
-	public ResponseEntity<?> putProjectFromToken(@Valid @RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> putProjectFromToken(
+			@ApiParam(
+					"id : project's identifier;\n"
+					+ "fieldName : project's fieldname to update;\n"
+					+ "value : field's new value."
+			)
+			@Valid @RequestBody UpdateEntityRequest request) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(request.getId())
@@ -718,7 +743,6 @@ public class MissionController {
 			}
 			this.dal.saveProject(proj);
 		} catch (ResourceNotFoundException e) {
-			// TODO Auto-generated catch block
 			return e.buildResponse();
 		}
 		return ResponseEntity.status(HttpStatus.OK).build();

@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.alten.hercules.model.consultant.Consultant;
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -25,17 +26,17 @@ public class Manager extends AppUser {
 	
 	public Manager() { super(); }
 	
-	public Manager(String email, String password, String firstname, String lastname) {
+	public Manager(String email, String password, String firstname, String lastname) throws InvalidValueException {
 		super(email, password, firstname, lastname);
 	}
 	
-	public Manager(String email, String password, String firstname, String lastname, boolean isAdmin) {
+	public Manager(String email, String password, String firstname, String lastname, boolean isAdmin) throws InvalidValueException {
 		super(email, password, firstname, lastname);
 		setAdmin(isAdmin);
 	}
 	
-	public Manager(String email, String firstname, String lastname, boolean isAdmin) {
-		super(email, "", firstname, lastname);
+	public Manager(String email, String firstname, String lastname, boolean isAdmin) throws InvalidValueException {
+		super(email, null, firstname, lastname);
 		setAdmin(isAdmin);
 	}
 	

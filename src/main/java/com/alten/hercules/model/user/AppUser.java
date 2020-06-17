@@ -14,6 +14,7 @@ import org.hibernate.Hibernate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -44,7 +45,7 @@ public abstract class AppUser implements UserDetails {
 	
 	public AppUser() {}
 	
-	public AppUser(String email, String password, String firstname, String lastname) {
+	public AppUser(String email, String password, String firstname, String lastname) throws InvalidValueException {
 		setEmail(email);
 		setPassword(password);
 		setFirstname(firstname);
@@ -59,8 +60,10 @@ public abstract class AppUser implements UserDetails {
 	public void setEmail(String email) { this.email = email; }
 	
 	public String getPassword() { return password; }
-	public void setPassword(String password) { this.password = new BCryptPasswordEncoder().encode(password); }
-	public void expireCredentials() { this.password = null; }
+	public void setPassword(String password) throws InvalidValueException {
+		if (password.equals("")) throw new InvalidValueException();
+		this.password = new BCryptPasswordEncoder().encode(password);
+	}
 	
 	public String getFirstname() { return firstname; }
 	public void setFirstname(String firstname) { this.firstname = firstname; }

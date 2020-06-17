@@ -1,4 +1,4 @@
-package com.alten.hercules.controller.auth.http.request;
+package com.alten.hercules.controller.authentification.http.request;
 
 import javax.validation.constraints.NotBlank;
 
