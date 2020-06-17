@@ -197,7 +197,7 @@ public class MissionController {
 		List<CompleteMissionResponse> body;
 		if (optManagerId.isEmpty()) {
 			body = dal.findAllValidated().stream()
-					.map(mission -> new CompleteMissionResponse(mission, false, false))
+					.map(mission -> new CompleteMissionResponse(mission, false, true))
 					.collect(Collectors.toList());
 		} else {
 			body = dal.findAllByManager(optManagerId.get()).stream()
