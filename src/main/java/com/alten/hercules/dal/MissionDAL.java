@@ -92,6 +92,8 @@ public class MissionDAL {
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
+	    /*Join<MissionSheet, Project> projectsJoin = sheetJoin.join("projects");
+	    Join<Project, Skill> skillsJoin = projectsJoin.join("skills");*/
 	    
 	    //Sub query to get last version's date. 
 	    Subquery<Date> subQuery = query.subquery(Date.class);
@@ -138,6 +140,14 @@ public class MissionDAL {
         key = "activitySector";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
         	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
+        
+        /*key = "skills";
+        if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
+        	String[] skills = criteria.get(key).split(",");
+        	for(int i=0;i<skills.length;i++) {
+        		criteriaList.add(builder.like(builder.lower(skillsJoin.get("label")), ("%" + skills[i] + "%").toLowerCase()));
+        	}
+        }*/
         
         
         
