@@ -95,6 +95,8 @@ public class MissionDAL {
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
+	    
+	    //Add joins towards the skills if needed only, otherwise it doesn't return results as wanted
 	    Join<MissionSheet, Project> projectsJoin = null;
 	    Join<Project, Skill> skillsJoin = null;
 	    if (criteria.containsKey("skills") && !criteria.get("skills").isBlank()) {
@@ -148,6 +150,9 @@ public class MissionDAL {
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
         	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
+        //the array of skill is received as a string with skills separated with commas
+        //an array of string is then created by splitting the string
+        //it loop through the skills array, and create 'OR' predicates
         key = "skills";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
         	String[] skills = criteria.get(key).split(",");
@@ -186,6 +191,7 @@ public class MissionDAL {
     	//Query is created using the criteriaList
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
     	
+    	//The skills create duplicates. The set remove duplicates, and must be re-ordered with the sheet status
     	List<Mission> foundMissions = em.createQuery(query).getResultList();
     	Set<Mission> setMissions = new HashSet<>(foundMissions);
     	List<Mission> uniqueMissions = new ArrayList<Mission>(setMissions);
