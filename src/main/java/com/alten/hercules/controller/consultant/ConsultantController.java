@@ -62,7 +62,8 @@ public class ConsultantController {
 	 */
 	@ApiOperation(value="List of all consultants.", notes = "Get a list of all consultants or only those still active.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message="OK.")
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentificated token.")
 	})
 	@GetMapping("")
 	public ResponseEntity<?> getAll(@RequestParam boolean enabled) {
@@ -79,7 +80,8 @@ public class ConsultantController {
 	@ApiOperation(value="Details of a consultant.", notes = "Get the details of a consultant by giving his ID number.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="OK."),
-		@ApiResponse(code = 404, message="Consultant not found.")
+		@ApiResponse(code = 404, message="Consultant not found."),
+		@ApiResponse(code = 401, message="Invalid authentificated token.")
 	})
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getById(@PathVariable Long id) {
@@ -100,6 +102,12 @@ public class ConsultantController {
 	 * @return 201 if the consultant is added<br>404 if the manager is not found<br>202 if the consultant already exists with the given email
 	 */
 	@ApiOperation(value="Creation of a consultant.", notes = "Create a new consultant by providing his identity, his email address and his manager's ID. ")
+	@ApiResponses({
+		@ApiResponse(code = 201, message="Consultant is created."),
+		@ApiResponse(code = 202, message="Consultant already exists."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
+		@ApiResponse(code = 404, message="Manager not found."),
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
 	public ResponseEntity<?> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
@@ -126,9 +134,15 @@ public class ConsultantController {
 	/**
 	 * Delete a consultant. It checks if the consultant's ID can be found and if the consultant is not linked to any missions.
 	 * @param id  the consultant's id
-	 * @return 404 if the id doesn't correspond to any consultant<br>200 if the deletion is done
+	 * @return 404 if the id doesn't correspond to any consultant<br>200 if the deletion is done<br>409 consultant linked to 1 or more missions
 	 */
 	@ApiOperation(value="Deletion of a consultant.", notes = "Delete a consultant if he exists given his id, and if he is not linked to a mission.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Consultant is deleted."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
+		@ApiResponse(code = 404, message="Consultant not found."),
+		@ApiResponse(code = 409, message="Consultant is linked to 1 or more missions.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
@@ -151,7 +165,14 @@ public class ConsultantController {
 	 * @param req  object containing the id of the consultant, the field name to update, and the new value.
 	 * @return 404 if the consultant cannot be found<br>400 if the field name cannot be found or the value is of wrong type<br>200 if update is done
 	 */
-	@ApiOperation(value="Update a fiald of a consultant.", notes = "Update a field of the consultant corresponding to the ID in the request if he exists.")
+	@ApiOperation(value="Update a fiald of a consultant.", 
+			notes = "Update a field of the consultant corresponding to the ID in the request if he exists.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Diploma updated."),
+		@ApiResponse(code = 401, message="Field name is not found or value is of wrong type."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
+		@ApiResponse(code = 404, message="Consultant not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
 	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
@@ -202,7 +223,13 @@ public class ConsultantController {
 	 * @param request object provides the consultant's id and the diploma informations
 	 * @return 404 if the consultant is not found<br>200 if the diploma is created and added to the consultant
 	 */
-	@ApiOperation(value="Create a new diploma of a consultant.", notes = "Create and add a new diploma object to the consultant. The request provides the consultant's ID and the diploma details.")
+	@ApiOperation(value="Create a new diploma of a consultant.", notes = "Create and add a new diploma object to the consultant. "
+			+ "The request provides the consultant's ID and the diploma details.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Diploma added."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
+		@ApiResponse(code = 404, message="Consultant not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("add-diploma")
 	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
@@ -219,7 +246,14 @@ public class ConsultantController {
 	 * @param request object containing the id of the diploma, the field name to update, and the new value
 	 * @return  404 if the diploma cannot be found<br>400 if the field name cannot be found or the value is of wrong type<br>200 if update is done
 	 */
-	@ApiOperation(value="Update a field of a diploma.", notes = "Update a field of the diploma corresponding to the diploma ID in the request if it exists.")
+	@ApiOperation(value="Update a field of a diploma.", 
+			notes = "Update a field of the diploma corresponding to the diploma ID in the request if it exists.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Diploma updated."),
+		@ApiResponse(code = 401, message="Field name is not found or value is of wrong type."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
+		@ApiResponse(code = 404, message="Diploma not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("update-diploma")
 	public ResponseEntity<?> updateDiploma(@Valid @RequestBody UpdateEntityRequest request) {
@@ -260,7 +294,13 @@ public class ConsultantController {
 	 * @param request  the request object (consultant's ID and diploma ID)
 	 * @return 200 if the diploma is deleted<br>404 if the consultant or diploma are not found
 	 */
-	@ApiOperation(value="Deletion of a diploma.", notes = "Delete a diploma and remove it from a consultant. The request provides the consultant's ID and the diploma ID.")
+	@ApiOperation(value="Deletion of a diploma.", notes = "Delete a diploma and remove it from a consultant. "
+			+ "The request provides the consultant's ID and the diploma ID.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="The diploma is removed from the consultant."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't administrator."),
+		@ApiResponse(code = 404, message="Consultant or diploma not found.")
+	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("remove-diploma")
 	public ResponseEntity<?> removeDiploma(@Valid @RequestBody RemoveDiplomaRequest request){
@@ -279,7 +319,12 @@ public class ConsultantController {
 	 * @param id  the ID of the consultant
 	 * @return 200 with the list of the missions of a consultant.
 	 */
-	@ApiOperation(value = "List of the missions of a consultant.", notes = "Get all missions of a consultant given the consultant's ID.")
+	@ApiOperation(value = "List of the missions of a consultant.", notes = "Get all missions of a consultant given the consultant's ID. "
+			+ "If the connected user is not a manager ,then it returns only the validated missions.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentificated token.")
+	})
 	@GetMapping("/{id}/missions")
 	public ResponseEntity<?> getConsultantMissions(@PathVariable Long id){
 		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
