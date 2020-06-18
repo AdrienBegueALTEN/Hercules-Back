@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 public abstract class ResponseEntityException extends IOException {
 	protected HttpStatus status;
 
-	ResponseEntityException(String message, HttpStatus status) {
+	protected ResponseEntityException(String message, HttpStatus status) {
 		super(message);
 		this.status = status;
 	}

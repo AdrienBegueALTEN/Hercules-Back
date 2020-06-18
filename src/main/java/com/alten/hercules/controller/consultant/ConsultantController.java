@@ -158,9 +158,7 @@ public class ConsultantController {
 		try {
 			Consultant consultant = dal.findById(req.getId())
 					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
-			EConsultantFieldname fieldName;
-			try { fieldName = EConsultantFieldname.valueOf(req.getFieldName()); }
-			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
+			EConsultantFieldname fieldName = EConsultantFieldname.valueOf(req.getFieldName());
 			switch(fieldName) {
 				case firstname :
 					consultant.setFirstname((String)req.getValue());
@@ -178,19 +176,13 @@ public class ConsultantController {
 					consultant.setExperience((Integer)req.getValue());
 					break;
 				case manager :
-					if(req.getValue() instanceof Integer || req.getValue() instanceof Long) {
-						int id = (Integer)req.getValue();
-						Manager manager = dal.findEnabledManager(Long.valueOf(id))
-							.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
-						consultant.setManager(manager);
-					}
-					else throw new InvalidValueException();
+					Manager manager = dal.findEnabledManager((Long)req.getValue())
+						.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
+					consultant.setManager(manager);
 					break;
 				case releaseDate:
-					if(req.getValue()==null) 
-						consultant.setReleaseDate(null);
-					else
-						consultant.setReleaseDate(LocalDate.parse((String)req.getValue()));
+					LocalDate releaseDate = req.getValue() != null ? LocalDate.parse((String)req.getValue()) : null;
+					consultant.setReleaseDate(releaseDate);
 					break;
 				default: throw new InvalidFieldnameException();
 			}
@@ -200,6 +192,8 @@ public class ConsultantController {
 			return e.buildResponse();
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
+		} catch (IllegalArgumentException e) {
+			return new InvalidFieldnameException().buildResponse();
 		}
 	}
 	
