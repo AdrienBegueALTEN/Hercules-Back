@@ -5,7 +5,11 @@ import javax.validation.constraints.NotNull;
 
 import com.alten.hercules.model.diploma.Diploma;
 
-
+/**
+ * Class that contains the information for a request that adds a diploma to a consultant.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AddDiplomaRequest {
 	
 	@NotNull private Long consultant;
@@ -37,6 +41,10 @@ public class AddDiplomaRequest {
 	public Integer getYear() { return year; }
 	public void setYear(Integer year) { this.year = year; }
 	
+	/**
+	 * Function that produces an Object Diploma by using its fields.
+	 * @return
+	 */
 	public Diploma buildDiploma() {
 		return new Diploma(entitled, establishment, level, year);
 	}

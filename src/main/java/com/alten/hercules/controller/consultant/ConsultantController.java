@@ -47,6 +47,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+/**
+ * Class that manages the requests sent to the API for the consultants.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/hercules/consultants")

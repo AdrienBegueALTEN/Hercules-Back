@@ -1,5 +1,10 @@
 package com.alten.hercules.consts;
 
+/**
+ * Class that contains useful String constant used through the project.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AppConst {
 	
 	private AppConst() {}

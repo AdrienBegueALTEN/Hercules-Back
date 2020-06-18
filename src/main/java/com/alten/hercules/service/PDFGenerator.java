@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Period;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +30,11 @@ import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
 
 
-
+/**
+ * Class that manages the creation of the pdf pages for either missions or projects.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class PDFGenerator {
 	
 	private final static Path pdfFolder = Paths.get("pdf");
@@ -326,8 +327,7 @@ public class PDFGenerator {
 	        contentStream.setNonStrokingColor(black);
 	        contentStream.beginText();
 	        contentStream.newLineAtOffset(10, 10);
-	        contentStream.setFont( font1, 10 );
-	        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); 
+	        contentStream.setFont( font1, 10 ); 
 	        contentStream.showText(mission.getLastVersion().getVersionDate().format(DateTimeFormatter.ofPattern("dd MM yyyy")));
 	        contentStream.endText();
         }
@@ -652,7 +652,6 @@ public class PDFGenerator {
         contentStream.beginText();
         contentStream.newLineAtOffset(10, 10);
         contentStream.setFont( font1, 10 );
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); 
         contentStream.showText(mission.getLastVersion().getVersionDate().format(DateTimeFormatter.ofPattern("dd MM yyyy")));
         contentStream.endText();
         

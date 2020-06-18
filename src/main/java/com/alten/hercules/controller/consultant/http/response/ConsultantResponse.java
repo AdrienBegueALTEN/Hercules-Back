@@ -8,6 +8,11 @@ import com.alten.hercules.model.user.Manager;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Class that contains the information for the response of a request that asks for the details of a consultant.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ConsultantResponse {
 	private Long id;

@@ -14,6 +14,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+/**
+ * Class that manages the requests sent to the API for the GRPD.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/hercules/grdp")
@@ -22,8 +27,12 @@ public class GRDPController {
 	@Autowired
 	private GRDPDAL dal;
 	
+	/**
+	 * Function that applies the GRPD to the database, by anonymising the data of the people that left the company for more than 5 years.
+	 * @return
+	 */
 	@ApiOperation(value = "Apply GRDP on all user.", notes = "Set anonymous lastname, firstname and email to the consultants, "
-			+ "the manager and recruitment officers that left the compagny since at least 5 years. ")
+			+ "the manager and recruitment officers that left the compagny for at least 5 years. ")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="GRPD is applied."),
 		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't administrator."),

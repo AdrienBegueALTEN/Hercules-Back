@@ -2,6 +2,11 @@ package com.alten.hercules.controller.consultant.http.response;
 
 import com.alten.hercules.model.consultant.Consultant;
 
+/**
+ * Class that contains the information for the response of a request that asks for the basic details of a consultant.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class BasicConsultantResponse {
 	
 	private Long id;
