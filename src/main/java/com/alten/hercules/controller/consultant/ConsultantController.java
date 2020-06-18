@@ -176,7 +176,7 @@ public class ConsultantController {
 					consultant.setExperience((Integer)req.getValue());
 					break;
 				case manager :
-					Manager manager = dal.findEnabledManager((Long)req.getValue())
+					Manager manager = dal.findEnabledManager(((Integer)req.getValue()).longValue())
 						.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
 					consultant.setManager(manager);
 					break;

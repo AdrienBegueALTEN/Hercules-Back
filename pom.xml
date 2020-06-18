@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.alten.hercules</groupId>
-	<artifactId>auth</artifactId>
+	<artifactId>hercules</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Hercules</name>
 	<description></description>
