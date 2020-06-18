@@ -732,6 +732,7 @@ public class MissionController {
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 			if(extension.equals("jpg") ||
 			   extension.equals("png") ||
+			   extension.equals("jpeg") ||
 			   extension.equals("gif")) {
 				Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
 				if(proj.getPicture()!=null) {
