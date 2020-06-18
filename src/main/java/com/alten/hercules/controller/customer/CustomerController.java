@@ -44,6 +44,11 @@ import com.alten.hercules.service.StoreImage;
 
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * Class that manages the requests sent to the API for the customers.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/hercules/customers")

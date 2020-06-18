@@ -34,6 +34,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+/**
+ * Class that manages the requests sent to the API for the recruitment officers.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @RestController
 @CrossOrigin(origins="*")
 @PreAuthorize("hasAuthority('ADMIN')")

@@ -75,6 +75,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+/**
+ * Class that manages the requests sent to the API for the missions and projects.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @RestController
 @CrossOrigin(origins="*")
 @RequestMapping("/hercules/missions")
@@ -116,6 +121,12 @@ public class MissionController {
 		return getMissionDetails(missionId, false);
 	}
 	
+	/**
+	 * Function that returns the information of a mission given its state.
+	 * @param missionId ID of the mission
+	 * @param complete boolean that represents if the mission is completed or not
+	 * @return 200 OK<br> 404 The mission is not found
+	 */
 	private ResponseEntity<?> getMissionDetails(Long missionId, boolean complete) {
 		try {
 			Mission mission = dal.findById(missionId)
@@ -326,6 +337,13 @@ public class MissionController {
 		return updateMission(id, request.getFieldName(), request.getValue());
 	}
 	
+	/**
+	 * Function that modifies a specific field of the given mission.
+	 * @param id ID of the mission
+	 * @param key name of the field to be modified
+	 * @param value modified value of the field
+	 * @return 200 The mission is modified<br> 400 the field name or the value is bad<br>403 The status doesn't give the right to modify<br>404 The mission is not found
+	 */
 	private ResponseEntity<?> updateMission(Long id, String key, Object value) {
 		try {
 			Mission mission = dal.findById(id)
@@ -434,6 +452,11 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
+	/**
+	 * Function that creates a new project for a given mission if the mission is modifiable and has less than 5 projects.
+	 * @param missionId Id of the mission
+	 * @throws ResponseEntityException exception thrown if the mission is not found, the mission has already 5 projects or is validated.
+	 */
 	private void _newProject(Long missionId) throws ResponseEntityException {
 		Mission mission = dal.findById(missionId)
 				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
@@ -501,6 +524,13 @@ public class MissionController {
 		return updateProject(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
+	/**
+	 * Function that will modify a specific field of a project.
+	 * @param id ID of the project to be modified
+	 * @param key name of the field that will be modified
+	 * @param value the modified value of the field
+	 * @return 200 The project is updated <br>403 The sheet status is not good<br>404 The project is not found<br>400 The field name is not good<br>
+	 */
 	private ResponseEntity<?> updateProject(Long id, String key, Object value){
 		try {
 			Project project = dal.findProjectById(id)
@@ -583,6 +613,11 @@ public class MissionController {
 		return ResponseEntity.ok(null);
 	}
 	
+	/**
+	 * Function that will delete a project by using its ID.
+	 * @param id ID of the project
+	 * @throws ResponseEntityException exception thrown if the project is not found
+	 */
 	private void projectDeletion(Long id) throws ResponseEntityException {
 			Project project = dal.findProjectById(id)
 					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
@@ -596,6 +631,10 @@ public class MissionController {
 			dal.removeProject(project);
 	}
 	
+	/**
+	 * Function that will remove the skills from a project and remove the skills from this project and totally delete the skills if they don't have any other project.
+	 * @param project the project which skills will be removed
+	 */
 	private void removeSkillFromDeletionProject(Project project) {
 		Set<Skill> skillsCopy = new HashSet<>();
 		for(Skill skill : project.getSkills()) {
@@ -606,11 +645,20 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that verifies if the given project is up to date.
+	 * @param project the project that will be verified
+	 * @throws NotLastVersionException exception thrown if the project is not up to date
+	 */
 	private void checkIfProjectOfLastVersion(Project project) throws NotLastVersionException {
 		if (project.getMissionSheet().getMission().getLastVersion().getId() != project.getMissionSheet().getId())
 			throw new NotLastVersionException();
 	}
 	
+	/**
+	 * Function that modifies the status of the mission "on waiting" to "on going".
+	 * @param mission the mission that will be modified
+	 */
 	private void updateSheetStatus(Mission mission) {
 		if (mission.getSheetStatus().equals(ESheetStatus.ON_WAITING)) {
 			mission.setSheetStatus(ESheetStatus.ON_GOING);
@@ -618,6 +666,11 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that verifies if a given date is the date of today.
+	 * @param date a date from the class LocalDate
+	 * @return true if the given date is today or false
+	 */
 	private boolean isToday(LocalDate date) {
 		LocalDate today = LocalDate.now();
 		
