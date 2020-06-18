@@ -101,7 +101,7 @@ public class MissionDAL {
 	    Join<Project, Skill> skillsJoin = null;
 	    if (criteria.containsKey("skills") && !criteria.get("skills").isBlank()) {
 		    projectsJoin = sheetJoin.join("projects", JoinType.INNER);
-		    skillsJoin = projectsJoin.join("skills", JoinType.LEFT);
+		    skillsJoin = projectsJoin.join("skills", JoinType.INNER);
 	    }
 	    
 	    //Sub query to get last version's date. 
