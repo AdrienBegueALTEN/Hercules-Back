@@ -5,6 +5,11 @@ import javax.validation.constraints.Pattern;
 
 import com.alten.hercules.consts.AppConst;
 
+/**
+ * Class that contains the information for a request that adds a consultant.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AddConsultantRequest {
 	
 	@NotNull

@@ -4,6 +4,11 @@ import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.ApiModelProperty;
 
+/**
+ * Class that contains the information for a request that adds a mission.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AddMissionRequest {
 	
 	@ApiModelProperty("Customer identifier.")

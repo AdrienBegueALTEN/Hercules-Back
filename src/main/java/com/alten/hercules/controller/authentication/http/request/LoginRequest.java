@@ -1,9 +1,15 @@
-package com.alten.hercules.controller.authentification.http.request;
+package com.alten.hercules.controller.authentication.http.request;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Class that contains the information for a request to log in.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class LoginRequest {
 	
+
 	@NotBlank
 	private String email;
 	

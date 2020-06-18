@@ -2,6 +2,11 @@ package com.alten.hercules.controller.mission.http.request;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Class that contains the information for a request for the generation of a PDF file.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class GeneratePDFRequest {
 	
 	@NotNull

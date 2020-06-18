@@ -2,6 +2,11 @@ package com.alten.hercules.controller.customer.http.response;
 
 import com.alten.hercules.model.customer.Customer;
 
+/**
+ * Class that contains the information of the response of a request that asks for the details of a customer.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class BasicCustomerResponse {
 	
 	private Long id;

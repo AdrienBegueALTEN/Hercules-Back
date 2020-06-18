@@ -4,6 +4,11 @@ import javax.validation.constraints.NotBlank;
 
 import com.alten.hercules.model.customer.Customer;
 
+/**
+ * Class that contains the information for a request that adds a customer.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AddCustomerRequest {
 	
 	@NotBlank

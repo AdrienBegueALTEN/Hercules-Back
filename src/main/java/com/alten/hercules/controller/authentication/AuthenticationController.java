@@ -1,4 +1,4 @@
-package com.alten.hercules.controller.authentification;
+package com.alten.hercules.controller.authentication;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alten.hercules.controller.authentification.http.request.ChangePasswordRequest;
-import com.alten.hercules.controller.authentification.http.request.LoginRequest;
+import com.alten.hercules.controller.authentication.http.request.ChangePasswordRequest;
+import com.alten.hercules.controller.authentication.http.request.LoginRequest;
 import com.alten.hercules.dal.AuthenticationDAL;
 import com.alten.hercules.model.exception.InvalidSheetStatusException;
 import com.alten.hercules.model.exception.InvalidValueException;
@@ -47,21 +47,26 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+/**
+ * Class that manages the requests sent to the API for the authentication.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @RestController
 @CrossOrigin(origins="*")
 @RequestMapping("/hercules/auth")
-public class AuthentificationController {
+public class AuthenticationController {
 	
 	@Autowired private AuthenticationManager authManager;
 	@Autowired private AuthenticationDAL  dal;
 	
 	@ApiOperation(
-			value = "User authentification with login/password.",
-			notes = "Return an authentification token which contains the identifier, the firstname, the lastname and the roles of the authentificated user."
+			value = "User authentication with login/password.",
+			notes = "Return an authentication token which contains the identifier, the firstname, the lastname and the roles of the authenticated user."
 	)
 	@ApiResponses({
-		@ApiResponse(code = 200, message="Authentification succeeded."),
-		@ApiResponse(code = 401, message="Authentificated failed.")
+		@ApiResponse(code = 200, message="Authentication succeeded."),
+		@ApiResponse(code = 401, message="Authentication failed.")
 	})
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(
@@ -91,8 +96,8 @@ public class AuthentificationController {
 	
 	@ApiOperation(
 			value = "Update user password (anonymous user).",
-			notes = "Update the password of an user without needs of an login/password authentification.\n"
-			+ "Return an authentification token which contains the identifier, the firstname, the lastname and the roles of the user.")
+			notes = "Update the password of an user without needs of an login/password authentication.\n"
+			+ "Return an authentication token which contains the identifier, the firstname, the lastname and the roles of the user.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Password updated."),
 		@ApiResponse(code = 400, message="New password is empty.")
@@ -113,11 +118,11 @@ public class AuthentificationController {
 	
 	@ApiOperation(
 			value = "Update user password.",
-			notes = "Update the password of an authentificated user.")
+			notes = "Update the password of an authenticated user.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Password updated."),
 		@ApiResponse(code = 400, message="New password is empty."),
-		@ApiResponse(code = 401, message="Invalid authentificated token."),
+		@ApiResponse(code = 401, message="Invalid authenticated token."),
 		@ApiResponse(code = 403, message="Real current password does not match with the given one.")
 	})
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'RECRUITMENT_OFFICER')")
@@ -144,7 +149,7 @@ public class AuthentificationController {
 			notes = "Return a ready-to-send email which contains an access link to the last sheet of a mission.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Email created."),
-		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
+		@ApiResponse(code = 401, message="Invalid authenticated token or user isn't manager."),
 		@ApiResponse(code = 403, message="User isn't the manager of the consultant linked to the mission or this one is validated."),
 		@ApiResponse(code = 404, message="Mission not found."),
 		@ApiResponse(code = 500, message="Error occured during the email creation.")
@@ -180,10 +185,10 @@ public class AuthentificationController {
 	
 	@ApiOperation(
 			value = "Generate mission sheet external access.",
-			notes = "Return a ready-to-send email which contains an access link to update the password of an user without needs of an login/password authentification.")
+			notes = "Return a ready-to-send email which contains an access link to update the password of an user without needs of an login/password authentication.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Email created."),
-		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't administrator."),
+		@ApiResponse(code = 401, message="Invalid authenticated token or user isn't administrator."),
 		@ApiResponse(code = 404, message="User not found."),
 		@ApiResponse(code = 500, message="Error occured during the email creation.")
 	})
@@ -210,6 +215,7 @@ public class AuthentificationController {
 		return response;		
 	}
 	
+
 	private ResponseEntity<ByteArrayResource> buildEmlFileResponse(File file) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());

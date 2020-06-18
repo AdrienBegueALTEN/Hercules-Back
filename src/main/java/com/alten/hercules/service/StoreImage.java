@@ -1,6 +1,5 @@
 package com.alten.hercules.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -27,7 +26,11 @@ public class StoreImage {
 	
 	public final static String LOGO_FOLDER = "img/logo/";
 	public final static String PROJECT_FOLDER = "img/proj/";
-
+	
+	
+	/**
+	 * Function that initializes the folders for the pictures.
+	 */
 	public void init() {
 		try {
 			if(!Files.exists(this.rootLogo))
@@ -39,11 +42,19 @@ public class StoreImage {
 		}
 	}
 	
+	/**
+	 * Function that delete all the pictures in the folders.
+	 */
 	public void deleteAll() {
 	    FileSystemUtils.deleteRecursively(this.rootLogo.toFile());
 	    FileSystemUtils.deleteRecursively(this.rootProj.toFile());
 	}
-
+	
+	/**
+	 * Function that saves the file of the given picture file.
+	 * @param file file to be saved
+	 * @param type String that shows if the file is a picture for a customer or a picture for a project.
+	 */
 	public void save(MultipartFile file, String type) {
 		try {
 			
@@ -84,7 +95,12 @@ public class StoreImage {
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * Function that deletes a specific picture file.
+	 * @param path path of the file 
+	 * @return true if the file was deleted and false if it doesn't exist
+	 */
 	public boolean delete(String path) {
 		try {
 			return Files.deleteIfExists(Paths.get(path));
@@ -92,7 +108,13 @@ public class StoreImage {
 			throw new RuntimeException("Could not delete the file. Error: " + e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * Function that gives an URL for a given image.
+	 * @param fileName name of the file
+	 * @param type String that shows if the file is a picture for a customer or a picture for a project.
+	 * @return An URL linked to the given image
+	 */
 	public Resource loadFileAsResource(String fileName, String type) {
 		try {
 			
@@ -115,6 +137,11 @@ public class StoreImage {
 		return null;
 	}
 	
+	/**
+	 * Function that deletes a picture file given its name and its type.
+	 * @param fileName name of the file
+	 * @param type String that shows if the file is a picture for a customer or a picture for a project.
+	 */
 	public void deleteFile(String fileName, String type) {
 		Path filePath = null;
 		switch(type) {

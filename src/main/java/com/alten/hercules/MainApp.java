@@ -7,13 +7,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import com.alten.hercules.controller.user.RecruitementOfficerController;
-import com.alten.hercules.dal.ConsultantDAL;
 import com.alten.hercules.service.PDFGenerator;
 import com.alten.hercules.service.StoreImage;
 
+/**
+ * Main class of the project.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan("com.alten")
 public class MainApp implements CommandLineRunner  {
