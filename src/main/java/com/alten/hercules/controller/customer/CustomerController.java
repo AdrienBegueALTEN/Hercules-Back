@@ -164,6 +164,7 @@ public class CustomerController {
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 				if(extension.equals("jpg") ||
 				   extension.equals("png") ||
+				   extension.equals("jpeg") ||
 				   extension.equals("gif")) {
 				Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 				if(customer.getLogo()!=null) {
