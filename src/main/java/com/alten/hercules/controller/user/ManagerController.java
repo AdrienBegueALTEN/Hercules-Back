@@ -146,7 +146,7 @@ public class ManagerController {
 	public ResponseEntity<?> updateManager(
 			@ApiParam(
 					"id : manager's identifier;\n"
-					+ "fieldName : field's name to update;\n"
+					+ "fieldname : field's name to update;\n"
 					+ "value : field's new value."
 			)
 			@Valid @RequestBody UpdateEntityRequest request) {

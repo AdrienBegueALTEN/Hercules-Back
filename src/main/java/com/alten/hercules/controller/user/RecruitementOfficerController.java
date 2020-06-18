@@ -29,6 +29,11 @@ import com.alten.hercules.model.exception.UnavailableEmailException;
 import com.alten.hercules.model.user.ERecruitmentOfficerFieldName;
 import com.alten.hercules.model.user.RecruitmentOfficer;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @CrossOrigin(origins="*")
 @PreAuthorize("hasAuthority('ADMIN')")
@@ -37,13 +42,39 @@ public class RecruitementOfficerController {
 	
 	@Autowired RecruitmentOfficerDAL dal;
 	
+	
+	@ApiOperation(
+			value = "Get all the recruitment officers.",
+			notes = "Return all the informations of all the recruitment officers."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token.")
+	})
 	@GetMapping("")
 	public ResponseEntity<?> getAll() {
 		return ResponseEntity.ok(dal.findAll());
 	}
 	
+	
+	@ApiOperation(
+			value = "Create a recruitment officer.",
+			notes = "Add a new recruitment officer in the database with the given information."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="Recruitment officer was created."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 409, message="Email address is not available."),
+		@ApiResponse(code = 404, message="Recruitment officer is not found."),
+		@ApiResponse(code = 400, message="Bad format for email or names")
+	})
 	@PostMapping("")
-	public ResponseEntity<?> addRecruitementOfficer(@Valid @RequestBody AddRecruitmentOfficerRequest request) {
+	public ResponseEntity<?> addRecruitementOfficer(@ApiParam(
+						"email : user's email;\n"
+						+ "firstname : user's firstname;\n"
+						+ "lastname : user's lastname;\n"
+					)
+					@Valid @RequestBody AddRecruitmentOfficerRequest request) {
 		if (!dal.emailIsAvailable(request.getEmail()))
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		RecruitmentOfficer recruitmentOfficer = request.buildUser();
@@ -52,9 +83,25 @@ public class RecruitementOfficerController {
 				.status(HttpStatus.CREATED)
 				.body(recruitmentOfficer.getId());
 	}
-	 
+	
+	
+	@ApiOperation(
+			value = "Modify a recruitment officer.",
+			notes = "Modify the specified field of the recruitment officer with the the given value."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Recruitment officer was modified."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 409, message="Email address is not available."),
+		@ApiResponse(code = 404, message="Recruitment officer is not found."),
+		@ApiResponse(code = 400, message="Bad fieldname or value")
+	})
 	@PutMapping("")
-	public ResponseEntity<?> updateRecruitementOfficer(@Valid @RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> updateRecruitementOfficer(@ApiParam(
+			"id : recruitment officer's id;\n"
+			+ "fieldname : name of the field to modify;\n"
+			+ "value : modified value;\n"
+			)@Valid @RequestBody UpdateEntityRequest request) {
 		try {
 			RecruitmentOfficer recruitmentOfficer = dal.findById(request.getId())
 					.orElseThrow(() -> new ResourceNotFoundException(RecruitmentOfficer.class));
@@ -91,8 +138,19 @@ public class RecruitementOfficerController {
 		}
 	}
 	 
+	
+	@ApiOperation(
+			value = "Delete a recruitment officer.",
+			notes = "Delete the recruitment officer from the database."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="Recruitment officer was deleted."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 404, message="Recruitment officer is not found.")
+	})
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteRecruitementOfficer(@PathVariable Long id) {
+	public ResponseEntity<?> deleteRecruitementOfficer(@ApiParam("Recruitment officer's id.")
+													   @PathVariable Long id) {
 		try {
 			RecruitmentOfficer recruitmentOfficer = dal.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(RecruitmentOfficer.class));
@@ -106,8 +164,18 @@ public class RecruitementOfficerController {
 	 }
 	
 	
+	@ApiOperation(
+			value = "Get a specific recruitment officer.",
+			notes = "Return the information of a specific recruitment officer."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 200, message="OK."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 404, message="Recruitment officer is not found.")
+	})
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getRecruitementOfficerById(@PathVariable Long id) {
+	public ResponseEntity<?> getRecruitementOfficerById(@ApiParam("Recruitment officer's id.")
+														@PathVariable Long id) {
 		try {
 			RecruitmentOfficer recruitmentOfficer = dal.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(RecruitmentOfficer.class));
