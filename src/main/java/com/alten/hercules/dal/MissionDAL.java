@@ -1,10 +1,13 @@
 package com.alten.hercules.dal;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -92,8 +95,14 @@ public class MissionDAL {
 	    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
 	    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
 	    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
-	    //Join<MissionSheet, Project> projectsJoin = sheetJoin.join("projects", JoinType.INNER);
-	    //Join<Project, Skill> skillsJoin = projectsJoin.join("skills", JoinType.INNER);
+	    
+	    //Add joins towards the skills if needed only, otherwise it doesn't return results as wanted
+	    Join<MissionSheet, Project> projectsJoin = null;
+	    Join<Project, Skill> skillsJoin = null;
+	    if (criteria.containsKey("skills") && !criteria.get("skills").isBlank()) {
+		    projectsJoin = sheetJoin.join("projects", JoinType.INNER);
+		    skillsJoin = projectsJoin.join("skills", JoinType.INNER);
+	    }
 	    
 	    //Sub query to get last version's date. 
 	    Subquery<Date> subQuery = query.subquery(Date.class);
@@ -141,15 +150,21 @@ public class MissionDAL {
         if (criteria.containsKey(key) && !criteria.get(key).isBlank())
         	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
+        //the array of skill is received as a string with skills separated with commas
+        //an array of string is then created by splitting the string
+        //it loop through the skills array, and create 'OR' predicates
         key = "skills";
         if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
         	String[] skills = criteria.get(key).split(",");
         	Predicate[] skillPredicates = new Predicate[skills.length];
         	for(int i=0;i<skills.length;i++) {
-        		//skillPredicates[i] = builder.like(builder.lower(skillsJoin.get("label")), ("%" + skills[i] + "%").toLowerCase());
+        		skillPredicates[i] = builder.like(builder.lower(skillsJoin.get("label")), ("%" + skills[i] + "%").toLowerCase());
         	}
         	if(skillPredicates.length>0)
         		criteriaList.add(builder.or(skillPredicates));
+        	/*for(int i=0;i<skills.length;i++) {
+        		criteriaList.add(builder.like(builder.lower(skillsJoin.get("label")), ("%" + skills[i] + "%").toLowerCase()));
+        	}*/
         }
         
         
@@ -175,8 +190,17 @@ public class MissionDAL {
     	
     	//Query is created using the criteriaList
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
-
-	    return em.createQuery(query).getResultList();
+    	
+    	//The skills create duplicates. The set remove duplicates, and must be re-ordered with the sheet status
+    	List<Mission> foundMissions = em.createQuery(query).getResultList();
+    	Set<Mission> setMissions = new HashSet<>(foundMissions);
+    	List<Mission> uniqueMissions = new ArrayList<Mission>(setMissions);
+    	uniqueMissions.sort((m1,m2)->{ 
+    		if(m1.getSheetStatus()==ESheetStatus.VALIDATED) return 1;
+    		else if(m1.getSheetStatus()==ESheetStatus.ON_GOING) return 0;
+    		else return -1;
+    	});
+	    return uniqueMissions;
 	}
 	
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {

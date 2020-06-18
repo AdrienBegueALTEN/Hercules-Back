@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.dal.GRDPDAL;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/hercules/grdp")
@@ -18,6 +22,12 @@ public class GRDPController {
 	@Autowired
 	private GRDPDAL dal;
 	
+	@ApiOperation(value = "Apply GRDP on all user.", notes = "Set anonymous lastname, firstname and email to the consultants, "
+			+ "the manager and recruitment officers that left the compagny since at least 5 years. ")
+	@ApiResponses({
+		@ApiResponse(code = 200, message="GRPD is applied."),
+		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't administrator."),
+	})
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@PutMapping
 	public ResponseEntity<?> applyGRDP() {
