@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -155,15 +156,23 @@ public class CustomerController {
 	@PreAuthorize("hasAuthority('MANAGER')")
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
-			Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
-			if(customer.getLogo()!=null) {
-				this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
-				customer.setLogo(null);
+			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+				if(extension.equals("jpg") ||
+				   extension.equals("png") ||
+				   extension.equals("gif")) {
+				Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
+				if(customer.getLogo()!=null) {
+					this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
+					customer.setLogo(null);
+				}
+				storeImage.save(file,"logo");
+				customer.setLogo(file.getOriginalFilename());
+				this.dal.save(customer);
+				return ResponseEntity.status(HttpStatus.OK).build();
 			}
-			storeImage.save(file,"logo");
-			customer.setLogo(file.getOriginalFilename());
-			this.dal.save(customer);
-			return ResponseEntity.status(HttpStatus.OK).build();
+			else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 		}

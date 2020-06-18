@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.alten.hercules</groupId>
-	<artifactId>auth</artifactId>
+	<artifactId>hercules</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Hercules</name>
 	<description></description>
@@ -106,6 +106,12 @@
 		    <artifactId>pdfbox</artifactId>
 		    <version>2.0.19</version>
 		</dependency>
+		
+		<dependency>
+		     <groupId>commons-io</groupId>
+		     <artifactId>commons-io</artifactId>
+		     <version>2.4</version>
+		 </dependency>
 		
 		<!-- swagger -->
 		<dependency>

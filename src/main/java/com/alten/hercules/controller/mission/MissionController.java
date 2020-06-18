@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -649,7 +650,8 @@ public class MissionController {
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid  token."),
 		@ApiResponse(code = 404, message="Project is not found"),
-		@ApiResponse(code = 200, message="Image is uploaded and project line is modified with the new image name in database.")
+		@ApiResponse(code = 200, message="Image is uploaded and project line is modified with the new image name in database."),
+		@ApiResponse(code = 400, message="The extension of the file is not good.")
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PostMapping("/projects/anonymous/{id}/upload-picture")
@@ -670,19 +672,27 @@ public class MissionController {
 	 * Upload a project picture on server side and and the file name to the project.
 	 * @param file  project picture (weight is less than 1 Mo)
 	 * @param id  project id
-	 * @return 404 if the project is not found<br>200 if the image is added
+	 * @return 404 if the project is not found<br>200 if the image is added<br>400 if the extension of the file is not good
 	 */
 	private ResponseEntity<?> uploadPicture(MultipartFile file, Long id){
 		try {
-			Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
-			if(proj.getPicture()!=null) {
-				this.storeImage.delete("img/proj/"+proj.getPicture());
-				proj.setPicture(null);
+			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+			if(extension.equals("jpg") ||
+			   extension.equals("png") ||
+			   extension.equals("gif")) {
+				Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
+				if(proj.getPicture()!=null) {
+					this.storeImage.delete("img/proj/"+proj.getPicture());
+					proj.setPicture(null);
+				}
+				storeImage.save(file,"project");
+				proj.setPicture(file.getOriginalFilename());
+				this.dal.saveProject(proj);
+				return ResponseEntity.status(HttpStatus.OK).build();
 			}
-			storeImage.save(file,"project");
-			proj.setPicture(file.getOriginalFilename());
-			this.dal.saveProject(proj);
-			return ResponseEntity.status(HttpStatus.OK).build();
+			else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 		}
@@ -921,6 +931,16 @@ public class MissionController {
 	}
 	
 	
+	@ApiOperation(
+			value = "Generate and send a pdf document.",
+			notes = "Given a list of projects and missions, it sends back a pdf document with a page for each project and mission."
+	)
+	@ApiResponses({
+		@ApiResponse(code = 201, message="PDF was created and can be sent."),
+		@ApiResponse(code = 401, message="Invalid authentification token."),
+		@ApiResponse(code = 400, message="PDF couldn't be created or sent."),
+		@ApiResponse(code = 404, message="Project or mission not found.")
+	})
 	@PostMapping("/pdf")
 	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
 		
@@ -991,7 +1011,7 @@ public class MissionController {
 			} catch (ResourceNotFoundException e) {
 				return e.buildResponse();
 			} catch (IOException e) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("the file could not be created");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the file could not be created");
 			} 
 			
 			try {
