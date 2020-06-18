@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Class that manages the uploaded picture files.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Service
 public class StoreImage {
 
