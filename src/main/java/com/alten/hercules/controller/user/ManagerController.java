@@ -40,6 +40,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+/**
+ * Class that manages the requests sent to the API for the managers.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @RestController
 @CrossOrigin(origins="*")
 @RequestMapping("/hercules/managers")
@@ -218,6 +223,11 @@ public class ManagerController {
 		}
 	}
 	
+	/**
+	 * Class that contains the information for the response of a request that asks for the details of a manager.
+	 * @author mfoltz, rjesson, abegue, jbaudot
+	 *
+	 */
 	private class ManagerResponseBodyBuilder{
 		Manager manager;
 		Map <String, Object> body = new HashMap<String, Object>();

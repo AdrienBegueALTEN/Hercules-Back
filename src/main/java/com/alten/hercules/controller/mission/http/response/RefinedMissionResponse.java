@@ -6,6 +6,11 @@ import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Class that contains the information for the response of a request that asks for specific details of a mission.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class RefinedMissionResponse {
 
 	@JsonIgnoreProperties(value = {"diplomas", "email", "experience", "id", "manager", "missions"})

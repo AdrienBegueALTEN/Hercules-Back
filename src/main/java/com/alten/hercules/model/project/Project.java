@@ -14,7 +14,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
-import com.alten.hercules.controller.mission.http.request.GeneratePDFRequest;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.skill.Skill;
 import com.fasterxml.jackson.annotation.JsonFormat;

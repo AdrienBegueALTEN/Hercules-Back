@@ -10,7 +10,11 @@ import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-
+/**
+ * Class that contains the information for the response of a request that asks for the basic details of a mission.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class BasicMissionResponse {
 
 	private Long id;

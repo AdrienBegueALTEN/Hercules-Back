@@ -10,6 +10,11 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Class that contains the information for the response of a request that asks for all the details of a mission.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CompleteMissionResponse {
 
