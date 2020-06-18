@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -45,15 +46,37 @@ public class StoreImage {
 
 	public void save(MultipartFile file, String type) {
 		try {
+			
+			
 			Path path = null;
 			switch(type) {
 			case "logo":
 				path = this.rootLogo.resolve(file.getOriginalFilename());
+				
+				/*
+				String[] parts = file.getOriginalFilename().split(".");
+				String fileExtension = parts[1]; 
+				System.out.println(fileExtension);
+				*/
+				
 				break;
 			case "project":
 				path = this.rootProj.resolve(file.getOriginalFilename());
+				
+				System.out.println(file.getOriginalFilename());
+				String fullFileName = file.getOriginalFilename();
+				System.out.println(fullFileName);
+				
+				String[] arrayFileNameSplit = fullFileName.split("\\.");
+				
+				String fileExtension = arrayFileNameSplit[0];
+				
+				System.out.println(fileExtension);
+				
+				
 				break;
 			}
+			
 			if (!Files.exists(path))
 				Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
@@ -72,10 +95,12 @@ public class StoreImage {
 
 	public Resource loadFileAsResource(String fileName, String type) {
 		try {
+			
 			Path filePath = null;
 			switch(type) {
 			case "logo":
 				filePath = this.rootLogo.resolve(fileName).normalize();
+				
 				break;
 			case "project":
 				filePath = this.rootProj.resolve(fileName).normalize();
