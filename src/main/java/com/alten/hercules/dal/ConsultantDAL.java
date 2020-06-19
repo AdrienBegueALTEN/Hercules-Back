@@ -21,7 +21,7 @@ import com.alten.hercules.model.user.Manager;
 
 /**
  * Layer to access the DAL needed for the consultants.
- * @author rjesson, mdoltz, abegue, jbaudot
+ * @author rjesson, mfoltz, abegue, jbaudot
  *
  */
 @Service

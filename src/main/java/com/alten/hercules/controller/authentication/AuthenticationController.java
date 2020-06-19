@@ -60,6 +60,11 @@ public class AuthenticationController {
 	@Autowired private AuthenticationManager authManager;
 	@Autowired private AuthenticationDAL  dal;
 	
+	/**
+	 * Function that manages the request of authentication from a user.
+	 * @param request Request that contains the information of the user for the login
+	 * @return 200 The authentication is a success<br> 401 The Authentication failed.
+	 */
 	@ApiOperation(
 			value = "User authentication with login/password.",
 			notes = "Return an authentication token which contains the identifier, the firstname, the lastname and the roles of the authenticated user."
@@ -81,6 +86,10 @@ public class AuthenticationController {
 		return ResponseEntity.ok(new JWTResponse((AppUser)authentication.getPrincipal()));
 	}
 	
+	/**
+	 * Function that checks from a request the token for modifying a password.
+	 * @return 200 The token is accepted<br> 401 The token is rejected.
+	 */
 	@ApiOperation(
 			value = "Check password modification token validity (anonymous user).",
 			notes = "Check the validity of a password modification token.")
@@ -94,13 +103,18 @@ public class AuthenticationController {
 		return ResponseEntity.ok(null);
 	}
 	
+	/**
+	 * Function that receives a new password from a request and tries to modify it for an unauthenticated user.
+	 * @param newPassword String that contains the new password
+	 * @return 200 The password has been modified<br>400 The new password is not accepted.
+	 */
 	@ApiOperation(
 			value = "Update user password (anonymous user).",
 			notes = "Update the password of an user without needs of an login/password authentication.\n"
 			+ "Return an authentication token which contains the identifier, the firstname, the lastname and the roles of the user.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Password updated."),
-		@ApiResponse(code = 400, message="New password is empty.")
+		@ApiResponse(code = 400, message="New password is empty or not acceptable.")
 	})
 	@PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
 	@PutMapping("/change-password-anonymous")
@@ -116,6 +130,11 @@ public class AuthenticationController {
 		} catch (InvalidValueException e) { return e.buildResponse(); }
 	}
 	
+	/**
+	 * Function that receives a new password from a request and tries to modify it for an authenticated user verifying that the current password is known.
+	 * @param request Request that contains the old and new password
+	 * @return 200 The password is updated<br>400 The new password is not accepted<br>401 The authentication is not good<br>403 The given current password is false.
+	 */
 	@ApiOperation(
 			value = "Update user password.",
 			notes = "Update the password of an authenticated user.")
