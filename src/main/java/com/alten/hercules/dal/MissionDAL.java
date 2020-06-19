@@ -1,7 +1,6 @@
 package com.alten.hercules.dal;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
@@ -32,7 +30,6 @@ import com.alten.hercules.dao.skill.SkillDAO;
 import com.alten.hercules.dao.user.ManagerDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.customer.Customer;
-import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
 import com.alten.hercules.model.mission.MissionSheet;
@@ -50,39 +47,70 @@ public class MissionDAL {
 	@Autowired private SkillDAO skillDAO;
 	@Autowired private ManagerDAO managerDAO;
 	
-	
 	//The entity manager is used for the Criteria API function below
 	@PersistenceContext
 	EntityManager em;
 	
+	/**
+	 * Retrieves a mission by its identifier.
+	 * @param id
+	 * @return the mission with the given identifier or Optional#empty() if not found.
+	 */
 	public Optional<Mission> findById(Long id) {
 		return missionDAO.findById(id);
 	}
 	
+	/**
+	 * Retrieves a consultant by its identifier.
+	 * @param id
+	 * @return the consultant with the given identifier or Optional#empty() if not found.
+	 */
 	public Optional<Consultant> findConsultantById(Long id) {
 		return consultantDAO.findById(id);
 	}
 	
+	/**
+	 * Retrieves a customer by its identifier.
+	 * @param id
+	 * @return the customer with the given identifier or Optional#empty() if not found.
+	 */
 	public Optional<Customer> findCustomerById(Long id) {
 		return customerDAO.findById(id);
 	}
 	
+	/**
+	 * Saves a mission.
+	 * @param mission
+	 * @return the saved mission.
+	 */
 	public Mission save(Mission mission) {
 		return missionDAO.save(mission);
 	}
 	
+	/**
+	 * Saves a mission sheet.
+	 * @param sheet
+	 * @return the saved mission sheet.
+	 */
 	public MissionSheet saveSheet(MissionSheet sheet) {
 		return sheetDAO.save(sheet);
 	}
 	
-	public void saveProject(Project project) {
-		projectDAO.save(project);
+	/**
+	 * Saves a project.
+	 * @param project
+	 * @return the saved project.
+	 */
+	public Project saveProject(Project project) {
+		return projectDAO.save(project);
 	}
 	
-	
-	
-	//The following function uses Criteria API to create a query. 
-	//It is used to manage the optional parameters of the advanced search.
+	/**
+	 * Perform a search among the missions according to a set of criteria
+	 * @param criteria The set of criteria
+	 * @param manager If present filter to keep validated missions and those of the manager identified by this parameter, if not, filter to keep only validated missions.
+	 * @return the list of missions which corresponds to all the criteria.
+	 */
 	public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
 		
 		CriteriaBuilder builder = em.getCriteriaBuilder();
@@ -203,70 +231,120 @@ public class MissionDAL {
 	    return uniqueMissions;
 	}
 	
+	/**
+	 * Retrieves the most recent mission sheet of a mission.
+	 * @param missionId
+	 * @return the most recent mission sheet of the mission with the given identifier or Optional#empty() if not found.
+	 */
 	public Optional<MissionSheet> findMostRecentVersion(Long missionId) {
 		return sheetDAO.findMostRecentVersion(missionId);
 	}
 	
+	/**
+	 * Retrieves all missions related to a manager's consultants.
+	 * @param managerId
+	 * @return the list of all missions related to the manager's consultants.
+	 */
 	public List<Mission> findAllByManager(Long managerId) {
 		return missionDAO.findAllByManager(managerId);
 	}
 	
+	/**
+	 * Retrieves all validated missions.
+	 * @return the list of all validated missions.
+	 */
 	public List<Mission> findAllValidated() {
 		return missionDAO.findAllBySheetStatus(ESheetStatus.VALIDATED);
 	}
-
-	public void changeMissionSecret(Mission mission) {
-		mission.changeSecret();
-		missionDAO.save(mission);
-	}
 	
-	public void removeProject(Project project) throws ResourceNotFoundException {
+	/**
+	 * Deletes a project.
+	 * @param project
+	 */
+	public void removeProject(Project project) {
 		MissionSheet sheet = project.getMissionSheet();
 		sheet.removeProject(project);
 		sheetDAO.save(sheet);
 		projectDAO.delete(project);
 	}
 
-	public void addProjectForSheet(MissionSheet sheet, Project project) throws ResourceNotFoundException {
+	/**
+	 * Saves a project linked to a mission sheet.
+	 * @param sheet Mission sheet to which the project must be linked.
+	 * @param project
+	 */
+	public void addProjectForSheet(MissionSheet sheet, Project project) {
 		project = projectDAO.save(project);
 		sheet.addProject(project);
 		sheetDAO.save(sheet);
 	}
 	
+	/**
+	 * Retrieves a project by its identifier.
+	 * @param id
+	 * @return the project with the given identifier or Optional#empty() if not found.
+	 */
 	public Optional<Project> findProjectById(Long id) {
 		return projectDAO.findById(id);
 	}
 	
-	
+	/**
+	 * Delete a mission.
+	 * @param mission
+	 */
 	public void delete(Mission mission) {
 		missionDAO.delete(mission);
 	}
 	
+	/**
+	 * Retrieves all missions related to a customer.
+	 * @param customerId
+	 * @return the list of all missions related to the customer.
+	 */
 	public List<Mission> findMissionsByCustomer(Long customerId){
 		return this.missionDAO.findByCustomerId(customerId);
 	}
 	
-	public void addSkillToProject(Project p, Skill s) {
-		s=this.skillDAO.save(s);
-		p.getSkills().add(s);
-		s.getProjects().add(p);
-		this.projectDAO.save(p);
+	/**
+	 * Saves a skill linked to a project.
+	 * @param project Project to which the skill must be linked.
+	 * @param skill
+	 */
+	public void addSkillToProject(Project project, Skill skill) {
+		skill = this.skillDAO.save(skill);
+		project.getSkills().add(skill);
+		skill.getProjects().add(project);
+		this.projectDAO.save(project);
 	}
 	
+	/**
+	 * Retrieves a skill by its identifier.
+	 * @param label Skill's identifier.
+	 * @return the skill with the given identifier or Optional#empty() if not found.
+	 */
 	public Optional<Skill> findSkillByLabel(String label){
 		return this.skillDAO.findById(label);
 	}
 	
-	public void removeSkillFromProject(Project p, Skill s) {
-		p.getSkills().remove(s);
-		this.projectDAO.save(p);
-		s.getProjects().remove(p);
-		this.skillDAO.save(s);
-		if(s.getProjects().isEmpty())
-			this.skillDAO.delete(s);
+	/**
+	 * Unlink a skill from a project.
+	 * @param project
+	 * @param skill
+	 */
+	public void removeSkillFromProject(Project project, Skill skill) {
+		project.getSkills().remove(skill);
+		this.projectDAO.save(project);
+		skill.getProjects().remove(project);
+		this.skillDAO.save(skill);
+		if(skill.getProjects().isEmpty())
+			this.skillDAO.delete(skill);
 		
 	}
 	
+	/**
+	 * Retrieves all skills.
+	 * @return the list of all skills.
+	 */
 	public List<Skill> findAllSkills(){
 		return this.skillDAO.findAll();
 	}
