@@ -1,5 +1,7 @@
 package com.alten.hercules.controller.consultant.http.response;
 
+import java.time.LocalDate;
+
 import com.alten.hercules.model.consultant.Consultant;
 
 /**
@@ -19,12 +21,15 @@ public class BasicConsultantResponse {
 	
 	private Long manager;
 	
+	private LocalDate releaseDate;
+	
 	public BasicConsultantResponse(Consultant consultant) {
 		this.id = consultant.getId();
 		this.email = consultant.getEmail();
 		this.firstname = consultant.getFirstname();
 		this.lastname = consultant.getLastname();
 		this.manager = consultant.getManager().getId();
+		this.releaseDate = consultant.getReleaseDate();
 	}
 
 	public Long getId() { return id; }
@@ -41,5 +46,10 @@ public class BasicConsultantResponse {
 
 	public Long getManager() { return manager; }
 	public void setManager(Long manager) { this.manager = manager; }
+
+	public LocalDate getReleaseDate() {return releaseDate;}
+	public void setReleaseDate(LocalDate releaseDate) {this.releaseDate = releaseDate;}
+	
+	
 
 }

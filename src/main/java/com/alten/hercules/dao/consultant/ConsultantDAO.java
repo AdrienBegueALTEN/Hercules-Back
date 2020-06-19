@@ -1,5 +1,6 @@
 package com.alten.hercules.dao.consultant;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ public interface ConsultantDAO extends JpaRepository<Consultant,Integer> {
 
 	public boolean existsByEmail(String email);
 	public Iterable<Consultant> findByReleaseDateIsNull();
+	public Iterable<Consultant> findByReleaseDateIsNullOrReleaseDateGreaterThan(LocalDate d);
 	public Optional<Consultant> findById(Long id);
 	public Optional<Consultant> findByEmail(String email);
 	@Transactional

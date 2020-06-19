@@ -1,5 +1,6 @@
 package com.alten.hercules.dal;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class ManagerDAL {
 	}
 	
 	public List<Manager> findAllActive() {
-		return managerDAO.findByReleaseDateIsNull();
+		return managerDAO.findByReleaseDateIsNullOrReleaseDateGreaterThan(LocalDate.now());
 	}
 	
 	public Optional<Manager> findById(Long id){

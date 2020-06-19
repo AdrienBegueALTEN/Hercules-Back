@@ -1,5 +1,6 @@
 package com.alten.hercules.dal;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,8 +49,9 @@ public class ConsultantDAL {
 	 * @return List of all consultant whose release date is not set
 	 */
 	public List<BasicConsultantResponse> findAllEnabled() {
+		LocalDate today = LocalDate.now();
 		List<BasicConsultantResponse> consultants = new ArrayList<>();
-		consultantDAO.findByReleaseDateIsNull().forEach((consultant) -> {
+		consultantDAO.findByReleaseDateIsNullOrReleaseDateGreaterThan(today).forEach((consultant) -> {
 			consultants.add(new BasicConsultantResponse(consultant)); });
 		return consultants;
 	}
