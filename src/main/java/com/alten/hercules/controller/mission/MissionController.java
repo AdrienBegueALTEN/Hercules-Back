@@ -1030,7 +1030,7 @@ public class MissionController {
 				}
 				
 				
-				if(missionIndex.size()<=0) {
+				if(missionIndex.size()>0) {
 					Set<Project> projects = new HashSet<Project>();
 					for(Integer index : missionIndex) {
 						
