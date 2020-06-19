@@ -185,7 +185,7 @@ public class ConsultantController {
 	 * @param req  object containing the id of the consultant, the field name to update, and the new value.
 	 * @return 404 if the consultant cannot be found<br>400 if the field name cannot be found or the value is of wrong type<br>200 if update is done
 	 */
-	@ApiOperation(value="Update a fiald of a consultant.", 
+	@ApiOperation(value="Update a field of a consultant.", 
 			notes = "Update a field of the consultant corresponding to the ID in the request if he exists.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Consultant updated."),
