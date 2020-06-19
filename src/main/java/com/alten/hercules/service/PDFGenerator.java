@@ -559,19 +559,31 @@ public class PDFGenerator {
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
         
+        int limitForDiploma = 5;
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
         for(Diploma diploma : diplomas ) {
 	        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
+	        	limitForDiploma += 15;
+	        	if(limitForDiploma>=155)
+	        		break;
 	        }
+	        if(limitForDiploma>=155)
+        		break;
 	        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
+	        	limitForDiploma += 15;
+	        	if(limitForDiploma>=155)
+	        		break;
 	        }
 	        contentStream.newLineAtOffset(0, -10);
+	        if(limitForDiploma>=155)
+        		break;
         }
         contentStream.endText();
+        
         
         // compétences de la mission
         contentStream.drawImage(blueStick,565,80,15,180);
