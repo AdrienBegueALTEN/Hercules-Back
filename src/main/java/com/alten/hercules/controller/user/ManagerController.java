@@ -118,9 +118,9 @@ public class ManagerController {
 	@PostMapping
 	public ResponseEntity<?> addManager(
 			@ApiParam(
-				"email : user's email;\n"
-				+ "firstname : user's firstname;\n"
-				+ "lastname : user's lastname;\n"
+				"email : manager's email;\n"
+				+ "firstname : manager's firstname;\n"
+				+ "lastname : manager's lastname;\n"
 				+ "isAdmin : indicates if the manager has the admin rights."
 			)
 			@Valid @RequestBody AddManagerRequest request) {

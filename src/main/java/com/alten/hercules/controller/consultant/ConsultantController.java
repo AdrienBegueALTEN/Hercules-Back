@@ -44,6 +44,7 @@ import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.model.user.Manager;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -62,7 +63,7 @@ public class ConsultantController {
 	
 	/**
 	 * Returns a list of all or only enabled consultants.
-	 * @param enabled  Boolean asking for enabled consultants
+	 * @param active Boolean asking for enabled consultants
 	 * @return 200 with the consultants list
 	 */
 	@ApiOperation(value="List of all consultants.", notes = "Get a list of all consultants or only those still active.")
@@ -71,8 +72,11 @@ public class ConsultantController {
 		@ApiResponse(code = 401, message="Invalid authentificated token.")
 	})
 	@GetMapping("")
-	public ResponseEntity<?> getAll(@RequestParam boolean enabled) {
-		return enabled ?
+	public ResponseEntity<?> getAll(
+			@ApiParam("Indicates if only active consultants should be returned.\n"
+					+ "False if isn't specified.")
+			@RequestParam Optional<Boolean> active) {
+		return active.orElse(false) ?
 				ResponseEntity.ok(dal.findAllEnabled()) :
 				ResponseEntity.ok(dal.findAll());
 	}
@@ -88,10 +92,12 @@ public class ConsultantController {
 		@ApiResponse(code = 404, message="Consultant not found."),
 		@ApiResponse(code = 401, message="Invalid authentificated token.")
 	})
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getById(@PathVariable Long id) {
+	@GetMapping("/{consultantId}")
+	public ResponseEntity<?> getById(
+			@ApiParam("Consultant's identifier.")
+			@PathVariable Long consultantId) {
 		try {
-			Consultant consultant = dal.findById(id)
+			Consultant consultant = dal.findById(consultantId)
 					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			return ResponseEntity.ok(new ConsultantResponse(consultant));
 		} catch (ResourceNotFoundException e) {
@@ -103,7 +109,7 @@ public class ConsultantController {
 
 	/**
 	 * Create a new consultant. Checks first if the manager of the new consultant or if a consultant with same email address exists.
-	 * @param req  object that provides the new consultant informations.
+	 * @param request  object that provides the new consultant informations.
 	 * @return 201 if the consultant is added<br>404 if the manager is not found<br>202 if the consultant already exists with the given email
 	 */
 	@ApiOperation(value="Creation of a consultant.", notes = "Create a new consultant by providing his identity, his email address and his manager's ID. ")
@@ -115,18 +121,25 @@ public class ConsultantController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
-	public ResponseEntity<?> addConsultant(@Valid @RequestBody AddConsultantRequest req) {
-		Optional<Consultant> optConsultant = dal.findByEmail(req.getEmail());
+	public ResponseEntity<?> addConsultant(
+			@ApiParam(
+					"email : consultant's email;\n"
+					+ "firstname : consultant's firstname;\n"
+					+ "lastname : consultant's lastname;\n"
+					+ "manager : identifier of the manager in charge of the consultant."
+				)
+			@Valid @RequestBody AddConsultantRequest request) {
+		Optional<Consultant> optConsultant = dal.findByEmail(request.getEmail());
 		if (optConsultant.isPresent())
 			return ResponseEntity
 					.accepted()
 					.body(optConsultant.get().getId());
 		try {
-			if (!dal.emailIsAvailable(req.getEmail()))
+			if (!dal.emailIsAvailable(request.getEmail()))
 				throw new UnavailableEmailException();
-			Manager manager = dal.findEnabledManager(req.getManager())
+			Manager manager = dal.findEnabledManager(request.getManager())
 					.orElseThrow(() -> new ResourceNotFoundException(Manager.class));
-			Consultant consultant = new Consultant(req.getEmail(), req.getFirstname(), req.getLastname(), manager);
+			Consultant consultant = new Consultant(request.getEmail(), request.getFirstname(), request.getLastname(), manager);
 			dal.save(consultant);
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
@@ -149,10 +162,12 @@ public class ConsultantController {
 		@ApiResponse(code = 409, message="Consultant is linked to 1 or more missions.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteConsultant(@PathVariable Long id) {
+	@DeleteMapping("/{consultantId}")
+	public ResponseEntity<?> deleteConsultant(
+			@ApiParam("Consultant's identifier.")
+			@PathVariable Long consultantId) {
 		try {
-			Consultant consultant = dal.findById(id)
+			Consultant consultant = dal.findById(consultantId)
 				.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
 			if (!consultant.getMissions().isEmpty())
 				throw new EntityDeletionException("The consultant is linked to one or more missions.");
@@ -180,7 +195,13 @@ public class ConsultantController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping
-	public ResponseEntity<?> updateConsultant(@Valid @RequestBody UpdateEntityRequest req) { 
+	public ResponseEntity<?> updateConsultant(
+			@ApiParam(
+					"id : consultant's identifier;\n"
+					+ "fieldname : field's name to update;\n"
+					+ "value : field's new value."
+			)
+			@Valid @RequestBody UpdateEntityRequest req) { 
 		try {
 			Consultant consultant = dal.findById(req.getId())
 					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
@@ -237,7 +258,15 @@ public class ConsultantController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("add-diploma")
-	public ResponseEntity<?> addDiploma(@Valid @RequestBody AddDiplomaRequest request) {
+	public ResponseEntity<?> addDiploma(
+			@ApiParam(
+				"consultant : identifier of diploma's owner;\n"
+				+ "establishment : name of the establishment that awarded the diploma;\n"
+				+ "entitled : diploma's entitled;\n"
+				+ "level : diploma's level;\n"
+				+ "year : year of obtention of the diplome"
+			)
+			@Valid @RequestBody AddDiplomaRequest request) {
 		try {
 			Consultant consultant = dal.findById(request.getConsultant())
 					.orElseThrow(() -> new ResourceNotFoundException(Consultant.class));
@@ -261,7 +290,13 @@ public class ConsultantController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("update-diploma")
-	public ResponseEntity<?> updateDiploma(@Valid @RequestBody UpdateEntityRequest request) {
+	public ResponseEntity<?> updateDiploma(
+			@ApiParam(
+					"id : diploma's identifier;\n"
+					+ "fieldname : field's name to update;\n"
+					+ "value : field's new value."
+			)
+			@Valid @RequestBody UpdateEntityRequest request) {
 		try {
 			if (request.getValue() == null)
 				throw new InvalidValueException();
@@ -308,7 +343,12 @@ public class ConsultantController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PutMapping("remove-diploma")
-	public ResponseEntity<?> removeDiploma(@Valid @RequestBody RemoveDiplomaRequest request){
+	public ResponseEntity<?> removeDiploma(
+			@ApiParam(
+				"consultant : identifier of diploma's owner;\n"
+				+ "diploma : diploma's identifier."
+			)
+			@Valid @RequestBody RemoveDiplomaRequest request){
 		try {
 			Diploma diploma = dal.findDiplomaById(request.getDiploma())
 					.orElseThrow(() -> new ResourceNotFoundException(Diploma.class));
@@ -330,16 +370,18 @@ public class ConsultantController {
 		@ApiResponse(code = 200, message="OK."),
 		@ApiResponse(code = 401, message="Invalid authentificated token.")
 	})
-	@GetMapping("/{id}/missions")
-	public ResponseEntity<?> getConsultantMissions(@PathVariable Long id){
+	@GetMapping("/{missionId}/missions")
+	public ResponseEntity<?> getConsultantMissions(
+			@ApiParam("Mission's identifier.")
+			@PathVariable Long missionId) {
 		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
 		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
 		if(optManagerId.isPresent())
-			return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
+			return ResponseEntity.ok(this.dal.findMissionsByConsultant(missionId).stream()
 					.map(mission -> new CompleteMissionResponse(mission, false, true))
 					.collect(Collectors.toList()));
 		else
-			return ResponseEntity.ok(this.dal.findMissionsByConsultant(id).stream()
+			return ResponseEntity.ok(this.dal.findMissionsByConsultant(missionId).stream()
 					.filter(mission -> mission.getSheetStatus().equals(ESheetStatus.VALIDATED))
 					.map(mission -> new CompleteMissionResponse(mission, false, false))
 					.collect(Collectors.toList()));
