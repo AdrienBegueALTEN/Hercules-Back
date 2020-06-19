@@ -687,7 +687,8 @@ public class MissionController {
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid authentification token."),
 		@ApiResponse(code = 404, message="Project is not found"),
-		@ApiResponse(code = 200, message="Image is uploaded and project line is modified with the new image name in database.")
+		@ApiResponse(code = 200, message="Image is uploaded and project line is modified with the new image name in database."),
+		@ApiResponse(code = 400, message="The extension of the file is not good.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/upload-picture")
@@ -831,7 +832,8 @@ public class MissionController {
 		@ApiResponse(code = 200, message="An image is found and returned")
 	})
 	@GetMapping("/projects/picture/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+    public ResponseEntity<Resource> downloadFile(@ApiParam("Name of the file")@PathVariable String fileName, 
+    		@ApiParam("Request")HttpServletRequest request) {
         // Load file as Resource
         Resource resource = storeImage.loadFileAsResource(fileName,"project");
         

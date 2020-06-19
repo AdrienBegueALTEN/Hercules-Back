@@ -117,7 +117,7 @@ public class ConsultantController {
 		@ApiResponse(code = 201, message="Consultant is created."),
 		@ApiResponse(code = 202, message="Consultant already exists."),
 		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
-		@ApiResponse(code = 404, message="Manager not found."),
+		@ApiResponse(code = 404, message="Manager not found.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping
@@ -188,7 +188,7 @@ public class ConsultantController {
 	@ApiOperation(value="Update a fiald of a consultant.", 
 			notes = "Update a field of the consultant corresponding to the ID in the request if he exists.")
 	@ApiResponses({
-		@ApiResponse(code = 200, message="Diploma updated."),
+		@ApiResponse(code = 200, message="Consultant updated."),
 		@ApiResponse(code = 401, message="Field name is not found or value is of wrong type."),
 		@ApiResponse(code = 401, message="Invalid authentificated token or user isn't manager."),
 		@ApiResponse(code = 404, message="Consultant not found.")

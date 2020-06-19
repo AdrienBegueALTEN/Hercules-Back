@@ -163,6 +163,11 @@ public class AuthenticationController {
 		} catch (InvalidValueException e) { return e.buildResponse(); }
 	}
 	
+	/**
+	 * Function that creates an email containing a link for accessing a specific mission sheet and modify it.
+	 * @param missionId ID of the mission.
+	 * @return 200 The email with the link is created<br>401 Invalid rights or token<br>403 The user is not the manager linked to the mission or the mission is already validated<br>404 The mission is not found<br>500 Error in the email's creation.
+	 */
 	@ApiOperation(
 			value = "Generate mission sheet external access.",
 			notes = "Return a ready-to-send email which contains an access link to the last sheet of a mission.")
@@ -202,8 +207,13 @@ public class AuthenticationController {
 		return response;		
 	}
 	
+	/**
+	 * Function that creates an email containing a link for modifying the password of a user.
+	 * @param userId ID of the user that needs to change his password
+	 * @return 200 The email is created with the link<br>401 Invalid rights or token<br>404 The user is not found<br>500 Error in the email's creation.
+	 */
 	@ApiOperation(
-			value = "Generate mission sheet external access.",
+			value = "Generate an email with a link to update the password.",
 			notes = "Return a ready-to-send email which contains an access link to update the password of an user without needs of an login/password authentication.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Email created."),
@@ -234,7 +244,12 @@ public class AuthenticationController {
 		return response;		
 	}
 	
-
+	/**
+	 * Function that gets the eml file for an email and sends it back in the response to the request.
+	 * @param file eml file
+	 * @return 200 The eml file is sent in the response
+	 * @throws IOException Exception for an error of handling with the file.
+	 */
 	private ResponseEntity<ByteArrayResource> buildEmlFileResponse(File file) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
