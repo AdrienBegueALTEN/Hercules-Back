@@ -1069,6 +1069,7 @@ public class MissionController {
 				else {
 					for(int i = 0; i<n ; i++) {
 						
+						
 						if(elements.get(i).getType().equals("p")){
 							Project project = dal.findProjectById(elements.get(i).getId())
 									.orElseThrow(() -> new ResourceNotFoundException(Project.class));

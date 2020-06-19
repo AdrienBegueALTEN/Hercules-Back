@@ -10,28 +10,57 @@ import com.alten.hercules.dao.diploma.DiplomaDAO;
 import com.alten.hercules.model.consultant.Consultant;
 import com.alten.hercules.model.diploma.Diploma;
 
+/**
+ * Layer to access the DAL needed for the diplomas.
+ * @author rjesson, mdoltz, abegue, jbaudot
+ *
+ */
 @Service
 public class DiplomaDAL {
 	
 	@Autowired private ConsultantDAO consultantDAO;
 	@Autowired private DiplomaDAO diplomaDAO;
 	
+	/**
+	 * Find a consultant by the id.
+	 * @param id  Consultant id
+	 * @return Optional consutant object
+	 */
 	public Optional<Consultant> findConsultantById(Long id) {
 		return consultantDAO.findById(id);
 	}
 	
+	/**
+	 * Create or update a diploma.
+	 * @param diploma Diploma object
+	 * @return Created or updated diploma
+	 */
 	public Diploma save(Diploma diploma) {
 		return diplomaDAO.save(diploma);
 	}
 	
+	/**
+	 * Delete a diploma.
+	 * @param diploma  Diploma object to delete
+	 */
 	public void delete(Diploma diploma) {
 		diplomaDAO.delete(diploma);
 	}
 
+	/**
+	 * Update a consultant.
+	 * @param consultant  Consultant object
+	 * @return Updated consultant object
+	 */
 	public Consultant saveConsultant(Consultant consultant) {
 		return consultantDAO.save(consultant);
 	}
 
+	/**
+	 * Find a diploma by its id.
+	 * @param id  Diploma id
+	 * @return Optional diploma object
+	 */
 	public Optional<Diploma> findById(Long id) {
 		return diplomaDAO.findById(id);
 	}
