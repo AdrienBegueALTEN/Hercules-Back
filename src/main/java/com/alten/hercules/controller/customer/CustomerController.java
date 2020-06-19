@@ -280,7 +280,7 @@ public class CustomerController {
 	 * Function that gives back a picture file of a logo, given the name of the file.
 	 * @param fileName Name of the file
 	 * @param request Request
-	 * @return 200 An image is given back<br>401 Authentication problem<br>404 The iage is not found.
+	 * @return 200 An image is given back<br>401 Authentication problem<br>404 The image is not found.
 	 */
 	@ApiOperation(value = "Dowload a logo file", notes = "Provide the logo as a file with the file name as parameter.")
 	@ApiResponses({

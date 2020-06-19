@@ -88,6 +88,11 @@ public class MissionController {
 	@Autowired private MissionDAL dal;
 	@Autowired private StoreImage storeImage;
 	
+	/**
+	 * Function that gives back the information of a specific mission.
+	 * @param missionId ID of the mission
+	 * @return 200 Information of the mission<br>401 Authentication problem<br>404 The mission is not found.
+	 */
 	@ApiOperation(
 			value = "Get a mission.",
 			notes = "Return all informations related to the mission and all his sheets.\n"
@@ -105,6 +110,10 @@ public class MissionController {
 		return getMissionDetails(missionId, true);
 	}
 	
+	/**
+	 * Function that gives back the information of a mission for an anonymous user.
+	 * @return 200 Information of the mission<br>401 Authentication problem<br>404 The mission is not found.
+	 */
 	@ApiOperation(
 			value = "Get a mission (anonymous user).",
 			notes = "Return the informations related to the mission and its most recent sheet.\n"
@@ -139,6 +148,11 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that realizes an advanced search in the missions with the given criteria, and gives back the corresponding missions.
+	 * @param criteria List of the names of the criteria and their values
+	 * @return 200 Results of the research<br> 401 Authentication problem.
+	 */
 	@ApiOperation(
 			value = "Advanced search within missions.",
 			notes = "Return all missions which has the status 'validated' and which match with the set of criteria.\n"
@@ -164,6 +178,11 @@ public class MissionController {
 		return ResponseEntity.ok(bodyComplete);
 	}
 	
+	/**
+	 * Function that deletes a specific mission with the ID given in the request.
+	 * @param missionId ID of the mission
+	 * @return 200 The mission is deleted<br>401 Authentication problem<br>403 The user has not the rights<br>404 The missions is not found<br>409 The mission is versioned.
+	 */
 	@ApiOperation("Delete a mission.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Mission deleted."),
@@ -191,6 +210,10 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that gives back all the information about the validated missions.
+	 * @return 200 The details of the validated missions are given<br>401 Authentication problem.
+	 */
 	@ApiOperation(
 			value = "Get missions.",
 			notes = "Return all missions which have the status 'validated'.\n"
@@ -218,7 +241,12 @@ public class MissionController {
 		}
 		return ResponseEntity.ok(body);
 	}
-
+	
+	/**
+	 * Function that creates a mission from the information given in the request with a consultant and a customer.
+	 * @param request Request that contains the consultant and customer linked to the mission.
+	 * @return 201 The mission is created<br>401 Authentication problem<br>403 The user has not the rights<br>404 The consultant/customer is not found.
+	 */
 	@ApiOperation(
 			value="Create a mission.",
 			notes="Create a mission linked to a consultant and a client."
@@ -251,6 +279,11 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that creates a new version of a specific mission.
+	 * @param missionId ID of the mission
+	 * @return 201 A new version is added<br>401 Authentication problem<br>403 The user has not the rights or the mission isn't validated<br>404 The mission is not found<br>409 A version was already created today.
+	 */
 	@ApiOperation(
 			value="New version",
 			notes="Create a new versioned sheet for a mission."
@@ -286,6 +319,11 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
+	/**
+	 * Function that updates the specific field of a specific mission with a given value in the request.
+	 * @param request Request that contains the ID of the mission, the name of the field and the modified value
+	 * @return 200 The mission is modified<br>400 The field's name is not valid<br>401 Authentication problem<br>403 The user has not the rights or the mission is validated<br>404 The mission is not found.
+	 */
 	@ApiOperation(
 			value="Update a mission's field value.",
 			notes="Update the value of one of the fields of a mission."
@@ -309,6 +347,11 @@ public class MissionController {
 		return updateMission(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
+	/**
+	 * Function that updates the specific field of a specific mission with a given value in the request for an anonymous user.
+	 * @param request Request that contains the ID of the mission, the name of the field and the modified value
+	 * @return 200 The mission is modified<br>400 The field's name is not valid<br>401 Authentication problem<br>403 The mission is validated<br>404 The mission is not found.
+	 */
 	@ApiOperation(
 			value="Update a mission's field (anonymous user).",
 			notes="Update the value of one of the fields of a mission."
@@ -409,6 +452,11 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that creates a project linked to a specific mission.
+	 * @param missionId ID of the mission
+	 * @return 201 A new project is added<br>401 Authentication problem<br>403 The user has not the rights or the mission is validated or there are already more than 4 projects<br>404 The mission is not found.
+	 */
 	@ApiOperation(
 			value="Create project.",
 			notes="Create a new empty project for the most recent sheet of a mission."
@@ -431,6 +479,10 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
+	/**
+	 * Function that creates a project linked to a specific mission for an anonymous user.
+	 * @return 201 A new project is added<br>401 Authentication problem<br>403 The mission is validated or there is already more than 4 projects<br>404 The mission is not found.
+	 */
 	@ApiOperation(
 			value="Create project (anonymous user).",
 			notes="Create a new empty project for the most recent sheet of a mission."
@@ -469,6 +521,11 @@ public class MissionController {
 		dal.addProjectForSheet(lastVersion, newProject);
 	}
 	
+	/**
+	 * Function updates the specific field of a specific project.
+	 * @param request Request that contains the ID of the project, the field's name and its modified value.
+	 * @return 200 The project is modified<br>400 The field's name is invalid<br>401 Authentication problem<br>403 The user has not the rights or the mission is validated or the project is not linked to the most recent version<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value="Update a project's field.",
 			notes="Update the value of one of the fields of a project."
@@ -492,6 +549,11 @@ public class MissionController {
 		return updateProject(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
+	/**
+	 * Function updates the specific field of a specific project for an anonymous user.
+	 * @param request Request that contains the ID of the project, the field's name and its modified value.
+	 * @return 200 The project is modified<br>400 The field's name is invalid<br>401 Authentication problem<br>403 The mission is validated or the project is not linked to the most recent version<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value="Update a project's field (anonymous user).",
 			notes="Update the value of one of the fields of a project."
@@ -567,6 +629,11 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that deletes a specific project.
+	 * @param projectId ID of the project
+	 * @return 200 The project is deleted<br>401 Authentication problem<br>403 The user has not the rights or the mission is validated or the project is not linked to the most recent version<br>404 The project is not found.
+	 */
 	@ApiOperation(value="Delete project.")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Project deleted."),
@@ -587,6 +654,11 @@ public class MissionController {
 		return ResponseEntity.ok(null);
 	}
 	
+	/**
+	 * Function that deletes a specific project.
+	 * @param projectId ID of the project
+	 * @return 200 The project is deleted<br>401 Authentication problem<br>403 The mission is validated or the project is not linked to the most recent version<br>404 The project is not found.
+	 */
 	@ApiOperation(value="Delete project (anonymous user).")
 	@ApiResponses({
 		@ApiResponse(code = 200, message="Project deleted."),
@@ -678,7 +750,12 @@ public class MissionController {
 				&& today.getYear() == date.getYear();
 	}
 	
-	
+	/**
+	 * Function that receives a picture file from the request and then saves it and updates the project.
+	 * @param file file with the picture of the project
+	 * @param id ID of the project
+	 * @return 200 The picture is saved and the project is updated<br>400 The extension of the file is not supported<br>401 Authentication problem<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value = "Link an image to a project.",
 			notes = "It takes a file in the body, then copies it in the server in the img/proj folder eand add the name to the "
@@ -692,10 +769,17 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/upload-picture")
-	public ResponseEntity<?> uploadLogoManager(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
+	public ResponseEntity<?> uploadLogoManager(@ApiParam("file")@RequestParam("file") MultipartFile file, 
+			@ApiParam("ID of project")@PathVariable Long id) {
 		return this.uploadPicture(file, id);
 	}
 	
+	/**
+	 * Function that receives a picture file from the request and then saves it and updates the project for an anonymous user.
+	 * @param file file with the picture of the project
+	 * @param id ID of the project
+	 * @return 200 The picture is saved and the project is updated<br>400 The extension of the file is not supported<br>401 Authentication problem<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value = "Link an image to a project by anonymous token.",
 			notes = "It takes a file in the body, then copies it in the server in the img/proj folder eand add the name to the "
@@ -709,7 +793,8 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PostMapping("/projects/anonymous/{id}/upload-picture")
-	public ResponseEntity<?> uploadLogoToken(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
+	public ResponseEntity<?> uploadLogoToken(@ApiParam("file")@RequestParam("file") MultipartFile file, 
+			@ApiParam("ID of project")@PathVariable Long id) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
@@ -761,6 +846,11 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that deletes the picture of a specific project.
+	 * @param id ID of the project
+	 * @return 200 The image is deleted and the project updated<br>401 Authentication problem<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value = "Delete an image from a project (manager user).",
 			notes = "It sets to null the picture value in the line of the project in the database, and delete from the server the picture file. "
@@ -773,10 +863,15 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/projects/{id}/delete-picture")
-	public ResponseEntity<?> deletePictureManager(@PathVariable Long id) {
+	public ResponseEntity<?> deletePictureManager(@ApiParam("ID of project")@PathVariable Long id) {
 		return this.deletePicture(id);
 	}
 	
+	/**
+	 * Function that deletes the picture of a specific project for an anonymous user.
+	 * @param id ID of the project
+	 * @return 200 The image is deleted and the project updated<br>401 Authentication problem<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value = "Delete an image from a project (anonymous user).",
 			notes = "It sets to null the picture value in the line of the project in the database, and delete from the server the picture file. "
@@ -789,7 +884,7 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@DeleteMapping("/projects/anonymous/{id}/delete-picture")
-	public ResponseEntity<?> deletePictureToken(@PathVariable Long id) {
+	public ResponseEntity<?> deletePictureToken(@ApiParam("ID of project")@PathVariable Long id) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
@@ -822,6 +917,12 @@ public class MissionController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
+	/**
+	 * Function that gives back a picture file, given the name of the file.
+	 * @param fileName Name of the file
+	 * @param request Request
+	 * @return 200 An image is given back<br>401 Authentication problem<br>404 The image is not found.
+	 */
 	@ApiOperation(
 			value = "Get a project image.",
 			notes = "The picture name is passed as a parameter and the file is returned."
@@ -859,6 +960,7 @@ public class MissionController {
                 .body(resource);
     }
 	
+
 	@ApiOperation(
 			value = "Add skills to a project (manager user).",
 			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
