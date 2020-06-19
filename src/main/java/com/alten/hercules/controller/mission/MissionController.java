@@ -1031,7 +1031,8 @@ public class MissionController {
 				
 				
 				if(missionIndex.size()>0) {
-					Set<Project> projects = new HashSet<Project>();
+					Set<Project> projectsToAdd = new HashSet<Project>();
+					Set<Project> projectsAlreadyAdded = new HashSet<Project>();
 					for(Integer index : missionIndex) {
 						
 						
@@ -1044,18 +1045,24 @@ public class MissionController {
 								Project project = dal.findProjectById(elements.get(i).getId())
 										.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 								if(project.getMissionSheet().getMission().getId()==id) {
-									if(!projects.contains(project)) {
-										pdfGenerator.makeProjectPDF(project,document);
+									
+									if(projectsToAdd.contains(project)) {
+										projectsToAdd.remove(project);
 									}
+									
+									pdfGenerator.makeProjectPDF(project,document);
+									projectsAlreadyAdded.add(project);
 								}
-								else {
-									projects.add(project);
+								else if(!projectsAlreadyAdded.contains(project)) {
+									
+									projectsToAdd.add(project);
+									
 								}
 							}
 						}
 					}
 					
-					for(Project project : projects) {
+					for(Project project : projectsToAdd) {
 						pdfGenerator.makeProjectPDF(project,document);
 					}
 				}
