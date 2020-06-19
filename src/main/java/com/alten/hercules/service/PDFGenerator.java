@@ -225,17 +225,30 @@ public class PDFGenerator {
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
         
+        
+        int limitForDiploma = 5;
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
         for(Diploma diploma : diplomas ) {
 	        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
+	        	limitForDiploma += 15;
+	        	if(limitForDiploma>=155)
+	        		break;
 	        }
+	        if(limitForDiploma>=155)
+        		break;
 	        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
+	        	limitForDiploma += 15;
+	        	if(limitForDiploma>=155)
+	        		break;
 	        }
 	        contentStream.newLineAtOffset(0, -10);
+	        limitForDiploma += 10;
+	        if(limitForDiploma>=155)
+        		break;
         }
         contentStream.endText();
         
@@ -371,7 +384,7 @@ public class PDFGenerator {
         contentStream.setFont( font1, 8 );
         showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2,35);
         
-     // Bulle durée 
+        // Bulle durée 
         contentStream.setNonStrokingColor(white);
         contentStream.moveTo(cx3 - rayon, cy1);
         contentStream.curveTo(cx3 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3, cy1 + rayon);
