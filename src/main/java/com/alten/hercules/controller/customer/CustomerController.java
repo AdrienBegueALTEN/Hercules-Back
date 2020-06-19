@@ -162,9 +162,18 @@ public class CustomerController {
 	public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file, @PathVariable Long id) {
 		try {
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-				if(extension.equals("jpg") ||
-				   extension.equals("png") ||
-				   extension.equals("gif")) {
+			if(extension.equals("jpg") ||
+			   extension.equals("JPG") ||
+			   extension.equals("png") ||
+			   extension.equals("PNG") ||
+			   extension.equals("jpeg") ||
+			   extension.equals("JPEG") ||
+			   extension.equals("gif") ||
+			   extension.equals("GIF") ||
+			   extension.equals("webp") ||
+			   extension.equals("WEBP") ||
+			   extension.equals("ico") ||
+			   extension.equals("ICO")) {
 				Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 				if(customer.getLogo()!=null) {
 					this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());

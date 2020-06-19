@@ -731,8 +731,17 @@ public class MissionController {
 		try {
 			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 			if(extension.equals("jpg") ||
+			   extension.equals("JPG") ||
 			   extension.equals("png") ||
-			   extension.equals("gif")) {
+			   extension.equals("PNG") ||
+			   extension.equals("jpeg") ||
+			   extension.equals("JPEG") ||
+			   extension.equals("gif") ||
+			   extension.equals("GIF") ||
+			   extension.equals("webp") ||
+			   extension.equals("WEBP") ||
+			   extension.equals("ico") ||
+			   extension.equals("ICO")) {
 				Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
 				if(proj.getPicture()!=null) {
 					this.storeImage.delete("img/proj/"+proj.getPicture());
