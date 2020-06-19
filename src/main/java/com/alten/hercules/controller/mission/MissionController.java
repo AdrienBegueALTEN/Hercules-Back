@@ -1066,8 +1066,9 @@ public class MissionController {
 						pdfGenerator.makeProjectPDF(project,document);
 					}
 				}
-				else {
+				/*else {
 					for(int i = 0; i<n ; i++) {
+						
 						
 						if(elements.get(i).getType().equals("p")){
 							Project project = dal.findProjectById(elements.get(i).getId())
@@ -1075,7 +1076,7 @@ public class MissionController {
 							pdfGenerator.makeProjectPDF(project,document);
 						}
 					}
-				}
+				}*/
 				
 			} catch (ResourceNotFoundException e) {
 				return e.buildResponse();
