@@ -960,7 +960,12 @@ public class MissionController {
                 .body(resource);
     }
 	
-
+	/**
+	 * Function that adds skills given in request to a specific project if the user is a manager.
+	 * @param id ID of the project
+	 * @param labels list of the skills to add
+	 * @return 200 Skills are added to the project and created if needed<br>401 Authentication problem<br>403 The user has not the rights<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value = "Add skills to a project (manager user).",
 			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
@@ -969,15 +974,22 @@ public class MissionController {
 	)
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid token."),
-		@ApiResponse(code = 404, message="Project is not found"),
+		@ApiResponse(code = 404, message="Project is not found."),
+		@ApiResponse(code = 403, message="The user is not a manager."),
 		@ApiResponse(code = 200, message="Skills are created and added to the project.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/skills")
-	public ResponseEntity<?> addSkillToProjectManager(@PathVariable Long id, @RequestBody String... labels) {
+	public ResponseEntity<?> addSkillToProjectManager(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Name of all the skills")@RequestBody String... labels) {
 		return this.addSkillToProject(id, labels);
 	}
 	
+	/**
+	 * Function that adds skills given in request to a specific project for an anonymous user.
+	 * @param id ID of the project
+	 * @param labels list of the skills to add
+	 * @return 200 Skills are added to the project and created if needed<br>401 Authentication problem<br>404 The project is not found.
+	 */
 	@ApiOperation(
 			value = "Add skills to a project (anonymous user).",
 			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
@@ -987,11 +999,11 @@ public class MissionController {
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid token."),
 		@ApiResponse(code = 404, message="Project is not found"),
-		@ApiResponse(code = 200, message="Image is deleted and project line is modified with null value in database.")
+		@ApiResponse(code = 200, message="Skills are created and added to the project.")
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PostMapping("/projects/anonymous/{id}/skills")
-	public ResponseEntity<?> addSkillToProjectToken(@PathVariable Long id, @RequestBody String... labels) {
+	public ResponseEntity<?> addSkillToProjectToken(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Name of all the skills")@RequestBody String... labels) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
@@ -1024,6 +1036,12 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that removes a specific skill from a specific project if the user is a manager.
+	 * @param id ID of the project
+	 * @param skill Skill to remove
+	 * @return 200 The skill is removed<br>401 Authentication problem<br>403 The user has not the rights<br>404 The project or the skill is not found.
+	 */
 	@ApiOperation(
 			value = "Delete a skill from a project (manager user).",
 			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
@@ -1032,15 +1050,22 @@ public class MissionController {
 	)
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid token."),
-		@ApiResponse(code = 404, message="Project is not found or skill is not found"),
-		@ApiResponse(code = 200, message="Skills are created and added to the project.")
+		@ApiResponse(code = 404, message="Project is not found or skill is not found."),
+		@ApiResponse(code = 403, message="The user is not a manager."),
+		@ApiResponse(code = 200, message="Skill is deleted from the project.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/projects/{id}/skills")
-	public ResponseEntity<?> removeSkillFromProjectManager(@PathVariable Long id, @RequestBody Skill skill) {
+	public ResponseEntity<?> removeSkillFromProjectManager(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Skill to remove")@RequestBody Skill skill) {
 		return this.removeSkillFromProject(id, skill);
 	}
 	
+	/**
+	 * Function that removes a specific skill from a specific project for an anonymous user.
+	 * @param id ID of the project
+	 * @param skill Skill to remove
+	 * @return 200 The skill is removed<br>401 Authentication problem<br>404 The project or the skill is not found.
+	 */
 	@ApiOperation(
 			value = "Delete a skill from a project (anonymous user).",
 			notes = "It adds to the given projet some skills. For each skill, it is checked if that one exists, if so the found one will be used. "
@@ -1050,11 +1075,11 @@ public class MissionController {
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid token."),
 		@ApiResponse(code = 404, message="Project is not found or skill is not found"),
-		@ApiResponse(code = 200, message="Skills are created and added to the project.")
+		@ApiResponse(code = 200, message="Skill is deleted from the project.")
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@DeleteMapping("/projects/anonymous/{id}/skills")
-	public ResponseEntity<?> removeSkillFromProjectToken(@PathVariable Long id, @RequestBody Skill skill) {
+	public ResponseEntity<?> removeSkillFromProjectToken(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Skill to remove")@RequestBody Skill skill) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
@@ -1086,6 +1111,10 @@ public class MissionController {
 		}
 	}
 	
+	/**
+	 * Function that gives back a list of all the existing skills in the database.
+	 * @return 200 A list of all the skills<br>401 Authentication problem.
+	 */
 	@ApiOperation(value = "Find all skills.")
 	@ApiResponses({
 		@ApiResponse(code = 401, message="Invalid token."),
@@ -1096,7 +1125,11 @@ public class MissionController {
 		return ResponseEntity.ok(this.dal.findAllSkills());
 	}
 	
-	
+	/**
+	 * Function that creates a PDF given a list of missions and projects that need to have a page in it and gives back a response with the document.
+	 * @param elements list of all the projects and missions that need to appear in the pdf
+	 * @return 201 A PDF is created and sent back<br>400 The PDF couldn't be created or sent<br>401 Authentication problem<br>404 A project or mission is not found.
+	 */
 	@ApiOperation(
 			value = "Generate and send a pdf document.",
 			notes = "Given a list of projects and missions, it sends back a pdf document with a page for each project and mission."
@@ -1108,7 +1141,7 @@ public class MissionController {
 		@ApiResponse(code = 404, message="Project or mission not found.")
 	})
 	@PostMapping("/pdf")
-	public ResponseEntity<?> generatePDF(@Valid @RequestBody List<GeneratePDFRequest> elements ) {
+	public ResponseEntity<?> generatePDF(@ApiParam("List of the projects and missions to put in the PDF")@Valid @RequestBody List<GeneratePDFRequest> elements ) {
 		
 		
 			int n = elements.size();
