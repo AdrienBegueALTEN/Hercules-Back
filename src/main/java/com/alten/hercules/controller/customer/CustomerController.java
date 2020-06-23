@@ -257,7 +257,9 @@ public class CustomerController {
 			   extension.equals("webp") ||
 			   extension.equals("WEBP") ||
 			   extension.equals("ico") ||
-			   extension.equals("ICO")) {
+			   extension.equals("ICO") ||
+			   extension.equals("svg") ||
+			   extension.equals("SVG")) {
 				Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 				if(customer.getLogo()!=null) {
 					this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());

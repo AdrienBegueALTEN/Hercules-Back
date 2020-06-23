@@ -827,7 +827,9 @@ public class MissionController {
 			   extension.equals("webp") ||
 			   extension.equals("WEBP") ||
 			   extension.equals("ico") ||
-			   extension.equals("ICO")) {
+			   extension.equals("ICO") ||
+			   extension.equals("svg") ||
+			   extension.equals("SVG")) {
 				Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
 				if(proj.getPicture()!=null) {
 					this.storeImage.delete("img/proj/"+proj.getPicture());
