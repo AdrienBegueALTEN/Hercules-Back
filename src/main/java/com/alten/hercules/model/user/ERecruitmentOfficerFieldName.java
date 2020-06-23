@@ -1,5 +1,10 @@
 package com.alten.hercules.model.user;
 
+/**
+ * Field's name enumeration for a RecruitmentOfficer.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public enum ERecruitmentOfficerFieldName {
 	firstname("firstname"),
 	lastname("lastname"),

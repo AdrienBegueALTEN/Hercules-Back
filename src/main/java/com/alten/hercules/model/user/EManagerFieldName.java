@@ -1,5 +1,10 @@
 package com.alten.hercules.model.user;
 
+/**
+ * Field's name enumeration for a Manager.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public enum EManagerFieldName {
 	firstname("firstname"),
 	lastname("lastname"),

@@ -25,6 +25,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Class model for a mission sheet.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MissionSheet {

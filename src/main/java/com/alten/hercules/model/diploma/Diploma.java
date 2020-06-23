@@ -10,6 +10,11 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Class model for a diploma.
+ * @author mfoltz
+ *
+ */
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Diploma {

@@ -2,6 +2,7 @@ package com.alten.hercules.model.consultant;
 
 /**
  * Field names enumeration of the Consultant entity
+ * @author mfoltz, rjesson, abegue, jbaudot
  * 
  */
 public enum EConsultantFieldname {

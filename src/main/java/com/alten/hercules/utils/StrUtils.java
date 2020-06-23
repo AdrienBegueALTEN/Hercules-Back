@@ -1,5 +1,10 @@
 package com.alten.hercules.utils;
 
+/**
+ * Class that contains elements to manage strings in the project.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public final class StrUtils {
 	
     private static final String LETTERS = "[A-ZÉa-zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ]";

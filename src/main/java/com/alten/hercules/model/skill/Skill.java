@@ -10,6 +10,11 @@ import javax.persistence.ManyToMany;
 import com.alten.hercules.model.project.Project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Class model for a skill.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 public class Skill {
 	@Id

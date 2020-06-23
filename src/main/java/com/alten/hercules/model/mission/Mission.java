@@ -22,6 +22,11 @@ import com.alten.hercules.model.customer.Customer;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Class model for a mission.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 public class Mission {
 

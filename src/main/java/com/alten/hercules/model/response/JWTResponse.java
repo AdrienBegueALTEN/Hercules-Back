@@ -6,6 +6,11 @@ import java.util.stream.Collectors;
 import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.security.jwt.JwtUtils;
 
+/**
+ * Class model for a JWT response.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class JWTResponse {
 	
 	private String accessToken;

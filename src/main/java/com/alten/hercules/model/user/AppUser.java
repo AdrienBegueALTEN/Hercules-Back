@@ -18,6 +18,11 @@ import com.alten.hercules.model.exception.InvalidValueException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Class model for an user.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 @Inheritance
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

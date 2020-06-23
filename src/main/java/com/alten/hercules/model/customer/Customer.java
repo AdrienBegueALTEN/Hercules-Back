@@ -12,6 +12,11 @@ import javax.persistence.OneToMany;
 import com.alten.hercules.model.mission.Mission;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Class model for a customer.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Customer {

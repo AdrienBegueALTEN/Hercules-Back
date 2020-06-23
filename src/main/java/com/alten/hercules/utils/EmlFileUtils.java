@@ -23,6 +23,11 @@ import com.alten.hercules.security.jwt.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class that contains elements to manage eml files in the project.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class EmlFileUtils {
 	
 	private static final Logger logger = LoggerFactory.getLogger(EmlFileUtils.class);

@@ -19,6 +19,11 @@ import com.alten.hercules.model.skill.Skill;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Class model for a project.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 public class Project {
 	

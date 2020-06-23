@@ -9,6 +9,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Class model for a recruitment officer.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RecruitmentOfficer extends AppUser {
