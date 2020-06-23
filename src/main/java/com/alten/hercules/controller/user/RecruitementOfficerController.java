@@ -47,7 +47,10 @@ public class RecruitementOfficerController {
 	
 	@Autowired RecruitmentOfficerDAL dal;
 	
-	
+	/**
+	 * Function that gives back the information of all the recruitment officers in the database.
+	 * @return 200 The details of all the recruitment officers are given back<br>401 Authentication problem.
+	 */
 	@ApiOperation(
 			value = "Get all the recruitment officers.",
 			notes = "Return all the informations of all the recruitment officers."
@@ -61,7 +64,11 @@ public class RecruitementOfficerController {
 		return ResponseEntity.ok(dal.findAll());
 	}
 	
-	
+	/**
+	 * Function that adds a recruitment officer using the information in the request.
+	 * @param request Request that contains the email and names of the new recruitment officer
+	 * @return 201 The recruitment officer is added<br>401 Authentication problem<br>400 The given values are not valid<br>404 The recruitment officer is not found<br>409 The email is already used.
+	 */
 	@ApiOperation(
 			value = "Create a recruitment officer.",
 			notes = "Add a new recruitment officer in the database with the given information."
@@ -89,7 +96,11 @@ public class RecruitementOfficerController {
 				.body(recruitmentOfficer.getId());
 	}
 	
-	
+	/**
+	 * Function that modifies the specific field of a specific recruitment officer using the information in the request.
+	 * @param request Request that contains the field's name, the modified value and the id of the recruitment officer
+	 * @return 200 The recruitment officer is updated<br>400 The given details are invalid<br>401 Authentication problem<br>404 The recruitment officer is not found<br>409 The email is already used.
+	 */
 	@ApiOperation(
 			value = "Modify a recruitment officer.",
 			notes = "Modify the specified field of the recruitment officer with the the given value."
@@ -143,7 +154,11 @@ public class RecruitementOfficerController {
 		}
 	}
 	 
-	
+	/**
+	 * Function that deletes a specific recruitment officer.
+	 * @param id ID of the recruitment officer
+	 * @return 200 The recruitment officer is removed<br>401 Authentication problem<br>404 The recruitment officer is not found.
+	 */
 	@ApiOperation(
 			value = "Delete a recruitment officer.",
 			notes = "Delete the recruitment officer from the database."
@@ -168,7 +183,11 @@ public class RecruitementOfficerController {
 		}
 	 }
 	
-	
+	/**
+	 * Function that gives back the information of a specific recruitment officer.
+	 * @param id ID of the recruitment officer
+	 * @return 200 The details of the recruitment officer are given back<br>401 Authentication problem<br>404 The recruitment officer is not found.
+	 */
 	@ApiOperation(
 			value = "Get a specific recruitment officer.",
 			notes = "Return the information of a specific recruitment officer."

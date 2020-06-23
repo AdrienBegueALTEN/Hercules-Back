@@ -52,6 +52,11 @@ public class ManagerController {
 	
 	@Autowired private ManagerDAL dal;
 	
+	/**
+	 * Function that retrieves the information of a specific manager and gives it back if the user is an administrator.
+	 * @param managerId ID of the manager
+	 * @return 200 The details of the manager are sent back<br>401 Authentication problem<br>403 The user has not the rights<br>404 The manager is not found.
+	 */
 	@ApiOperation(
 			value = "Get a manager.",
 			notes = "Return all informations related to the manager."
@@ -84,6 +89,11 @@ public class ManagerController {
 		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	 }
 	
+	/**
+	 * Function that gives back the information of all the managers in the database if the user is manager.
+	 * @param onlyActive Boolean that indicates if we only search the active managers or not
+	 * @return 200 A list of the managers and their details active or not is given back<br>401 Authentication problem<br>403 The user has not the rights.
+	 */
 	@ApiOperation(
 			value = "Get all managers.",
 			notes = "Return the list of all the managers."
@@ -102,6 +112,11 @@ public class ManagerController {
 		return ResponseEntity.ok(onlyActive.orElse(false) ? dal.findAllActive() : dal.findAll());
 	}
 	
+	/**
+	 * Function that adds a manager in the database using the information given in the request.
+	 * @param request Request that contains the email, names and admin authorities of the new manager
+	 * @return 201 The manager is added<br>400 The given details are not valid<br>401 Authentication problem<br>403 The user has not the rights<br>404 The manager is not found<br>409 The email is already used.
+	 */
 	@ApiOperation(
 			value = "Create a manager.",
 			notes = "Add a new manager user in database."
@@ -133,7 +148,12 @@ public class ManagerController {
 			return e.buildResponse();
 		}
 	}
-	 
+	
+	/**
+	 * Function that modifies a specific field of a manager if the user is an administrator.
+	 * @param request Request that contains the field's name, the modified value and the id of the manager
+	 * @return 200 The manager is updated<br>400 The field's name or value is invalid<br>401 Authentication problem<br>403 The user has not the rights<br>404 The manager is not found<br>409 The email is already used.
+	 */
 	@ApiOperation(
 			value="Update a manager's field value.",
 			notes="Update the value of one of the fields of a manager."
@@ -195,6 +215,11 @@ public class ManagerController {
 		}
 	}
 	
+	/**
+	 * Function that deletes a specific manager if the user is an administrator.
+	 * @param managerId ID of the manager
+	 * @return 200 The manager is removed<br>401 Authentication problem<br>403 The uszr has not the rights<br>404 The manager is not found<br>409 The manager is still linked to a consultant, he can't be deleted.
+	 */
 	@ApiOperation(
 			value = "Delete a manager.",
 			notes = "Delete a manager user in database."
