@@ -36,6 +36,11 @@ import com.alten.hercules.model.mission.MissionSheet;
 import com.alten.hercules.model.project.Project;
 import com.alten.hercules.model.skill.Skill;
 
+/**
+ * Layer to access the DAL needed for the missions.
+ * @author rjesson, mfoltz, abegue, jbaudot
+ *
+ */
 @Service
 public class MissionDAL {
 	

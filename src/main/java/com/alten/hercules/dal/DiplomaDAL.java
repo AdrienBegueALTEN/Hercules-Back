@@ -12,7 +12,7 @@ import com.alten.hercules.model.diploma.Diploma;
 
 /**
  * Layer to access the DAL needed for the diplomas.
- * @author rjesson, mdoltz, abegue, jbaudot
+ * @author rjesson, mfoltz, abegue, jbaudot
  *
  */
 @Service

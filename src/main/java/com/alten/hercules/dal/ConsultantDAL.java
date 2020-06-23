@@ -45,7 +45,7 @@ public class ConsultantDAL {
 	public ConsultantDAL() {}
 	
 	/**
-	 * List of all consultant still member of ALTEN
+	 * Function that returns a list of all consultant still member of ALTEN
 	 * @return List of all consultant whose release date is not set
 	 */
 	public List<BasicConsultantResponse> findAllEnabled() {

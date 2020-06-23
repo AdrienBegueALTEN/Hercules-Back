@@ -83,7 +83,7 @@ public class ConsultantController {
 
 	/**
 	 * Returns a consultant object corresponding to the given ID.
-	 * @param id  Number of the consultant
+	 * @param consultantId  Number of the consultant
 	 * @return 200 with a consultant object<br>404 when none is found
 	 */
 	@ApiOperation(value="Details of a consultant.", notes = "Get the details of a consultant by giving his ID number.")
@@ -151,7 +151,7 @@ public class ConsultantController {
 
 	/**
 	 * Delete a consultant. It checks if the consultant's ID can be found and if the consultant is not linked to any missions.
-	 * @param id  the consultant's id
+	 * @param consultantId  the consultant's id
 	 * @return 404 if the id doesn't correspond to any consultant<br>200 if the deletion is done<br>409 consultant linked to 1 or more missions
 	 */
 	@ApiOperation(value="Deletion of a consultant.", notes = "Delete a consultant if he exists given his id, and if he is not linked to a mission.")
@@ -361,7 +361,7 @@ public class ConsultantController {
 	
 	/**
 	 * Returns the list of the missions associated to a consultant.
-	 * @param id  the ID of the consultant
+	 * @param missionId  the ID of the mission
 	 * @return 200 with the list of the missions of a consultant.
 	 */
 	@ApiOperation(value = "List of the missions of a consultant.", notes = "Get all missions of a consultant given the consultant's ID. "

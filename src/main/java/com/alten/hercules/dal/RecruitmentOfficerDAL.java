@@ -13,7 +13,7 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 
 /**
  * Layer to access the DAL needed for the recruitment officers.
- * @author rjesson, mdoltz, abegue, jbaudot
+ * @author rjesson, mfoltz, abegue, jbaudot
  *
  */
 @Service

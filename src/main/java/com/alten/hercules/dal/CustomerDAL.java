@@ -13,7 +13,7 @@ import com.alten.hercules.model.mission.Mission;
 
 /**
  * Layer to access the DAL needed for the customers.
- * @author rjesson, mdoltz, abegue, jbaudot
+ * @author rjesson, mfoltz, abegue, jbaudot
  *
  */
 @Service

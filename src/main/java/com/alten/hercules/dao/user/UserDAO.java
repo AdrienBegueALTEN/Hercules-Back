@@ -10,11 +10,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alten.hercules.model.user.AppUser;
 
+/**
+ * Interface that is inherited from JpaRepository and serves to make queries for the users.
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Repository
 public interface UserDAO extends JpaRepository<AppUser, Long>  {
 	
+	/**
+	 * Query that checks if a user has the given email.
+	 * @param email Given email
+	 * @return A boolean that indicates if a user owns the given email.
+	 */
 	boolean existsByEmail(String email);
+	
+	/**
+	 * Query that looks for an user with the given email.
+	 * @param email Given email
+	 * @return A corresponding user of possible;
+	 */
 	Optional<AppUser> findByEmail(String email);
+	
+	/**
+	 * Query that applies the GRPD to an user by making his fields anonymous.
+	 */
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE app_user "

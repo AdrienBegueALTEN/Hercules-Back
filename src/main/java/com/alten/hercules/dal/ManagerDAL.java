@@ -14,7 +14,7 @@ import com.alten.hercules.model.user.Manager;
 
 /**
  * Layer to access the DAL needed for the managers.
- * @author rjesson, mdoltz, abegue, jbaudot
+ * @author rjesson, mfoltz, abegue, jbaudot
  *
  */
 @Service

@@ -8,7 +8,7 @@ import com.alten.hercules.dao.user.UserDAO;
 
 /**
  * Layer to access the DAL needed to apply GRPD.
- * @author rjesson, mdoltz, abegue, jbaudot
+ * @author rjesson, mfoltz, abegue, jbaudot
  *
  */
 @Service
