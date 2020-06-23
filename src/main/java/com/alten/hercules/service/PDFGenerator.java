@@ -146,11 +146,11 @@ public class PDFGenerator {
 	        
 	        contentStream.drawImage(customerLogo, height-70,width-70,optimalWidth,optimalHeight); //65 max en hauteur   65 max en largeur
         }
-        else {
+        /*else {
         	contentStream.setNonStrokingColor(black);
             contentStream.setFont( font1, 8 );
             showCenteredText(contentStream,"aucun logo disponible",(int)height-40,(int)width-35);
-        }
+        }*/ // texte à afficher si logo indisponible
         
         
         contentStream.beginText();
@@ -477,11 +477,11 @@ public class PDFGenerator {
 	        
 	        contentStream.drawImage(customerLogo, height-70,width-70,optimalWidth,optimalHeight); //65 max en hauteur   65 max en largeur
         }
-        else {
+        /*else {
         	contentStream.setNonStrokingColor(black);
             contentStream.setFont( font1, 8 );
             showCenteredText(contentStream,"aucun logo disponible",(int)height-40,(int)width-35);
-        }
+        }*/ // texte à afficher si logo indisponible
         
         
         contentStream.beginText();
@@ -579,6 +579,7 @@ public class PDFGenerator {
 	        		break;
 	        }
 	        contentStream.newLineAtOffset(0, -10);
+	        limitForDiploma += 10;
 	        if(limitForDiploma>=155)
         		break;
         }
@@ -665,12 +666,12 @@ public class PDFGenerator {
 	        
 	        contentStream.drawImage(projectPicture, 60+(235-optimalWidth)/2,25+(235-optimalHeight),optimalWidth,optimalHeight); //235 max en hauteur   235 max en largeur
         }
-        else {
+        /*else {
         	contentStream.setNonStrokingColor(black);
             contentStream.setFont( font1, 8 );
             showCenteredText(contentStream,"aucune photo disponible",175,160);
             
-        }
+        }*/ //texte à afficher si photo indisponible
         
         // Note de version
         contentStream.setNonStrokingColor(black);
