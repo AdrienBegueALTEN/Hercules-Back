@@ -26,21 +26,20 @@ public class JwtUtils {
 	private static final String TOKEN_PREFIX = "Bearer ";
 	
 	public static String generateMissionToken(Mission mission) {
-		return Jwts.builder()
-				.setSubject(Long.toString(mission.getId()))
-				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + MISSION_EXPIRATION))
-				.claim("secret", mission.getSecret())
-				.signWith(SignatureAlgorithm.HS512, MISSION_SIGNATURE)
-				.compact();
+		return buildAnonymousToken(mission.getId(), MISSION_EXPIRATION, mission.getSecret(), MISSION_SIGNATURE);
 	}
 	
 	public static String generatePasswordCreationToken(AppUser user) {
+		return buildAnonymousToken(user.getId(), PASSWORD_CREATION_EXPIRATION, user.getSecret(), PASSWORD_CREATION_SIGNATURE);
+	}
+	
+	private static String buildAnonymousToken(Long subject, Long expiration, int secret, String signature) {
 		return Jwts.builder()
-				.setSubject(Long.toString(user.getId()))
+				.setSubject(Long.toString(subject))
 				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + PASSWORD_CREATION_EXPIRATION))
-				.signWith(SignatureAlgorithm.HS512, PASSWORD_CREATION_SIGNATURE)
+				.setExpiration(new Date((new Date()).getTime() + expiration))
+				.claim("secret", secret)
+				.signWith(SignatureAlgorithm.HS512, signature)
 				.compact();
 	}
 	

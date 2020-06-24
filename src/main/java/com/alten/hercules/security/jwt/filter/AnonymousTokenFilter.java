@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.alten.hercules.dao.mission.MissionDAO;
 import com.alten.hercules.dao.user.UserDAO;
 import com.alten.hercules.model.mission.Mission;
+import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.model.user.EAuthorities;
 import com.alten.hercules.security.jwt.ETokenType;
 import com.alten.hercules.security.jwt.JwtUtils;
@@ -36,11 +37,11 @@ public class AnonymousTokenFilter extends OncePerRequestFilter {
 			String token = JwtUtils.parseToken(request).orElseThrow();
 			ETokenType tokenType = JwtUtils.getTokenType(token).orElseThrow();
 			Claims claims = JwtUtils.getClaims(token, tokenType).orElseThrow();
+			Integer tokenSecret = (Integer)claims.get("secret");
 			switch (tokenType) {
 				case MISSION:
 					Long missionId = Long.parseLong(claims.getSubject());
 					Mission mission = missionDao.findById(missionId).get();
-					Integer tokenSecret = (Integer)claims.get("secret");
 					if (tokenSecret == mission.getSecret()) {
 						Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 						authorities.add(new SimpleGrantedAuthority(EAuthorities.MISSION.name()));
@@ -51,12 +52,14 @@ public class AnonymousTokenFilter extends OncePerRequestFilter {
 					break;
 				case PASSWORD_CREATION:
 					Long userId = Long.parseLong(claims.getSubject());
-					UserDetails userDetails = userDao.findById(userId).get();
-					Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-					authorities.add(new SimpleGrantedAuthority(EAuthorities.CHANGE_PASSWORD.name()));
-					AnonymousAuthenticationToken authentication = new AnonymousAuthenticationToken("user", userDetails, authorities);
-					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(authentication);
+					AppUser user = userDao.findById(userId).get();
+					if (tokenSecret == user.getSecret()) {
+						Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+						authorities.add(new SimpleGrantedAuthority(EAuthorities.CHANGE_PASSWORD.name()));
+						AnonymousAuthenticationToken authentication = new AnonymousAuthenticationToken("user", user, authorities);
+						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+					}
 				default:
 			}
 		} catch (Exception ignored) {}

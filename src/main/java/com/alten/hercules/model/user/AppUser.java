@@ -48,6 +48,10 @@ public abstract class AppUser implements UserDetails {
 	@Column(nullable = true)
 	private LocalDate releaseDate;
 	
+	@JsonIgnore
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private Integer secret;
+	
 	public AppUser() {}
 	
 	public AppUser(String email, String password, String firstname, String lastname) throws InvalidValueException {
@@ -56,6 +60,7 @@ public abstract class AppUser implements UserDetails {
 		setFirstname(firstname);
 		setLastname(lastname);
 		setReleaseDate(null);
+		changeSecret();
 	}
 	
 	public Long getId() { return id; }
@@ -70,6 +75,7 @@ public abstract class AppUser implements UserDetails {
 		else {
 			if (password.equals("")) throw new InvalidValueException();
 			this.password = new BCryptPasswordEncoder().encode(password);
+			changeSecret();
 		}
 	}
 	
@@ -81,6 +87,11 @@ public abstract class AppUser implements UserDetails {
 
 	public LocalDate getReleaseDate() { return releaseDate; }
 	public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+	
+	public int getSecret() { return secret; }
+	private void changeSecret() {
+		this.secret = (int)Math.floor(Math.random() * Math.floor(Integer.MAX_VALUE));
+	}
 
 	@JsonIgnore
 	@Override

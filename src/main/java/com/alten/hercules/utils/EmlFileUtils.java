@@ -70,8 +70,8 @@ public class EmlFileUtils {
 		final String link = AppConst.MISSION_SHEET_URL + JwtUtils.generateMissionToken(mission);
 		final String body =
 				"<p>Bonjour,</p>" +
-				"<p>Merci de bien vouloir renseigner les informations relatives à votre dernière mission chez '" + customer + "' via cette page :</p>" +
-				"<a href=\"" + link + "\">" + link + "</a>" +
+				"<p>Merci de bien vouloir compléter la <a href=\"" + link + "\">fiche mission</a>' correspondant à votre dernière mission chez " + customer + "'.</p>" +
+				"<p>Ce lien ne restera accessible pendant <b>30 jours</b>.</p>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + manager + ".</p>";
 		final String fileName = 
@@ -83,12 +83,12 @@ public class EmlFileUtils {
 		AppUser loggedUser = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		final String from = loggedUser.getEmail();
 		final String to =  targetedUser.getEmail();
-		final String subject = "Activation de votre compte Hercules";
+		final String subject = "Nouveau mot de passe compte Hercules";
 		final String link = AppConst.LOGIN_URL + JwtUtils.generatePasswordCreationToken(targetedUser);
 		final String body =
 				"<p>Bonjour,</p>" +
-				"<p>Voici le lien d'activation de votre compte Hercules :</p>" +
-				"<a href=\"" + link + "\">" + link + "</a>" +
+				"<p>Voici un <a href=\"" + link + "\">lien</a> vous permettant de définir un nouveau mot de passe pour votre compte Hercules.</p>" +
+				"<p>Ce lien ne restera accessible que pendant <b>24h</b>.</p>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + loggedUser.getFirstname() + " " + loggedUser.getLastname() + ".</p>";
 		final String fileName = 
