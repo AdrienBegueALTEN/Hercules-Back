@@ -1,6 +1,7 @@
 package com.alten.hercules.controller.user.http.request.recruitmentOfficer;
 
 import com.alten.hercules.controller.user.http.request.AddUserRequest;
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.user.RecruitmentOfficer;
 
 public class AddRecruitmentOfficerRequest extends AddUserRequest {
@@ -10,7 +11,7 @@ public class AddRecruitmentOfficerRequest extends AddUserRequest {
 	}
 
 	@Override
-	public RecruitmentOfficer buildUser() {
+	public RecruitmentOfficer buildUser() throws InvalidValueException {
 		return new RecruitmentOfficer(email, firstname, lastname);
 	}
 

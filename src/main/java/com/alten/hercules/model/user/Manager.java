@@ -31,20 +31,15 @@ public class Manager extends AppUser {
 	
 	public Manager() { super(); }
 	
-	public Manager(String email, String password, String firstname, String lastname) throws InvalidValueException {
-		super(email, password, firstname, lastname);
-	}
-	
-	public Manager(String email, String password, String firstname, String lastname, boolean isAdmin) throws InvalidValueException {
-		super(email, password, firstname, lastname);
-		setAdmin(isAdmin);
+	public Manager(String email, String firstname, String lastname) throws InvalidValueException {
+		super(email, firstname, lastname);
+		setAdmin(false);
 	}
 	
 	public Manager(String email, String firstname, String lastname, boolean isAdmin) throws InvalidValueException {
-		super(email, null, firstname, lastname);
+		super(email, firstname, lastname);
 		setAdmin(isAdmin);
 	}
-	
 	
 	public boolean isAdmin() { return isAdmin; }
 	public void setAdmin(boolean isAdmin) { this.isAdmin = isAdmin; }

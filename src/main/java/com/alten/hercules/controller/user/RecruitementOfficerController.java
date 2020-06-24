@@ -87,13 +87,15 @@ public class RecruitementOfficerController {
 						+ "lastname : user's lastname;\n"
 					)
 					@Valid @RequestBody AddRecruitmentOfficerRequest request) {
-		if (!dal.emailIsAvailable(request.getEmail()))
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		RecruitmentOfficer recruitmentOfficer = request.buildUser();
-		recruitmentOfficer = dal.save(recruitmentOfficer);
-		return ResponseEntity
-				.status(HttpStatus.CREATED)
-				.body(recruitmentOfficer.getId());
+		try {
+			if (!dal.emailIsAvailable(request.getEmail())) 
+				throw new UnavailableEmailException();
+			return ResponseEntity
+					.status(HttpStatus.CREATED)
+					.body(dal.save(request.buildUser()).getId());
+		} catch (ResponseEntityException e) {
+			return e.buildResponse();
+		}
 	}
 	
 	/**

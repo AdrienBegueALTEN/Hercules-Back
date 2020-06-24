@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.alten.hercules.model.exception.InvalidValueException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -20,11 +21,8 @@ public class RecruitmentOfficer extends AppUser {
 
 	public RecruitmentOfficer() { super(); }
 	
-	public RecruitmentOfficer(String email, String firstname, String lastname) {
-		setEmail(email);
-		setFirstname(firstname);
-		setLastname(lastname);
-		setReleaseDate(null);
+	public RecruitmentOfficer(String email, String firstname, String lastname) throws InvalidValueException {
+		super(email, firstname, lastname);
 	}
 
 	@JsonIgnore

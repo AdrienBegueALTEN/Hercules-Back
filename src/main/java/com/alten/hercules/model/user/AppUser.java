@@ -54,9 +54,8 @@ public abstract class AppUser implements UserDetails {
 	
 	public AppUser() {}
 	
-	public AppUser(String email, String password, String firstname, String lastname) throws InvalidValueException {
+	public AppUser(String email, String firstname, String lastname) throws InvalidValueException {
 		setEmail(email);
-		setPassword(password);
 		setFirstname(firstname);
 		setLastname(lastname);
 		setReleaseDate(null);
