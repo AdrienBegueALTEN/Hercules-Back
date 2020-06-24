@@ -96,39 +96,203 @@ public class PDFGenerator {
 	}
 	
 	/**
-	 * Function that manages the generation of a PDF page for a mission
-	 * @param mission object Mission that contains the necessary information for the page
-	 * @param document PDDocument from PDFBox that represents the pdf document
-	 * @throws IOException
+	 * Function that manages to generate the particular parts for a mission page.
+	 * @param contentStream PDPageContentStream from PDFBox that represents the stream for the page
+	 * @param mission Mission of the created page
+	 * @param height Height of the page
+	 * @param width Width of the page
+	 * @throws IOException exception that indicates the failure of the PDF creation
 	 */
-	public void makeMissionPDF(Mission mission, PDDocument document) throws IOException {
+	private void makeMissionPDF(PDPageContentStream contentStream, Mission mission, float height, float width) throws IOException {
 
-		float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves
 		
-        PDPage page = new PDPage(PDRectangle.A4);
-        page.setRotation(90);
-        document.addPage( page );
+        
+        // text of the mission in the header
+        contentStream.beginText();
+        contentStream.setFont( font1, 12 );
+        contentStream.setNonStrokingColor(white);
+        contentStream.newLineAtOffset(75, width-70);
+        contentStream.showText(cutText(mission.getLastVersion().getTitle(),font1,(int) height-70-75,12));
+        contentStream.newLineAtOffset(0,35);
+        contentStream.setFont(font2, 18);
+        contentStream.setNonStrokingColor(darkblue);
+        contentStream.showText( "Mission");
+        contentStream.setFont(font1, 18);
+        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
+        contentStream.endText();
+        
+        
+                
+        // description of the mission
+        contentStream.drawImage(blueStick,315,280,15,220);
+        contentStream.setNonStrokingColor(white);
+        contentStream.addRect(330, 280, 480, 220);
+        contentStream.fill();
+        contentStream.beginText();
+        contentStream.newLineAtOffset(340, 480);
+        contentStream.setFont( font1, 15 );
+        contentStream.setNonStrokingColor(lightblue);
+        contentStream.showText("La Mission ");
+        contentStream.newLineAtOffset(15, -5);
+        contentStream.setFont( font1, 10 );
+        contentStream.setNonStrokingColor(black);
+        
+        String missionDescription = mission.getLastVersion().getDescription();
+        for(String line : separateLines(missionDescription,font1,445,10)) {
+        	contentStream.newLineAtOffset(0, -15);
+        	contentStream.showText(line);
+        }
+        contentStream.endText();
+
+        
+        // Comment
+        contentStream.setNonStrokingColor(lightblue);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(60, 240);
+        contentStream.setFont( font2, 15 );
+        contentStream.showText("«");
+        contentStream.newLineAtOffset(0, -5);
+        contentStream.setFont( font1, 10 );
+        String commentary = mission.getLastVersion().getComment();
+        for(String line : separateLines(commentary,font1,220,10)) {
+        	contentStream.newLineAtOffset(0, -15);
+        	contentStream.showText(line);
+        }
+        contentStream.newLineAtOffset(220, -15);
+        contentStream.setFont( font2, 15 );
+        contentStream.showText("»");
+        contentStream.endText();
+        
 
         
         
-        float height=page.getMediaBox().getHeight();
-        float width= page.getMediaBox().getWidth();
+        
+	}
+	
+	/**
+	 * Function that manages to generate the particular parts for a project page.
+	 * @param document PDDocument from PDFBox that represents the PDF document
+	 * @param contentStream PDPageContentStream from PDFBox that represents the stream for the page
+	 * @param project Project of the created page
+	 * @param height Height of the page
+	 * @param width Width of the page
+	 * @throws IOException exception that indicates the failure of the PDF creation
+	 */
+	private void makeProjectPDF(PDDocument document, PDPageContentStream contentStream, Project project, float height, float width) throws IOException {
+		
+		Mission mission = project.getMissionSheet().getMission();
+		
+        
+        // text for the project in the header
+        contentStream.beginText();
+        contentStream.setFont( font1, 12 );
+        contentStream.setNonStrokingColor(white);
+        contentStream.newLineAtOffset(75, width-70);
+        contentStream.showText(cutText(project.getTitle(),font1,(int) height-70-75,12));
+        contentStream.newLineAtOffset(0,35);
+        contentStream.setFont(font2, 18);
+        contentStream.setNonStrokingColor(darkblue);
+        contentStream.showText( "Projet");
+        contentStream.setFont(font1, 18);
+        contentStream.showText(cutText( " « "+ project.getMissionSheet().getConsultantRole()+
+        						" » chez "+ mission.getCustomer().getName()+ 
+        						" par "+ mission.getConsultant().getFirstname()+
+        						" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
+        contentStream.endText();
+        
+       
+                
+        // description of the project
+        contentStream.drawImage(blueStick,315,280,15,220);
+        contentStream.setNonStrokingColor(white);
+        contentStream.addRect(330, 280, 480, 220);
+        contentStream.fill();
+        contentStream.beginText();
+        contentStream.newLineAtOffset(340, 480);
+        contentStream.setFont( font1, 15 );
+        contentStream.setNonStrokingColor(lightblue);
+        contentStream.showText("La Mission ");
+        contentStream.newLineAtOffset(15, -5);
+        contentStream.setFont( font1, 10 );
+        contentStream.setNonStrokingColor(black);
+        
+        String projectDescription = project.getDescription();
+        for(String line : separateLines(projectDescription,font1,445,10)) {
+        	contentStream.newLineAtOffset(0, -15);
+        	contentStream.showText(line);
+        }
+        contentStream.endText();
         
         
         
+        // photo of the project
+        if(project.getPicture()!=null) {
+	        PDImageXObject projectPicture = 
+	        		PDImageXObject.createFromFile("img\\proj\\"+project.getPicture(), document);
+	        float optimalHeight = projectPicture.getHeight();
+	        float optimalWidth = projectPicture.getWidth();
+	        if(projectPicture.getWidth()>projectPicture.getHeight()) {
+	        	if(projectPicture.getWidth()>=235) {
+	        		optimalHeight = projectPicture.getHeight()/(projectPicture.getWidth()/235);
+	        		optimalWidth = 235;
+	        	}
+	        }
+	        else {
+	        	if(projectPicture.getHeight()>=235) {
+	        		optimalWidth = projectPicture.getWidth()/(projectPicture.getHeight()/235);
+	        		optimalHeight = 235;
+	        	}
+	        }
+	        
+	        contentStream.drawImage(projectPicture, 60+(235-optimalWidth)/2,25+(235-optimalHeight),optimalWidth,optimalHeight); //235 max en hauteur   235 max en largeur
+        }
+        /*else {
+        	contentStream.setNonStrokingColor(black);
+            contentStream.setFont( font1, 8 );
+            showCenteredText(contentStream,"aucune photo disponible",175,160);
+            
+        }*/ //texte à afficher si photo indisponible
         
         
         
-        PDPageContentStream contentStream = new PDPageContentStream(document, page);
-        
-        
-        contentStream.transform(new Matrix(0, 1, -1, 0, width, 0));
-        
-        // en-tête
+		
+	}
+	
+	/**
+	 * Function that manages the generation of a PDF for projects and missions.
+	 * @param mission Main mission or mission related to the project
+	 * @param projects Set of the projects of the mission or a set with only the main project
+	 * @param document PDDocument from PDFBox that represents the PDF document
+	 * @param isMission boolean that indicates if it is a page for a project or a mission
+	 * @throws IOException exception that indicates the failure of the PDF creation
+	 */
+	public void makePDFPage(Mission mission,Set<Project> projects, PDDocument document, boolean isMission) throws IOException {
+		
+		float constantForCircleWithBezierCurve = (float) 0.551915024494; // look for Bezier Curves
+		
+		// Creation of a new page
+		PDPage page = new PDPage(PDRectangle.A4);
+		page.setRotation(90);
+		document.addPage( page );
+
+		// Dimensions of the page
+		float height=page.getMediaBox().getHeight();
+		float width= page.getMediaBox().getWidth();
+		        
+		// Content stream for the new page
+		PDPageContentStream contentStream = new PDPageContentStream(document, page);
+		        
+		// landscape format
+		contentStream.transform(new Matrix(0, 1, -1, 0, width, 0));
+		
+		
+		
+		// header
         contentStream.drawImage(layoutAlten,0,0,height,width);
         
         if(mission.getCustomer().getLogo()!=null) {
-	        PDImageXObject customerLogo = PDImageXObject.createFromFile("img\\logo\\"+mission.getCustomer().getLogo(), document);
+	        PDImageXObject customerLogo = 
+	        		PDImageXObject.createFromFile("img\\logo\\"+mission.getCustomer().getLogo(), document);
 	        float optimalHeight = customerLogo.getHeight();
 	        float optimalWidth = customerLogo.getWidth();
 	        if(customerLogo.getWidth()>customerLogo.getHeight()) {
@@ -152,21 +316,13 @@ public class PDFGenerator {
             showCenteredText(contentStream,"aucun logo disponible",(int)height-40,(int)width-35);
         }*/ // texte à afficher si logo indisponible
         
-        
-        contentStream.beginText();
-        contentStream.setFont( font1, 12 );
-        contentStream.setNonStrokingColor(white);
-        contentStream.newLineAtOffset(75, width-70);
-        contentStream.showText(cutText(mission.getLastVersion().getTitle(),font1,(int) height-70-75,12));
-        contentStream.newLineAtOffset(0,35);
-        contentStream.setFont(font2, 18);
-        contentStream.setNonStrokingColor(darkblue);
-        contentStream.showText( "Mission");
-        contentStream.setFont(font1, 18);
-        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
-        contentStream.endText();
-        
-        // description du client
+        // particular parts for a project or a mission
+     	if(isMission)
+     		makeMissionPDF(contentStream, mission, height, width);
+     	else
+     		makeProjectPDF(document, contentStream, projects.iterator().next(), height, width);
+		
+		// description of the customer
         contentStream.drawImage(blueStick,60,280,15,220);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(75, 280, 220, 220);
@@ -189,29 +345,8 @@ public class PDFGenerator {
         	contentStream.showText(line);
         }
         contentStream.endText();
-                
-        // description de la mission
-        contentStream.drawImage(blueStick,315,280,15,220);
-        contentStream.setNonStrokingColor(white);
-        contentStream.addRect(330, 280, 480, 220);
-        contentStream.fill();
-        contentStream.beginText();
-        contentStream.newLineAtOffset(340, 480);
-        contentStream.setFont( font1, 15 );
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText("La Mission ");
-        contentStream.newLineAtOffset(15, -5);
-        contentStream.setFont( font1, 10 );
-        contentStream.setNonStrokingColor(black);
-        
-        String missionDescription = mission.getLastVersion().getDescription();
-        for(String line : separateLines(missionDescription,font1,445,10)) {
-        	contentStream.newLineAtOffset(0, -15);
-        	contentStream.showText(line);
-        }
-        contentStream.endText();
-        
-        // diplômes du consultant
+		
+		// diplomas of the consultant
         contentStream.drawImage(blueStick,315,80,15,180);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(330, 80, 220, 180);
@@ -224,7 +359,6 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(15, -5);
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
-        
         
         int limitForDiploma = 5;
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
@@ -251,8 +385,8 @@ public class PDFGenerator {
         		break;
         }
         contentStream.endText();
-        
-        // compétences de la mission
+		
+		// skills of the missions
         contentStream.drawImage(blueStick,565,80,15,180);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(580, 80, 230, 180);
@@ -266,7 +400,6 @@ public class PDFGenerator {
         
         int cy = 223;
     	int counter = 0;
-        Set<Project> projects =  mission.getLastVersion().getProjects();
         for(Project project : projects ) {
         	
         	for(Skill skill : project.getSkills()) {
@@ -313,29 +446,9 @@ public class PDFGenerator {
 		        }
         	}
         }
-        
-        
-        // Commentaire
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(60, 240);
-        contentStream.setFont( font2, 15 );
-        contentStream.showText("«");
-        contentStream.newLineAtOffset(0, -5);
-        contentStream.setFont( font1, 10 );
-        String commentary = mission.getLastVersion().getComment();
-        for(String line : separateLines(commentary,font1,220,10)) {
-        	contentStream.newLineAtOffset(0, -15);
-        	contentStream.showText(line);
-        }
-        contentStream.newLineAtOffset(220, -15);
-        contentStream.setFont( font2, 15 );
-        contentStream.showText("»");
-        contentStream.endText();
-        
-        
-        
-        // Note de version
+		
+		
+		// Version note
         if(mission.getLastVersion().getVersionDate()!=null) {
 	        contentStream.setNonStrokingColor(black);
 	        contentStream.beginText();
@@ -344,11 +457,11 @@ public class PDFGenerator {
 	        contentStream.showText(mission.getLastVersion().getVersionDate().format(DateTimeFormatter.ofPattern("dd MM yyyy")));
 	        contentStream.endText();
         }
+		
+		
+		// Bubbles
         
         
-        // Bulles
-        
-         
         int rayon = 28;
         int cx1 = 420;
         int cy1 = 40;
@@ -357,7 +470,7 @@ public class PDFGenerator {
         int cx4 = 720;
         
         
-        // Bulle contrat
+        // Contract bubble
         contentStream.setNonStrokingColor(white);
         contentStream.moveTo(cx1 - rayon, cy1);
         contentStream.curveTo(cx1 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1, cy1 + rayon);
@@ -371,7 +484,7 @@ public class PDFGenerator {
         showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1,35);
         
         
-        // Bulle équipe 
+        // Team bubble
         contentStream.setNonStrokingColor(white);
         contentStream.moveTo(cx2 - rayon, cy1);
         contentStream.curveTo(cx2 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2, cy1 + rayon);
@@ -383,8 +496,8 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
         showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2,35);
-        
-        // Bulle durée 
+		
+		// Duration bubble
         contentStream.setNonStrokingColor(white);
         contentStream.moveTo(cx3 - rayon, cy1);
         contentStream.curveTo(cx3 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3, cy1 + rayon);
@@ -409,8 +522,8 @@ public class PDFGenerator {
         }
         
         showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3,35);
-        
-     // Bulle localisation
+		
+		// Localization bubble
         contentStream.setNonStrokingColor(white);
         contentStream.moveTo(cx4 - rayon, cy1);
         contentStream.curveTo(cx4 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4, cy1 + rayon);
@@ -422,344 +535,9 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
         showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4,35);
-        
-        contentStream.close();
-        
-        
-	}
 	
-	/**
-	 * Function that manages the generation of a pdf page for a project
-	 * @param project object Project that contains the necessary information for the page
-	 * @param document PDDocument from PDFBox that represents the pdf document
-	 * @throws IOException
-	 */
-	public void makeProjectPDF(Project project,PDDocument document) throws IOException {
-		
-		Mission mission = project.getMissionSheet().getMission();
-		
-		float constantForCircleWithBezierCurve = (float) 0.551915024494; // voir Bezier Curves
-		
-		PDPage page = new PDPage(PDRectangle.A4);
-        page.setRotation(90);
-        document.addPage( page );
-
-        
-        float height=page.getMediaBox().getHeight();
-        float width= page.getMediaBox().getWidth();
-        
-
-        PDPageContentStream contentStream = new PDPageContentStream(document, page);
-        
-        
-        contentStream.transform(new Matrix(0, 1, -1, 0, width, 0));
-        
-        // en-tête
-        contentStream.drawImage(layoutAlten,0,0,height,width);
-        
-        if(mission.getCustomer().getLogo()!=null) {
-	        PDImageXObject customerLogo = 
-	        		PDImageXObject.createFromFile("img\\logo\\"+mission.getCustomer().getLogo(), document);
-	        float optimalHeight = customerLogo.getHeight();
-	        float optimalWidth = customerLogo.getWidth();
-	        if(customerLogo.getWidth()>customerLogo.getHeight()) {
-	        	if(customerLogo.getWidth()>=65) {
-	        		optimalHeight = customerLogo.getHeight()/(customerLogo.getWidth()/65);
-	        		optimalWidth = 65;
-	        	}
-	        }
-	        else {
-	        	if(customerLogo.getHeight()>=65) {
-	        		optimalWidth = customerLogo.getWidth()/(customerLogo.getHeight()/65);
-	        		optimalHeight = 65;
-	        	}
-	        }
-	        
-	        contentStream.drawImage(customerLogo, height-70,width-70,optimalWidth,optimalHeight); //65 max en hauteur   65 max en largeur
-        }
-        /*else {
-        	contentStream.setNonStrokingColor(black);
-            contentStream.setFont( font1, 8 );
-            showCenteredText(contentStream,"aucun logo disponible",(int)height-40,(int)width-35);
-        }*/ // texte à afficher si logo indisponible
-        
-        
-        contentStream.beginText();
-        contentStream.setFont( font1, 12 );
-        contentStream.setNonStrokingColor(white);
-        contentStream.newLineAtOffset(75, width-70);
-        contentStream.showText(cutText(project.getTitle(),font1,(int) height-70-75,12));
-        contentStream.newLineAtOffset(0,35);
-        contentStream.setFont(font2, 18);
-        contentStream.setNonStrokingColor(darkblue);
-        contentStream.showText( "Projet");
-        contentStream.setFont(font1, 18);
-        contentStream.showText(cutText( " « "+ project.getMissionSheet().getConsultantRole()+
-        						" » chez "+ mission.getCustomer().getName()+ 
-        						" par "+ mission.getConsultant().getFirstname()+
-        						" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
-        contentStream.endText();
-        
-        // description du client
-        contentStream.drawImage(blueStick,60,280,15,220);
-        contentStream.setNonStrokingColor(white);
-        contentStream.addRect(75, 280, 220, 220);
-        contentStream.fill();
-        contentStream.beginText();
-        contentStream.newLineAtOffset(85, 480);
-        contentStream.setFont( font1, 15 );
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(cutText(mission.getCustomer().getName(),font1,210,15));
-        contentStream.newLineAtOffset(15, -20);
-        contentStream.setFont( font3, 10 );
-        contentStream.setNonStrokingColor(black);
-        contentStream.showText(cutText(mission.getCustomer().getActivitySector(),font3,195,10));
-        contentStream.setFont( font1, 10 );
-        contentStream.newLineAtOffset(0, -5);
-        
-        String customerDescription = mission.getCustomer().getDescription();
-        for(String line : separateLines(customerDescription,font1,185,10)) {
-        	contentStream.newLineAtOffset(0, -15);
-        	contentStream.showText(line);
-        }
-        contentStream.endText();
-                
-        // description du projet
-        contentStream.drawImage(blueStick,315,280,15,220);
-        contentStream.setNonStrokingColor(white);
-        contentStream.addRect(330, 280, 480, 220);
-        contentStream.fill();
-        contentStream.beginText();
-        contentStream.newLineAtOffset(340, 480);
-        contentStream.setFont( font1, 15 );
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText("La Mission ");
-        contentStream.newLineAtOffset(15, -5);
-        contentStream.setFont( font1, 10 );
-        contentStream.setNonStrokingColor(black);
-        
-        String projectDescription = project.getDescription();
-        for(String line : separateLines(projectDescription,font1,445,10)) {
-        	contentStream.newLineAtOffset(0, -15);
-        	contentStream.showText(line);
-        }
-        contentStream.endText();
-        
-        // diplômes du consultant
-        contentStream.drawImage(blueStick,315,80,15,180);
-        contentStream.setNonStrokingColor(white);
-        contentStream.addRect(330, 80, 220, 180);
-        contentStream.fill();
-        contentStream.beginText();
-        contentStream.newLineAtOffset(340, 240);
-        contentStream.setFont( font1, 15 );
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(cutText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname(),font1,210,15));
-        contentStream.newLineAtOffset(15, -5);
-        contentStream.setFont( font1, 10 );
-        contentStream.setNonStrokingColor(black);
-        
-        int limitForDiploma = 5;
-        Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
-        for(Diploma diploma : diplomas ) {
-	        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
-	        	contentStream.newLineAtOffset(0, -15);
-	        	contentStream.showText(line);
-	        	limitForDiploma += 15;
-	        	if(limitForDiploma>=155)
-	        		break;
-	        }
-	        if(limitForDiploma>=155)
-        		break;
-	        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
-	        	contentStream.newLineAtOffset(0, -15);
-	        	contentStream.showText(line);
-	        	limitForDiploma += 15;
-	        	if(limitForDiploma>=155)
-	        		break;
-	        }
-	        contentStream.newLineAtOffset(0, -10);
-	        limitForDiploma += 10;
-	        if(limitForDiploma>=155)
-        		break;
-        }
-        contentStream.endText();
-        
-        
-        // compétences de la mission
-        contentStream.drawImage(blueStick,565,80,15,180);
-        contentStream.setNonStrokingColor(white);
-        contentStream.addRect(580, 80, 230, 180);
-        contentStream.fill();
-        contentStream.beginText();
-        contentStream.newLineAtOffset(590, 240);
-        contentStream.setFont( font1, 15 );
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText("Compétences mises en avant");
-        contentStream.endText();
-        
-        
-        int cy = 223;
-    	int counter = 0;
-        for(Skill skill : project.getSkills()) {
-        	
-        	if(counter<20 && counter>=10) {
-    			int cx = 588+115;
-    			int cyBis  = cy + 150;
-        		contentStream.setNonStrokingColor(yellow);
-                contentStream.moveTo(cx - 2, cyBis);
-                contentStream.curveTo(cx - 2, cyBis + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cyBis + 2, cx, cyBis + 2);
-                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cyBis + 2, cx + 2, cyBis + constantForCircleWithBezierCurve*2, cx + 2, cyBis);
-                contentStream.curveTo(cx + 2, cyBis - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cyBis - 2, cx, cyBis - 2);
-                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cyBis - 2, cx - 2, cyBis - constantForCircleWithBezierCurve*2, cx - 2, cyBis);
-                contentStream.fill();
-                contentStream.setNonStrokingColor(black);
-    		}
-    		else if(counter<10) {
-    			int cx = 588;
-    			contentStream.setNonStrokingColor(yellow);
-                contentStream.moveTo(cx - 2, cy);
-                contentStream.curveTo(cx - 2, cy + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cy + 2, cx, cy + 2);
-                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cy + 2, cx + 2, cy + constantForCircleWithBezierCurve*2, cx + 2, cy);
-                contentStream.curveTo(cx + 2, cy - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cy - 2, cx, cy - 2);
-                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cy - 2, cx - 2, cy - constantForCircleWithBezierCurve*2, cx - 2, cy);
-                contentStream.fill();
-                contentStream.setNonStrokingColor(black);
-
-    		}
-            
-        	for(String line : separateLines(skill.getLabel(),font1,95,10)) {
-        		if(counter<20) {
-	        		contentStream.beginText();
-	        		contentStream.setFont( font1, 10 );
-	        		if(counter>=10)
-	        			contentStream.newLineAtOffset(595+115, 220+(counter-10)*(-15));
-	        		else if(counter<10)
-	        			contentStream.newLineAtOffset(595, 220+counter*(-15));
-			        contentStream.showText(line);
-			        contentStream.endText();
-			        cy -= 15;
-			        counter += 1;
-        		}
-		    }
-        }
-        
-        
-        // photo projet
-        if(project.getPicture()!=null) {
-	        PDImageXObject projectPicture = 
-	        		PDImageXObject.createFromFile("img\\proj\\"+project.getPicture(), document);
-	        float optimalHeight = projectPicture.getHeight();
-	        float optimalWidth = projectPicture.getWidth();
-	        if(projectPicture.getWidth()>projectPicture.getHeight()) {
-	        	if(projectPicture.getWidth()>=235) {
-	        		optimalHeight = projectPicture.getHeight()/(projectPicture.getWidth()/235);
-	        		optimalWidth = 235;
-	        	}
-	        }
-	        else {
-	        	if(projectPicture.getHeight()>=235) {
-	        		optimalWidth = projectPicture.getWidth()/(projectPicture.getHeight()/235);
-	        		optimalHeight = 235;
-	        	}
-	        }
-	        
-	        contentStream.drawImage(projectPicture, 60+(235-optimalWidth)/2,25+(235-optimalHeight),optimalWidth,optimalHeight); //235 max en hauteur   235 max en largeur
-        }
-        /*else {
-        	contentStream.setNonStrokingColor(black);
-            contentStream.setFont( font1, 8 );
-            showCenteredText(contentStream,"aucune photo disponible",175,160);
-            
-        }*/ //texte à afficher si photo indisponible
-        
-        // Note de version
-        contentStream.setNonStrokingColor(black);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(10, 10);
-        contentStream.setFont( font1, 10 );
-        contentStream.showText(mission.getLastVersion().getVersionDate().format(DateTimeFormatter.ofPattern("dd MM yyyy")));
-        contentStream.endText();
-        
-        // Bulles
-        
-         
-        int rayon = 28;
-        int cx1 = 420;
-        int cy1 = 40;
-        int cx2 = 520;
-        int cx3 = 620;
-        int cx4 = 720;
-        
-        
-        // Bulle contrat
-        contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx1 - rayon, cy1);
-        contentStream.curveTo(cx1 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1, cy1 + rayon);
-        contentStream.curveTo(cx1 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 + rayon, cy1);
-        contentStream.curveTo(cx1 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx1 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx1, cy1 - rayon);
-        contentStream.curveTo(cx1 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx1 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx1 - rayon, cy1);
-        contentStream.fill();
-        contentStream.drawImage(contractIcon,411,45,contractIcon.getWidth()/3,contractIcon.getHeight()/3);
-        contentStream.setNonStrokingColor(black);
-        contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1,35);
-        
-        
-        // Bulle équipe 
-        contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx2 - rayon, cy1);
-        contentStream.curveTo(cx2 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2, cy1 + rayon);
-        contentStream.curveTo(cx2 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 + rayon, cy1);
-        contentStream.curveTo(cx2 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx2 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx2, cy1 - rayon);
-        contentStream.curveTo(cx2 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx2 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx2 - rayon, cy1);
-        contentStream.fill();
-        contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
-        contentStream.setNonStrokingColor(black);
-        contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText("Taille d'équipe : "+mission.getLastVersion().getTeamSize().toString()),cx2,35);
-        
-     // Bulle durée 
-        contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx3 - rayon, cy1);
-        contentStream.curveTo(cx3 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3, cy1 + rayon);
-        contentStream.curveTo(cx3 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 + rayon, cy1);
-        contentStream.curveTo(cx3 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx3 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx3, cy1 - rayon);
-        contentStream.curveTo(cx3 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx3 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx3 - rayon, cy1);
-        contentStream.fill();
-        contentStream.drawImage(durationIcon,610,45,durationIcon.getWidth()/3,durationIcon.getHeight()/3);
-        contentStream.setNonStrokingColor(black);
-        contentStream.setFont( font1, 8 );
-        int durationDay = 0;
-        int durationMonth = 0;
-        int durationYear = 0;
-        
-        if(project.getBeginDate()!=null && project.getEndDate()!=null) {
-	        Period period = Period.between(project.getBeginDate(), project.getEndDate());
-	        durationDay =  period.getDays();
-	        durationMonth = period.getMonths();
-	        durationYear = period.getYears();
-        }
-        	
-        
-        
-        showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3,35);
-        
-     // Bulle localisation
-        contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx4 - rayon, cy1);
-        contentStream.curveTo(cx4 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4, cy1 + rayon);
-        contentStream.curveTo(cx4 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 + rayon, cy1);
-        contentStream.curveTo(cx4 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx4 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx4, cy1 - rayon);
-        contentStream.curveTo(cx4 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx4 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx4 - rayon, cy1);
-        contentStream.fill();
-        contentStream.drawImage(localizationIcon,709,45,localizationIcon.getWidth()/3,localizationIcon.getHeight()/3);
-        contentStream.setNonStrokingColor(black);
-        contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4,35);
         
         contentStream.close();
-		
 	}
 	
 	/**
