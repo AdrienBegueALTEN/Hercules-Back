@@ -140,7 +140,8 @@ public class ManagerController {
 			)
 			@Valid @RequestBody AddManagerRequest request) {
 		try {
-			if (!dal.emailIsAvailable(request.getEmail())) throw new UnavailableEmailException();
+			if (!dal.emailIsAvailable(request.getEmail())) 
+				throw new UnavailableEmailException();
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
 					.body(dal.save(request.buildUser()).getId());
