@@ -1162,7 +1162,7 @@ public class MissionController {
 							if(elements.get(i).getType().equals("m")){
 								Mission mission = dal.findById(elements.get(i).getId())
 										.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
-								pdfGenerator.makeMissionPDF(mission,document);
+								pdfGenerator.makePDFPage(mission, mission.getLastVersion().getProjects(), document, true);
 								missionIndex.add(i);
 							
 							}
@@ -1189,7 +1189,7 @@ public class MissionController {
 										projectsToAdd.remove(project);
 									}
 									
-									pdfGenerator.makeProjectPDF(project,document);
+									pdfGenerator.makePDFPage(project.getMissionSheet().getMission(), Set.of(project), document, false);
 									projectsAlreadyAdded.add(project);
 								}
 								else if(!projectsAlreadyAdded.contains(project)) {
@@ -1202,7 +1202,7 @@ public class MissionController {
 					}
 					
 					for(Project project : projectsToAdd) {
-						pdfGenerator.makeProjectPDF(project,document);
+						pdfGenerator.makePDFPage(project.getMissionSheet().getMission(), Set.of(project), document, false);
 					}
 				}
 				else {
@@ -1212,7 +1212,7 @@ public class MissionController {
 						if(elements.get(i).getType().equals("p")){
 							Project project = dal.findProjectById(elements.get(i).getId())
 									.orElseThrow(() -> new ResourceNotFoundException(Project.class));
-							pdfGenerator.makeProjectPDF(project,document);
+							pdfGenerator.makePDFPage(project.getMissionSheet().getMission(), Set.of(project), document, false);
 						}
 					}
 				}
