@@ -356,9 +356,20 @@ public class PDFGenerator {
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
         contentStream.showText(cutText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname(),font1,210,15));
-        contentStream.newLineAtOffset(15, -5);
+        contentStream.newLineAtOffset(15, -15);
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
+        Integer exp = mission.getLastVersion().getConsultantStartXp();
+        if(exp == 0) {
+        	contentStream.showText("Diplômé récemment");
+        }
+        else if(exp == 1) {
+        	contentStream.showText(exp.toString()+" an d'expérience");
+        }
+        else {
+        	contentStream.showText(exp.toString()+" ans d'expérience");
+        }
+        contentStream.newLineAtOffset(0, -5);
         
         int limitForDiploma = 5;
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
@@ -367,21 +378,21 @@ public class PDFGenerator {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
 	        	limitForDiploma += 15;
-	        	if(limitForDiploma>=155)
+	        	if(limitForDiploma>=140)
 	        		break;
 	        }
-	        if(limitForDiploma>=155)
+	        if(limitForDiploma>=140)
         		break;
 	        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
 	        	limitForDiploma += 15;
-	        	if(limitForDiploma>=155)
+	        	if(limitForDiploma>=140)
 	        		break;
 	        }
-	        contentStream.newLineAtOffset(0, -10);
-	        limitForDiploma += 10;
-	        if(limitForDiploma>=155)
+	        contentStream.newLineAtOffset(0, -5);
+	        limitForDiploma += 5;
+	        if(limitForDiploma>=140)
         		break;
         }
         contentStream.endText();
