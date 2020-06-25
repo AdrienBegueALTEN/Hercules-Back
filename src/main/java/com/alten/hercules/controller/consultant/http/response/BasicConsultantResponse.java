@@ -11,16 +11,34 @@ import com.alten.hercules.model.consultant.Consultant;
  */
 public class BasicConsultantResponse {
 	
+	/**
+	 * ID of the consultant
+	 */
 	private Long id;
-
+	
+	/**
+	 * Email of the consultant
+	 */
 	private String email;
 	
+	/**
+	 * First name of the consultant
+	 */
 	private String firstname;
 	
+	/**
+	 * Last name of the consultant
+	 */
 	private String lastname;
 	
+	/**
+	 * ID of the manager of the consultant
+	 */
 	private Long manager;
 	
+	/**
+	 * Date of the release of the consultant
+	 */
 	private LocalDate releaseDate;
 	
 	public BasicConsultantResponse(Consultant consultant) {

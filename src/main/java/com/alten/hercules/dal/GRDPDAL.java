@@ -14,7 +14,14 @@ import com.alten.hercules.dao.user.UserDAO;
 @Service
 public class GRDPDAL {
 	
+	/**
+	 * DAO for consultants
+	 */
 	@Autowired private ConsultantDAO consultantDAO;
+	
+	/**
+	 * DAO for users
+	 */
 	@Autowired private UserDAO userDAO;
 	
 	/**

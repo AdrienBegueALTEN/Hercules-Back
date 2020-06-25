@@ -27,31 +27,55 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class Project {
 	
+	/**
+	 * ID of the project
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	/**
+	 * Mission's sheet of the project
+	 */
 	@JsonIgnore
 	@ManyToOne
 	private MissionSheet missionSheet;
-
+	
+	/**
+	 * Title of the project
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String title = "";
 	
+	/**
+	 * A description about the project
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(1000) default ''")
 	private String description = "";
 	
+	/**
+	 * Date of beginning of the project
+	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(nullable = true)
 	private LocalDate beginDate = null;
 	
+	/**
+	 * Date of end of the project
+	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(nullable = true)
 	private LocalDate endDate = null;
-
+	
+	/**
+	 * A path for the picture of the project
+	 */
 	@Column(nullable = true)
 	private String picture = null;
 	
+	/**
+	 * Set of skills of the project
+	 */
 	@ManyToMany
 	@JoinTable(
 			  name = "projects_skills", 
@@ -59,12 +83,18 @@ public class Project {
 			  inverseJoinColumns = @JoinColumn(name = "skill_label"))
 	private Set<Skill> skills = new HashSet<>();
 	
+	/**
+	 * Empty constructor
+	 */
 	public Project() {}
 	
 	public Project(MissionSheet missionSheet) {
 		this.missionSheet = missionSheet;
 	}
 	
+	/**
+	 * Constructor
+	 */
 	public Project(Project project, MissionSheet missionSheet) {
 		setTitle(project.getTitle());
 		setDescription(project.getDescription());

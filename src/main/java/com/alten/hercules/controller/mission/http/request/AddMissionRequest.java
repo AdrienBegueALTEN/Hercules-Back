@@ -11,10 +11,16 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class AddMissionRequest {
 	
+	/**
+	 * ID of the customer
+	 */
 	@ApiModelProperty("Customer identifier.")
 	@NotNull
 	private Long customer;
 	
+	/**
+	 * ID of the consultant
+	 */
 	@ApiModelProperty("Consultant identifier.")
 	@NotNull
 	private Long consultant;

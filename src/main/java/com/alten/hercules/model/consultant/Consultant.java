@@ -34,37 +34,70 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Consultant {
 	
+	/**
+	 * ID of the consultant
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
+	/**
+	 * Email of the consultant
+	 */
 	@Column(nullable = false)
 	private String email;
 	
+	/**
+	 * First name of the consultant
+	 */
 	@Column(nullable = false)
 	private String firstname;
 	
+	/**
+	 * Last name of the consultant
+	 */
 	@Column(nullable = false)
 	private String lastname;
 	
+	/**
+	 * Years of experience of the consultant
+	 */
 	@Column(nullable = false, columnDefinition = "integer default 0")
 	private int experience;
 	
+	/**
+	 * Date of release of the consultant
+	 */
 	@Column(nullable = true)
 	private LocalDate releaseDate = null;
 	
+	/**
+	 * Manager of the consultant
+	 */
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Manager manager;
 	
+	/**
+	 * Set of diplomas of the consultant
+	 */
 	@OneToMany(fetch = FetchType.LAZY)
 	private Set<Diploma> diplomas;
 	
+	/**
+	 * Set of missions of the consultant
+	 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="consultant")
 	private Set<Mission> missions;
 	
+	/**
+	 * Empty constructor
+	 */
 	public Consultant() { super(); }
 	
+	/**
+	 * Constructor
+	 */
 	public Consultant(String email, String firstname, String lastname, Manager manager) throws InvalidValueException {
 		setEmail(email);
 		setFirstname(firstname);
@@ -124,6 +157,10 @@ public class Consultant {
 		return Objects.equals(id, consultant.id);
 	}
 	
+	/**
+	 * Function that generates a response with the manager of this consultant details
+	 * @return A map with the details of the manager
+	 */
 	@JsonGetter("manager")
     public Map<String, Object> getManagerResponse() {
 		Map<String, Object> manager = new HashMap<>();

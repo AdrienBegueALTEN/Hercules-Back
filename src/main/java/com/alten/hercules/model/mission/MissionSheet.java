@@ -34,56 +34,104 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MissionSheet {
 	
+	/**
+	 * City of the mission
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String city = "";
 	
+	/**
+	 * Comment of the mission
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(255) default ''")
 	private String comment = "";
-
+	
+	/**
+	 * Role of the consultant of the mission
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(50) default ''")
 	private String consultantRole = "";
 	
+	/**
+	 * Experience of the consultant at the beginning of the mission
+	 */
 	@Min(0)
 	private Integer consultantStartXp;
 	
+	/**
+	 * Type of contract of the mission
+	 */
 	@Enumerated(EnumType.STRING)
 	private EContractType contractType;
 	
+	/**
+	 * Country of the mission
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String country = "";;
 	
+	/**
+	 * A description about the mission
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(1000) default ''")
 	private String description = "";
 	
+	/**
+	 * ID of the sheet
+	 */
 	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	/**
+	 * ID of the mission
+	 */
 	@JsonIgnore
 	@ManyToOne
 	private Mission mission;
 	
+	/**
+	 * Set of projects of the mission
+	 */
 	@OrderBy("beginDate")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy="missionSheet", cascade = CascadeType.ALL)
 	private Set<Project> projects = new HashSet<>();
 	
+	/**
+	 * Size of the team of the mission
+	 */
 	@Min(1)
 	private Integer teamSize;
 	
+	/**
+	 * Title of the mission
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String title = "";
 	
+	/**
+	 * Date of creation of the sheet 
+	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(nullable = true)
 	private LocalDate versionDate;
 	
+	/**
+	 * Empty constructor
+	 */
 	public MissionSheet() {}
 	
+	/**
+	 * Simplified constructor with the mission
+	 */
 	public MissionSheet(Mission mission) {
 		this.mission = mission;
 	}
 	
+	/**
+	 * Complete constructor with a sheet
+	 */
 	public MissionSheet(MissionSheet sheet) throws InvalidValueException {
 		setMission(sheet.mission);
 		setVersionDate(LocalDate.now());

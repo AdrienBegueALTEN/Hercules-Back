@@ -18,7 +18,15 @@ import com.alten.hercules.model.mission.Mission;
  */
 @Service
 public class CustomerDAL {
+	
+	/**
+	 * DAO for customers
+	 */
 	@Autowired private CustomerDAO customerDAO;
+	
+	/**
+	 * DAO for missions
+	 */
 	@Autowired private MissionDAO missionDAO;
 	
 	/**

@@ -18,20 +18,45 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Diploma {
-
+	
+	/**
+	 * ID of the diploma
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	/**
+	 * Title of the diploma
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String entitled;
+	
+	/**
+	 * Establishment that gave the diploma
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String establishment;
+	
+	/**
+	 * Level of the diploma
+	 */
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) default ''")
 	private String level;
+	
+	/**
+	 * Year of obtainment of the diploma
+	 */
 	private int year;
-
+	
+	/**
+	 * Empty constructor
+	 */
 	public Diploma() {}
 	
+	/**
+	 * Constructor
+	 */
 	public Diploma(String entitled, String establishment, String level, int year) {
 		setEntitled(entitled);
 		setEstablishment(establishment);

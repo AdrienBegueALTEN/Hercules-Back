@@ -16,13 +16,32 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 public class BasicMissionResponse {
-
+	
+	/**
+	 * ID of the mission
+	 */
 	private Long id;
+	
+	/**
+	 * Object Consultant of the mission
+	 */
 	@JsonIgnoreProperties(value = {"missions"})
 	private Consultant consultant;
+	
+	/**
+	 * Object Customer of the mission
+	 */
 	@JsonIgnoreProperties(value = {"missions"})
 	private Customer customer;
+	
+	/**
+	 * Set of the different versions of the mission
+	 */
 	private Set<MissionSheet> versions;
+	
+	/**
+	 * Status of the mission 
+	 */
 	private ESheetStatus sheetStatus;
 	
 	public BasicMissionResponse(Mission mission) {

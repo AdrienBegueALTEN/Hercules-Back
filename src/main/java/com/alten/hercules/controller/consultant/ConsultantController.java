@@ -57,7 +57,10 @@ import io.swagger.annotations.ApiResponses;
 @CrossOrigin(origins = "*")
 @RequestMapping("/hercules/consultants")
 public class ConsultantController {
-
+	
+	/**
+	 * DAL for the consultants
+	 */
 	@Autowired
 	private ConsultantDAL dal;
 	

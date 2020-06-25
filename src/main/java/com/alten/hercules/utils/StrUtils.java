@@ -7,12 +7,26 @@ package com.alten.hercules.utils;
  */
 public final class StrUtils {
 	
+	/**
+	 * Regex pattern for letters
+	 */
     private static final String LETTERS = "[A-ZÉa-zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ]";
+    /**
+     * Regex pattern for a name
+     */
     public static final String NAME_PATTERN = "^(" + LETTERS + "|(" + LETTERS + "[ -]" + LETTERS + "))+$";
+    /**
+     * Regex pattern for an email
+     */
 	public static final String EMAIL_PATTERN = "^[a-z]+\\.[a-z]+([1-9]|[1-9]\\d?)?@alten\\.com$";
 
 	private StrUtils() {}
 	
+	/**
+	 * Function that manages the case for a name
+	 * @param str name
+	 * @return formalized name
+	 */
 	public static String formaliseFirstname(String str) {
 		char[] chars = str.toCharArray();
 		boolean toUpperCase = true;

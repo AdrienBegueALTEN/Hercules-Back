@@ -18,7 +18,14 @@ import com.alten.hercules.model.diploma.Diploma;
 @Service
 public class DiplomaDAL {
 	
+	/**
+	 * DAO for consultants
+	 */
 	@Autowired private ConsultantDAO consultantDAO;
+	
+	/**
+	 * DAO for diplomas
+	 */
 	@Autowired private DiplomaDAO diplomaDAO;
 	
 	/**

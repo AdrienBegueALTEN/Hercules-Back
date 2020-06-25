@@ -84,8 +84,15 @@ import io.swagger.annotations.ApiResponses;
 @CrossOrigin(origins="*")
 @RequestMapping("/hercules/missions")
 public class MissionController {
-
+	
+	/**
+	 * DAL for missions
+	 */
 	@Autowired private MissionDAL dal;
+	
+	/**
+	 * Object that manages the operations for the pictures.
+	 */
 	@Autowired private StoreImage storeImage;
 	
 	/**

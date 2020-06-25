@@ -9,8 +9,19 @@ import com.alten.hercules.model.customer.Customer;
  */
 public class BasicCustomerResponse {
 	
+	/**
+	 * ID of the customer
+	 */
 	private Long id;
+	
+	/**
+	 * Name of the customer
+	 */
 	private String name;
+	
+	/**
+	 * Activity sector of the customer
+	 */
 	private String activitySector;
 	
 	public BasicCustomerResponse(Customer customer) {

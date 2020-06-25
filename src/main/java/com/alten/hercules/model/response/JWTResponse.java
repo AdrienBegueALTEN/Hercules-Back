@@ -13,7 +13,14 @@ import com.alten.hercules.security.jwt.JwtUtils;
  */
 public class JWTResponse {
 	
+	/**
+	 * Token of the user
+	 */
 	private String accessToken;
+	
+	/**
+	 * Map with the information of an user
+	 */
 	private Map<String, Object> user;
 
 	public JWTResponse(AppUser user) {

@@ -12,10 +12,29 @@ import com.alten.hercules.model.diploma.Diploma;
  */
 public class AddDiplomaRequest {
 	
+	/**
+	 * ID of the consultant
+	 */
 	@NotNull private Long consultant;
+	
+	/**
+	 * Establishment of the diploma
+	 */
 	@NotBlank private String establishment;
+	
+	/**
+	 * Title of the diploma
+	 */
 	@NotBlank private String entitled;
+	
+	/**
+	 * Level of the diploma
+	 */
 	@NotBlank private String level;
+	
+	/**
+	 * Year of obtainment of the diploma
+	 */
 	@NotNull private Integer year;
 	
 	public AddDiplomaRequest(Long consultant, String establishment, String entitled, String level, Integer year) {
@@ -43,7 +62,7 @@ public class AddDiplomaRequest {
 	
 	/**
 	 * Function that produces an Object Diploma by using its fields.
-	 * @return
+	 * @return A Diploma
 	 */
 	public Diploma buildDiploma() {
 		return new Diploma(entitled, establishment, level, year);

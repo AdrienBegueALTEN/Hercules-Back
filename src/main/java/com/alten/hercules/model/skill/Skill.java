@@ -17,18 +17,31 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 public class Skill {
+	
+	/**
+	 * Name of the skill
+	 */
 	@Id
 	private String label;
 	
+	/**
+	 * Set of projects that contain the skill
+	 */
 	@JsonIgnore
 	@ManyToMany(mappedBy = "skills")
 	private Set<Project> projects = new HashSet<>();
-
+	
+	/**
+	 * Constructor with the name
+	 */
 	public Skill(String label) {
 		super();
 		this.label = label;
 	}
-
+	
+	/**
+	 * Empty constructor
+	 */
 	public Skill() {
 		super();
 	}

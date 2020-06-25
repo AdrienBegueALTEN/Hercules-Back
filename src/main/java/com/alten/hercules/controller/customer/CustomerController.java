@@ -56,10 +56,16 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping("/hercules/customers")
 public class CustomerController {
-
+	
+	/**
+	 * DAL for the customers.
+	 */
 	@Autowired
 	private CustomerDAL dal;
-
+	
+	/**
+	 * Object that manages the operation for the pictures.
+	 */
 	@Autowired
 	private StoreImage storeImage;
 	

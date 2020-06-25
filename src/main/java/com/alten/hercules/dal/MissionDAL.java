@@ -44,12 +44,39 @@ import com.alten.hercules.model.skill.Skill;
 @Service
 public class MissionDAL {
 	
+	/**
+	 * DAO for missions
+	 */
 	@Autowired private MissionDAO missionDAO;
+	
+	/**
+	 * DAO for missions sheets
+	 */
 	@Autowired private MissionSheetDAO sheetDAO;
+	
+	/**
+	 * DAO for consultants
+	 */
 	@Autowired private ConsultantDAO consultantDAO;
+	
+	/**
+	 * DAO for customers
+	 */
 	@Autowired private CustomerDAO customerDAO;
+	
+	/**
+	 * DAO for projects
+	 */
 	@Autowired private ProjectDAO projectDAO;
+	
+	/**
+	 * DAO for skills
+	 */
 	@Autowired private SkillDAO skillDAO;
+	
+	/**
+	 * DAO for managers
+	 */
 	@Autowired private ManagerDAO managerDAO;
 	
 	//The entity manager is used for the Criteria API function below

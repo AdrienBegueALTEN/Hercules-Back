@@ -8,10 +8,16 @@ import javax.validation.constraints.NotBlank;
  *
  */
 public class ChangePasswordRequest {
-
+	
+	/**
+	 * Given password that should be equal to the current one
+	 */
 	@NotBlank
 	private String currentPassword;
 	
+	/**
+	 * New password that is wanted
+	 */
 	@NotBlank
 	private String newPassword;
 	

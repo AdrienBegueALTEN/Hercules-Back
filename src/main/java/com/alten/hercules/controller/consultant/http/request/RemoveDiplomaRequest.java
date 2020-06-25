@@ -9,7 +9,14 @@ import javax.validation.constraints.NotNull;
  */
 public class RemoveDiplomaRequest {
 	
+	/**
+	 * ID of the consultant
+	 */
 	@NotNull private Long consultant;
+	
+	/**
+	 * ID of the diploma
+	 */
 	@NotNull private Long diploma;
 	
 	public Long getConsultant() { return consultant; }

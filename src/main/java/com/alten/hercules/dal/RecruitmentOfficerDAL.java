@@ -19,8 +19,19 @@ import com.alten.hercules.model.user.RecruitmentOfficer;
 @Service
 public class RecruitmentOfficerDAL {
 	
+	/**
+	 * DAO for consultants
+	 */
 	@Autowired private ConsultantDAO consultantDAO;
+	
+	/**
+	 * DAO for recruitment officers
+	 */
 	@Autowired private RecruitmentOfficerDAO recruitmentOfficerDAO;
+	
+	/**
+	 * DAO for users
+	 */
 	@Autowired private UserDAO userDAO;
 	
 	/**

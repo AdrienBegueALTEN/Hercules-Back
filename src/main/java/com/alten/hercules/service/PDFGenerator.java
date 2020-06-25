@@ -37,13 +37,25 @@ import com.alten.hercules.model.skill.Skill;
  */
 public class PDFGenerator {
 	
+	/**
+	 * Path for the pdf folder
+	 */
 	private final static Path pdfFolder = Paths.get("pdf");
 	
 	
 	
 	// Polices utilisées
+	/**
+	 * Helvetica font
+	 */
     PDFont font1 = PDType1Font.HELVETICA;
+    /**
+     * Bold helvetica font
+     */
     PDFont font2 = PDType1Font.HELVETICA_BOLD;
+    /**
+     * Oblique helvetica font
+     */
     PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
 	
     //Couleurs utilisées

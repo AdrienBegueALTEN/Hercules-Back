@@ -20,34 +20,60 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Customer {
-
+	
+	/**
+	 * ID of the customer
+	 */
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	/**
+	 * Name of the customer
+	 */
 	@Column(nullable = false, unique = true)
 	private String name;
 	
+	/**
+	 * Activity sector of the customer
+	 */
 	@Column(nullable = false)
 	private String activitySector;
 	
+	/**
+	 * A description about the customer
+	 */
 	@Column(length = 1000)
 	private String description = null;
 	
+	/**
+	 * Path of the logo of the customer
+	 */
 	private String logo = null;
 	
+	/**
+	 * Set of missions of the customer
+	 */
 	@OneToMany(mappedBy="customer")
 	private Set<Mission> missions;
 	
+	/**
+	 * Empty constructor
+	 */
 	public Customer() {}
-
+	
+	/**
+	 * Simplified constructor
+	 */
 	public Customer(String name, String activitySector, String description) {
 		this.name = name;
 		this.activitySector = activitySector;
 		this.description = description;
 	}
 
-
+	/**
+	 * Complete constructor
+	 */
 	public Customer(long id, String activitySector, String description, String name, String logo) {
 		super();
 		this.id = id;

@@ -50,6 +50,9 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/hercules/managers")
 public class ManagerController {
 	
+	/**
+	 * DAL for the managers
+	 */
 	@Autowired private ManagerDAL dal;
 	
 	/**

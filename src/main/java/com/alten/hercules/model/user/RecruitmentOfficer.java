@@ -18,13 +18,22 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RecruitmentOfficer extends AppUser {
-
+	
+	/**
+	 * Empty constructor
+	 */
 	public RecruitmentOfficer() { super(); }
 	
+	/**
+	 * Constructor
+	 */
 	public RecruitmentOfficer(String email, String firstname, String lastname) throws InvalidValueException {
 		super(email, firstname, lastname);
 	}
-
+	
+	/**
+	 * Function that returns the authorizations of the recruitment officer
+	 */
 	@JsonIgnore
 	@Override
 	public Collection<SimpleGrantedAuthority> getAuthorities() {

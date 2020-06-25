@@ -45,6 +45,9 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/hercules/recruitment-officers")
 public class RecruitementOfficerController {
 	
+	/**
+	 * DAL for the recruitment officers
+	 */
 	@Autowired RecruitmentOfficerDAL dal;
 	
 	/**

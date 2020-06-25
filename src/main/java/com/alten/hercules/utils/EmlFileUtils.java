@@ -30,7 +30,11 @@ import org.slf4j.LoggerFactory;
  */
 public class EmlFileUtils {
 	
+
 	private static final Logger logger = LoggerFactory.getLogger(EmlFileUtils.class);
+	/**
+	 * eml extension
+	 */
 	private static final String EXTENSION = ".eml";
 	
 	@Bean
@@ -38,6 +42,15 @@ public class EmlFileUtils {
 	    return new JavaMailSenderImpl();
 	}
 	
+	/**
+	 * Generates an eml file
+	 * @param from Sender
+	 * @param to Receiver
+	 * @param subject subject of the mail
+	 * @param body text of the mail
+	 * @param fileName name of the eml file
+	 * @return An eml file
+	 */
 	public static Optional<File> genereateEmlFile(String from, String to, String subject, String body, String fileName) {
 		File emlFile = null;
 		try {
@@ -61,6 +74,11 @@ public class EmlFileUtils {
 	    return Optional.ofNullable(emlFile);
 	}
 	
+	/**
+	 * Produces an eml file for a mission with a link
+	 * @param mission Mission to send
+	 * @return An eml file
+	 */
 	public static Optional<File> genereateEmlFileWithMissionLink(Mission mission) {
 		final String from = mission.getConsultant().getManager().getEmail();
 		final String to =  mission.getConsultant().getEmail();
@@ -79,6 +97,11 @@ public class EmlFileUtils {
 		return genereateEmlFile(from, to, subject, body, fileName);
 	}
 	
+	/**
+	 * Produces an eml file for an user with a link for changing password
+	 * @param targetedUser user that needs password's reset
+	 * @return An eml file
+	 */
 	public static Optional<File> genereateEmlFileWithPasswordCreationLink(AppUser targetedUser) {
 		AppUser loggedUser = (AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 		final String from = loggedUser.getEmail();

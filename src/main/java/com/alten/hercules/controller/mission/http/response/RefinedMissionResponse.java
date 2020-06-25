@@ -12,11 +12,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 public class RefinedMissionResponse {
-
+	
+	/**
+	 * Object Consultant of the mission
+	 */
 	@JsonIgnoreProperties(value = {"diplomas", "email", "experience", "id", "manager", "missions"})
 	private Consultant consultant;
+	
+	/**
+	 * Object Customer of the mission
+	 */
 	@JsonIgnoreProperties(value = {"activitySector", "description", "id", "missions"})
 	private Customer customer;
+	
+	/**
+	 * Last version of the mission
+	 */
 	@JsonIgnoreProperties(value = {"comment", "versionDate"})
 	private MissionSheet lastVersion;
 	

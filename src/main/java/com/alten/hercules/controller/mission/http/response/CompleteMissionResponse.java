@@ -17,14 +17,37 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CompleteMissionResponse {
-
+	
+	/**
+	 * Object that contains the information of the consultant of the mission
+	 */
 	@JsonIgnoreProperties(value = {"missions"})
 	private ConsultantResponse consultant;
+	
+	/**
+	 * Object that contains the information of the customer of the mission
+	 */
 	@JsonIgnoreProperties(value = {"missions"})
 	private Customer customer;
+	
+	/**
+	 * ID of the mission
+	 */
 	private Long id;
+	
+	/**
+	 * Last version of the mission
+	 */
 	private MissionSheet lastVersion;
+	
+	/**
+	 * Status of the mission
+	 */
 	private ESheetStatus sheetStatus;
+	
+	/**
+	 * Set of the different versions of the mission
+	 */
 	private Set<MissionSheet> versions;
 	
 	public CompleteMissionResponse(Mission mission, boolean allVersions, boolean sheetStatus) {

@@ -21,8 +21,19 @@ import com.alten.hercules.model.user.Manager;
 @Service
 public class AuthenticationDAL {
 	
+	/**
+	 * DAO for managers
+	 */
 	@Autowired private ManagerDAO managerDao;
+	
+	/**
+	 * DAO for missions
+	 */
 	@Autowired private MissionDAO missionDao;
+	
+	/**
+	 * DAO for users
+	 */
 	@Autowired private UserDAO userDAO;
 	
 	/**

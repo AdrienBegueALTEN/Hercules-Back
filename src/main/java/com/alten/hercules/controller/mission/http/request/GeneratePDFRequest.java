@@ -3,20 +3,31 @@ package com.alten.hercules.controller.mission.http.request;
 import javax.validation.constraints.NotNull;
 
 /**
- * Class that contains the information for a request for the generation of a PDF file.
+ * Class that contains the information for a request for the generation of a PDF file for the particular page of a project or a mission.
  * @author mfoltz, rjesson, abegue, jbaudot
  *
  */
 public class GeneratePDFRequest {
 	
+	/**
+	 * ID of the project or mission
+	 */
 	@NotNull
 	private Long id;
 	
+	/**
+	 * ID of the customer
+	 */
 	private Long customer;
 	
-	
+	/**
+	 * ID of the consultant
+	 */
 	private Long consultant;
 	
+	/**
+	 * String that indicates the type of the page : project or mission
+	 */
 	@NotNull
 	private String type;
 

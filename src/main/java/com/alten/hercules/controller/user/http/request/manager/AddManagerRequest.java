@@ -5,7 +5,10 @@ import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.user.Manager;
 
 public class AddManagerRequest extends AddUserRequest {
-
+	
+	/**
+	 * Boolean that indicates if the manager has the administration rights.
+	 */
 	private boolean isAdmin;
 	
 	public AddManagerRequest(String email, String firstname, String lastname, boolean isAdmin) {

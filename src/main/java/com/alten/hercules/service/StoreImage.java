@@ -19,8 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 public class StoreImage {
-
+	
+	/**
+	 * Path for the logo folder
+	 */
 	private final Path rootLogo = Paths.get("img/logo/");
+	/**
+	 * Path for the proj folder
+	 */
 	private final Path rootProj = Paths.get("img/proj/");
 	
 	public final static String LOGO_FOLDER = "img/logo/";

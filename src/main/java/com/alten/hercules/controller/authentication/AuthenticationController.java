@@ -57,7 +57,14 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/hercules/auth")
 public class AuthenticationController {
 	
+	/**
+	 * Object that manages the authentication operations
+	 */
 	@Autowired private AuthenticationManager authManager;
+	
+	/**
+	 * DAL for the authentication
+	 */
 	@Autowired private AuthenticationDAL  dal;
 	
 	/**

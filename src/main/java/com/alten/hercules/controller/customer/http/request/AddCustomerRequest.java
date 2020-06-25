@@ -11,12 +11,21 @@ import com.alten.hercules.model.customer.Customer;
  */
 public class AddCustomerRequest {
 	
+	/**
+	 * Name of the customer
+	 */
 	@NotBlank
 	private String name;
-
+	
+	/**
+	 * Activity sector of the customer
+	 */
 	@NotBlank
 	private String activitySector;
 	
+	/**
+	 * A description about the customer
+	 */
 	private String description;
 	
 	public AddCustomerRequest(String name, String activitySector, String description) {
@@ -33,7 +42,11 @@ public class AddCustomerRequest {
 
 	public String getDescription() { return description; }
 	public void setDescription(String description) { this.description = description; }
-
+	
+	/**
+	 * Function that generates a Customer
+	 * @return A Customer
+	 */
 	public Customer buildCustomer() {
 		return new Customer(name, activitySector, description);
 	}

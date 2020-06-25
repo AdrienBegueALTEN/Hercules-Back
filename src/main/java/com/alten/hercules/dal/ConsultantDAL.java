@@ -27,18 +27,33 @@ import com.alten.hercules.model.user.Manager;
 @Service
 public class ConsultantDAL {
 	
+	/**
+	 * DAO for consultants
+	 */
 	@Autowired
 	private ConsultantDAO consultantDAO;
 	
+	/**
+	 * DAO for managers
+	 */
 	@Autowired
 	private ManagerDAO managerDAO;
 	
+	/**
+	 * DAo for users
+	 */
 	@Autowired
 	private UserDAO userDAO;
 	
+	/**
+	 * DAO for diplomas
+	 */
 	@Autowired
 	private DiplomaDAO diplomaDAO;
 	
+	/**
+	 * DAO for missions
+	 */
 	@Autowired
 	private MissionDAO missionDAO;
 	

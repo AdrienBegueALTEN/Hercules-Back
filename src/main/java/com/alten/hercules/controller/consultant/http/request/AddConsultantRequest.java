@@ -12,16 +12,28 @@ import com.alten.hercules.consts.AppConst;
  */
 public class AddConsultantRequest {
 	
+	/**
+	 * Email of new consultant
+	 */
 	@NotNull
 	@Pattern(regexp = AppConst.EMAIL_PATTERN)
 	private String email;
-
+	
+	/**
+	 * First name of new consultant
+	 */
 	@NotNull
 	private String firstname;
 	
+	/**
+	 * Last name of new consultant
+	 */
 	@NotNull
 	private String lastname;
 	
+	/**
+	 * ID of the manager of new consultant
+	 */
 	@NotNull
 	private Long manager;
 	

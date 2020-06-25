@@ -27,33 +27,60 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Inheritance
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class AppUser implements UserDetails {
-
+	
+	/**
+	 * ID of the user
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
+	/**
+	 * Email of the user
+	 */
 	@Column(nullable = false)
 	private String email;
-
+	
+	/**
+	 * Password of the user
+	 */
 	@JsonIgnore
 	@Column(nullable = true)
 	private String password;
 	
+	/**
+	 * First name of the user
+	 */
 	@Column(nullable = false)
 	private String firstname;
 	
+	/**
+	 * Last name of the user
+	 */
 	@Column(nullable = false)
 	private String lastname;
 	
+	/**
+	 * Date of release of the user
+	 */
 	@Column(nullable = true)
 	private LocalDate releaseDate;
 	
+	/**
+	 * Secret of the user
+	 */
 	@JsonIgnore
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private Integer secret;
 	
+	/**
+	 * Empty constructor
+	 */
 	public AppUser() {}
 	
+	/**
+	 * Complete constructor
+	 */
 	public AppUser(String email, String firstname, String lastname) throws InvalidValueException {
 		setEmail(email);
 		setFirstname(firstname);
@@ -96,18 +123,31 @@ public abstract class AppUser implements UserDetails {
 	@Override
 	public String getUsername() { return email; }
 	
+	
+	/**
+	 * Verifies if the account is not expired
+	 */
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() { return true; }
-
+	
+	/**
+	 * Verifies if the account is not locked
+	 */
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() { return true; }
-
+	
+	/**
+	 * Verifies if the identifiers are valid
+	 */
 	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() { return password != null; }
-
+	
+	/**
+	 * Verifies if the user is active
+	 */
 	@JsonIgnore
 	@Override
 	public boolean isEnabled() { return releaseDate == null; }

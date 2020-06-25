@@ -19,9 +19,13 @@ import com.alten.hercules.service.StoreImage;
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan("com.alten")
 public class MainApp implements CommandLineRunner  {
-
+	
+	/**
+	 * Object that manages the pictures and the associated folders
+	 */
 	@Resource
 	private StoreImage storeImage;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(MainApp.class, args);
 	}

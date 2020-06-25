@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 
- * Represent the content of an entity update request.
+ * Represents the content of an entity update request.
  *
  * @author Adrien Bègue
  *

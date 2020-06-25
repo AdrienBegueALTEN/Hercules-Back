@@ -24,18 +24,33 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Manager extends AppUser {
 	
+	/**
+	 * Boolean that indicates if the manager has the administration rights
+	 */
 	private boolean isAdmin = false;
 	
+	/**
+	 * Set of consultants of the manager
+	 */
     @OneToMany(mappedBy="manager")
     private Set<Consultant> consultants = new HashSet<>();
 	
+    /**
+     * Empty constructor
+     */
 	public Manager() { super(); }
 	
+	/**
+	 * Simplified constructor
+	 */
 	public Manager(String email, String firstname, String lastname) throws InvalidValueException {
 		super(email, firstname, lastname);
 		setAdmin(false);
 	}
 	
+	/**
+	 * Complete constructor
+	 */
 	public Manager(String email, String firstname, String lastname, boolean isAdmin) throws InvalidValueException {
 		super(email, firstname, lastname);
 		setAdmin(isAdmin);
@@ -46,7 +61,10 @@ public class Manager extends AppUser {
 	
 	public Set<Consultant> getConsultants() { return consultants; }
 	public void setConsultants(Set<Consultant> consultants) { this.consultants = consultants; }
-
+	
+	/**
+	 * Function that returns the authorizations of the manager
+	 */
 	@JsonIgnore
 	@Override
 	public Collection<SimpleGrantedAuthority> getAuthorities() {

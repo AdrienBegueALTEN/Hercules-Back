@@ -16,6 +16,9 @@ import com.alten.hercules.model.user.AppUser;
  */
 public class AppUserDetailsService implements UserDetailsService {
 	
+	/**
+	 * DAO for users
+	 */
 	@Autowired UserDAO userDAO;
 	
 	/**

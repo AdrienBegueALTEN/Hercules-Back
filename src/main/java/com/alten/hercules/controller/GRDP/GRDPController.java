@@ -23,7 +23,10 @@ import io.swagger.annotations.ApiResponses;
 @CrossOrigin(origins = "*")
 @RequestMapping("/hercules/grdp")
 public class GRDPController {
-
+	
+	/**
+	 * DAL for the GRPD.
+	 */
 	@Autowired
 	private GRDPDAL dal;
 	

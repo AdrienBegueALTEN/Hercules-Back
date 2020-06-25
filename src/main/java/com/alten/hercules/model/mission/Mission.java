@@ -29,35 +29,59 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 public class Mission {
-
+	
+	/**
+	 * ID of the mission
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	/**
+	 * Consultant of the mission
+	 */
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
 	private Consultant consultant;
 	
+	/**
+	 * Customer of the mission
+	 */
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
 	private Customer customer;
 	
+	/**
+	 * Set of different versions of the mission
+	 */
 	@OneToMany(mappedBy="mission", cascade = CascadeType.ALL)
 	@OrderBy("version_date DESC")
 	private Set<MissionSheet> versions = new HashSet<>();
 	
+	/**
+	 * Status of the mission
+	 */
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private ESheetStatus sheetStatus;
 	
+	/**
+	 * Secret of the mission
+	 */
 	@JsonIgnore
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private Integer secret;
 	
+	/**
+	 * Empty constructor
+	 */
 	public Mission() {}
 	
+	/**
+	 * Constructor
+	 */
 	public Mission(Consultant consultant, Customer customer) {
 		setConsultant(consultant);
 		setCustomer(customer);
@@ -82,10 +106,18 @@ public class Mission {
 	public void setSheetStatus(ESheetStatus sheetStatus) { this.sheetStatus = sheetStatus; }
 	
 	public int getSecret() { return secret; }
+	
+	/**
+	 * Modifies randomly the secret
+	 */
 	public void changeSecret() {
 		this.secret = (int)Math.floor(Math.random() * Math.floor(Integer.MAX_VALUE));
 	}
 	
+	/**
+	 * Verifies if the mission is currently validated
+	 * @return A boolean that indicates if the mission is validated
+	 */
 	@JsonIgnore
 	public boolean isValidated() {
 		return sheetStatus.equals(ESheetStatus.VALIDATED);
