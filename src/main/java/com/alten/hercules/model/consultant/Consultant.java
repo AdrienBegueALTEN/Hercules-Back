@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import com.alten.hercules.model.diploma.Diploma;
 import com.alten.hercules.model.exception.InvalidValueException;
@@ -81,6 +82,7 @@ public class Consultant {
 	/**
 	 * Set of diplomas of the consultant
 	 */
+	@OrderBy(value = "year")
 	@OneToMany(fetch = FetchType.LAZY)
 	private Set<Diploma> diplomas;
 	
