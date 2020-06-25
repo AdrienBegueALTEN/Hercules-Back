@@ -252,15 +252,15 @@ public class MissionDAL {
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
     	
     	//The skills create duplicates. The set remove duplicates, and must be re-ordered with the sheet status
-    	/*List<Mission> foundMissions = em.createQuery(query).getResultList();
+    	List<Mission> foundMissions = em.createQuery(query).getResultList();
     	Set<Mission> setMissions = new HashSet<>(foundMissions);
     	List<Mission> uniqueMissions = new ArrayList<Mission>(setMissions);
     	uniqueMissions.sort((m1,m2)->{ 
     		if(m1.getSheetStatus()==ESheetStatus.VALIDATED) return 1;
     		else if(m1.getSheetStatus()==ESheetStatus.ON_GOING) return 0;
     		else return -1;
-    	});*/
-	    return em.createQuery(query).getResultList();
+    	});
+	    return uniqueMissions;
 	}
 	
 	/**
