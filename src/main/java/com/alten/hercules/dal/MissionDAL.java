@@ -116,7 +116,7 @@ public class MissionDAL {
 	 * @param manager If present filter to keep validated missions and those of the manager identified by this parameter, if not, filter to keep only validated missions.
 	 * @return the list of missions which corresponds to all the criteria.
 	 */
-	/*public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
+	public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
 		
 		CriteriaBuilder builder = em.getCriteriaBuilder();
 	    CriteriaQuery<Mission> query = builder.createQuery(Mission.class);
@@ -144,7 +144,10 @@ public class MissionDAL {
 	    .where(builder.equal(root.get("id"), subRoot.get("mission")));
 	    
 	    //Only joins the latest version
-	    sheetJoin.on(builder.equal(subQuery, sheetJoin.get("versionDate")));
+	    Predicate sheetDatePredicate = builder.or(builder.equal(subQuery, sheetJoin.get("versionDate")),
+	    		builder.isNull(subQuery));
+	    sheetJoin.on(sheetDatePredicate);
+
 
 	    //Contains the criteria used to create the final query
         List<Predicate> criteriaList = new ArrayList<>();
@@ -222,103 +225,16 @@ public class MissionDAL {
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
     	
     	//The skills create duplicates. The set remove duplicates, and must be re-ordered with the sheet status
-    	List<Mission> foundMissions = em.createQuery(query).getResultList();
+    	/*List<Mission> foundMissions = em.createQuery(query).getResultList();
     	Set<Mission> setMissions = new HashSet<>(foundMissions);
     	List<Mission> uniqueMissions = new ArrayList<Mission>(setMissions);
     	uniqueMissions.sort((m1,m2)->{ 
     		if(m1.getSheetStatus()==ESheetStatus.VALIDATED) return 1;
     		else if(m1.getSheetStatus()==ESheetStatus.ON_GOING) return 0;
     		else return -1;
-    	});
-	    return uniqueMissions;
-	}*/
-	//The following function uses Criteria API to create a query. 
-		//It is used to manage the optional parameters of the advanced search.
-		public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
-			
-			CriteriaBuilder builder = em.getCriteriaBuilder();
-		    CriteriaQuery<Mission> query = builder.createQuery(Mission.class);
-		    
-		    //Gets the whole mission table
-		    Root<Mission> root = query.from(Mission.class);
-		    
-		    //Joints are used to join tables together using objects of the root class (i.e Mission.class)
-		    Join<Mission, Consultant> consultantJoin = root.join("consultant", JoinType.INNER);
-		    Join<Mission, Customer> customerJoin = root.join("customer", JoinType.INNER);
-		    Join<Mission, MissionSheet> sheetJoin = root.join("versions", JoinType.INNER);
-		    
-		    //Sub query to get last version's date. 
-		    Subquery<Date> subQuery = query.subquery(Date.class);
-		    Root<MissionSheet> subRoot = subQuery.from(MissionSheet.class);
-		    subQuery.select(builder.greatest(subRoot.get("versionDate")))
-		    .where(builder.equal(root.get("id"), subRoot.get("mission")));
-		    
-		    //Only joins the latest version
-		    sheetJoin.on(builder.equal(subQuery, sheetJoin.get("versionDate")));
-
-		    //Contains the criteria used to create the final query
-	        List<Predicate> criteriaList = new ArrayList<>();
-	        
-	       
-	        //It checks if the title is here. If it's present, the criterion is added to the criteriaList
-	        String key = "title";
-	        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
-	        
-	        	criteriaList.add(builder.like(builder.lower(sheetJoin.get("title")), ("%" + criteria.get(key) + "%").toLowerCase()));
-	        
-	        try {
-	            key = "customer";
-		        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
-		        	criteriaList.add(builder.equal(customerJoin.get("id"), Long.parseLong(criteria.get(key))));
-	        } catch (NumberFormatException ignored) {}
-		        
-	        try {
-		        key = "consultant";
-		        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
-		        	criteriaList.add(builder.equal(consultantJoin.get("id"), Long.parseLong(criteria.get(key))));
-	        } catch (NumberFormatException ignored) {}
-
-	        
-	        //Searches the location of the mission using country or city rows
-	        //Two ways lower case make the searched string case insensitive
-	        key = "location";
-	        if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
-	        	final String pattern = ("%" + criteria.get(key) + "%").toLowerCase();
-	        	final Predicate city = builder.like(builder.lower(sheetJoin.get("city")), pattern);
-	        	final Predicate country = builder.like(builder.lower(sheetJoin.get("country")), pattern);
-	        	criteriaList.add(builder.or(city, country));
-	        }
-	        
-	        key = "activitySector";
-	        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
-	        	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
-	        
-	        
-	        
-	        Predicate AllValidatedMissions = builder.equal(root.get("sheetStatus").as(String.class), ESheetStatus.VALIDATED.name());
-	        
-	        //If the user is authenticated, the manager long exists and the query retrieves all of his missions and all validated missions of other managers
-	        //If the user is a guest, he only gets the validated missions
-	        if (manager.isPresent())
-		    	criteriaList.add(builder.or(
-		    			AllValidatedMissions,
-		    			builder.equal(consultantJoin.get("manager"), managerDAO.getOne(manager.get()))));
-	        else criteriaList.add(AllValidatedMissions);
-	          
-	        
-	        //caseExpression watches the sheetStatus and sorts the mission by their status
-	        Expression<Object> caseExpression = builder.selectCase()
-	    	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("VALIDATED")), 3)
-	    	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("ON_GOING")), 2)
-	    	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("ON_WAITING")), 1);
-	     
-	    	query = query.orderBy(builder.asc(caseExpression));
-	    	
-	    	//Query is created using the criteriaList
-	    	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
-
-		    return em.createQuery(query).getResultList();
-		}
+    	});*/
+	    return em.createQuery(query).getResultList();
+	}
 	
 	/**
 	 * Retrieves the most recent mission sheet of a mission.
