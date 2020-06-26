@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -60,19 +61,21 @@ public class StoreImage {
 	 * @param file file to be saved
 	 * @param type String that shows if the file is a picture for a customer or a picture for a project.
 	 */
-	public void save(MultipartFile file, String type) {
+	public void save(MultipartFile file, String name, String type) {
 		try {
 			Path path = null;
 			switch(type) {
 			case "logo":
-				path = this.rootLogo.resolve(file.getOriginalFilename());
+				path = this.rootLogo.resolve(name);
 				break;
 			case "project":
-				path = this.rootProj.resolve(file.getOriginalFilename());
+				path = this.rootProj.resolve(name);
 				break;
 			}
 			if (!Files.exists(path))
-				Files.copy(file.getInputStream(), path);
+				Files.copy(file.getInputStream(), path,
+		                StandardCopyOption.REPLACE_EXISTING); 
+				//Files.copy(file.getInputStream(), path);
 		} catch (Exception e) {
 			System.out.println(e.getClass());
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());

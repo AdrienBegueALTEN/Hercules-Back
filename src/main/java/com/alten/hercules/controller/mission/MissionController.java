@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -776,9 +777,10 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@PostMapping("/projects/{id}/upload-picture")
-	public ResponseEntity<?> uploadLogoManager(@ApiParam("file")@RequestParam("file") MultipartFile file, 
+	public ResponseEntity<?> uploadLogoManager(@ApiParam("Blob with the picture")@RequestPart("blob") MultipartFile blob, 
+			@ApiParam("Name of picture")@RequestPart("name") String name,
 			@ApiParam("ID of project")@PathVariable Long id) {
-		return this.uploadPicture(file, id);
+		return this.uploadPicture(blob, name, id);
 	}
 	
 	/**
@@ -800,7 +802,8 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PostMapping("/projects/anonymous/{id}/upload-picture")
-	public ResponseEntity<?> uploadLogoToken(@ApiParam("file")@RequestParam("file") MultipartFile file, 
+	public ResponseEntity<?> uploadLogoToken(@ApiParam("Blob with the picture")@RequestPart("blob") MultipartFile blob, 
+			@ApiParam("Name of picture")@RequestPart("name") String name, 
 			@ApiParam("ID of project")@PathVariable Long id) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
@@ -811,7 +814,7 @@ public class MissionController {
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
 		}
-		return this.uploadPicture(file, id);
+		return this.uploadPicture(blob, name, id);
 	}
 	
 	/**
@@ -820,30 +823,19 @@ public class MissionController {
 	 * @param id  project id
 	 * @return 404 if the project is not found<br>200 if the image is added<br>400 if the extension of the file is not good
 	 */
-	private ResponseEntity<?> uploadPicture(MultipartFile file, Long id){
+	private ResponseEntity<?> uploadPicture(MultipartFile blob, String name, Long id){
 		try {
-			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-			if(extension.equals("jpg") ||
-			   extension.equals("JPG") ||
-			   extension.equals("png") ||
-			   extension.equals("PNG") ||
-			   extension.equals("jpeg") ||
-			   extension.equals("JPEG") ||
-			   extension.equals("gif") ||
-			   extension.equals("GIF") ||
-			   extension.equals("webp") ||
-			   extension.equals("WEBP") ||
-			   extension.equals("ico") ||
-			   extension.equals("ICO") ||
-			   extension.equals("svg") ||
-			   extension.equals("SVG")) {
+			String extension = FilenameUtils.getExtension(name).toLowerCase();
+			if(extension.equals("jpg") || extension.equals("png") || extension.equals("jpeg") 
+					|| extension.equals("gif") || extension.equals("webp") || extension.equals("ico") 
+					|| extension.equals("svg")) {
 				Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
 				if(proj.getPicture()!=null) {
 					this.storeImage.delete("img/proj/"+proj.getPicture());
 					proj.setPicture(null);
 				}
-				storeImage.save(file,"project");
-				proj.setPicture(file.getOriginalFilename());
+				storeImage.save(blob, name, "project");
+				proj.setPicture(name);
 				this.dal.saveProject(proj);
 				return ResponseEntity.status(HttpStatus.OK).build();
 			}
