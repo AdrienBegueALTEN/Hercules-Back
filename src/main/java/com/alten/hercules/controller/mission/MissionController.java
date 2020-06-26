@@ -527,6 +527,7 @@ public class MissionController {
 			throw new ProjectsBoundsException();
 		Project newProject = new Project(lastVersion);
 		dal.addProjectForSheet(lastVersion, newProject);
+		updateSheetStatus(mission);
 	}
 	
 	/**
@@ -709,6 +710,7 @@ public class MissionController {
 			removeSkillFromDeletionProject(project);
 			this.storeImage.delete(StoreImage.PROJECT_FOLDER+project.getPicture());
 			dal.removeProject(project);
+			updateSheetStatus(project.getMissionSheet().getMission());
 	}
 	
 	/**
