@@ -252,10 +252,8 @@ public class CustomerController {
 	public ResponseEntity<?> uploadLogo(@ApiParam("Blob with the logo")@RequestPart("blob") MultipartFile blob, 
 			@ApiParam("Name of logo")@RequestPart("name") String name,
 			@ApiParam("ID of the customer")@PathVariable Long id) {
-		System.out.println(name);
 		try {
 			String extension = FilenameUtils.getExtension(name).toLowerCase();
-			System.out.println(extension);
 			if(extension.equals("jpg") || extension.equals("png") || extension.equals("jpeg") 
 					|| extension.equals("gif") || extension.equals("webp") || extension.equals("ico") 
 					|| extension.equals("svg")) {
@@ -270,11 +268,9 @@ public class CustomerController {
 				return ResponseEntity.status(HttpStatus.OK).build();
 			}
 			else {
-				System.out.println("br");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 			}
 		} catch (Exception e) {
-			System.out.println("f "+e);
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 		}
 	}
