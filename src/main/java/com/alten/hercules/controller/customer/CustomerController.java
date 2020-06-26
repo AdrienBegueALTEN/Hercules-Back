@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -233,7 +234,7 @@ public class CustomerController {
 	
 	/**
 	 * Function that receives a picture file from the request and then saves it and updates the customer.
-	 * @param file file with the picture of the logo
+	 * @param blob file with the picture of the logo
 	 * @param id ID of the customer
 	 * @return 200 The logo is saved and the customer is updated<br>400 The extension of the file is not supported<br>401 Authentication problem<br>404 The customer is not found.
 	 */
@@ -248,38 +249,32 @@ public class CustomerController {
 	})
 	@PostMapping("/{id}/logo")
 	@PreAuthorize("hasAuthority('MANAGER')")
-	public ResponseEntity<?> uploadLogo(@ApiParam("File with the logo")@RequestParam("file") MultipartFile file, 
+	public ResponseEntity<?> uploadLogo(@ApiParam("Blob with the logo")@RequestPart("blob") MultipartFile blob, 
+			@ApiParam("Name of logo")@RequestPart("name") String name,
 			@ApiParam("ID of the customer")@PathVariable Long id) {
+		System.out.println(name);
 		try {
-			String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-			if(extension.equals("jpg") ||
-			   extension.equals("JPG") ||
-			   extension.equals("png") ||
-			   extension.equals("PNG") ||
-			   extension.equals("jpeg") ||
-			   extension.equals("JPEG") ||
-			   extension.equals("gif") ||
-			   extension.equals("GIF") ||
-			   extension.equals("webp") ||
-			   extension.equals("WEBP") ||
-			   extension.equals("ico") ||
-			   extension.equals("ICO") ||
-			   extension.equals("svg") ||
-			   extension.equals("SVG")) {
+			String extension = FilenameUtils.getExtension(name).toLowerCase();
+			System.out.println(extension);
+			if(extension.equals("jpg") || extension.equals("png") || extension.equals("jpeg") 
+					|| extension.equals("gif") || extension.equals("webp") || extension.equals("ico") 
+					|| extension.equals("svg")) {
 				Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 				if(customer.getLogo()!=null) {
 					this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());
 					customer.setLogo(null);
 				}
-				storeImage.save(file,"logo");
-				customer.setLogo(file.getOriginalFilename());
+				storeImage.save(blob, name, "logo");
+				customer.setLogo(name);
 				this.dal.save(customer);
 				return ResponseEntity.status(HttpStatus.OK).build();
 			}
 			else {
+				System.out.println("br");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 			}
 		} catch (Exception e) {
+			System.out.println("f "+e);
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 		}
 	}
