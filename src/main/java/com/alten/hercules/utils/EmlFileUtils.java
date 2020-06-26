@@ -88,7 +88,7 @@ public class EmlFileUtils {
 		final String link = AppConst.MISSION_SHEET_URL + JwtUtils.generateMissionToken(mission);
 		final String body =
 				"<p>Bonjour,</p>" +
-				"<p>Merci de bien vouloir compléter la <a href=\"" + link + "\">fiche mission</a>' correspondant à votre dernière mission chez " + customer + "'.</p>" +
+				"<p>Merci de bien vouloir compléter la <a href=\"" + link + "\">fiche mission</a> correspondant à votre dernière mission chez " + customer + ".</p>" +
 				"<p>Ce lien ne restera accessible pendant <b>30 jours</b>.</p>" +
 				"<p>Cordialement,</p>" +
 				"<p>" + manager + ".</p>";
