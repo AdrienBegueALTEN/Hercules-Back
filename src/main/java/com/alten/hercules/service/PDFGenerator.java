@@ -144,7 +144,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(340, 480);
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText("La Mission ");
+        contentStream.showText("La mission ");
         contentStream.newLineAtOffset(15, -5);
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
@@ -372,15 +372,18 @@ public class PDFGenerator {
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
         Integer exp = mission.getLastVersion().getConsultantStartXp();
-        if(exp == 0) {
-        	contentStream.showText("Diplômé récemment");
+        String text;
+        switch (exp) {
+        	case 0:
+        		text = "Jeune diplomé";
+        		break;
+        	case 1:
+        		text = "Un an d'expérience";
+        		break;
+        	default:
+        		text = exp + " ans d'expérience";
         }
-        else if(exp == 1) {
-        	contentStream.showText(exp.toString()+" an d'expérience");
-        }
-        else {
-        	contentStream.showText(exp.toString()+" ans d'expérience");
-        }
+        contentStream.showText(text);
         contentStream.newLineAtOffset(0, -5);
         
         int limitForDiploma = 5;
