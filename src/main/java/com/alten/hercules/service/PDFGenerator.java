@@ -150,6 +150,7 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(black);
         
         String missionDescription = mission.getLastVersion().getDescription();
+
         for(String line : separateLines(missionDescription,font1,445,10)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
@@ -166,6 +167,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(0, -5);
         contentStream.setFont( font1, 10 );
         String commentary = mission.getLastVersion().getComment();
+        
         for(String line : separateLines(commentary,font1,220,10)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
@@ -229,6 +231,7 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(black);
         
         String projectDescription = project.getDescription();
+        
         for(String line : separateLines(projectDescription,font1,445,10)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
@@ -352,6 +355,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(0, -5);
         
         String customerDescription = mission.getCustomer().getDescription();
+        
         for(String line : separateLines(customerDescription,font1,185,10)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
@@ -590,6 +594,7 @@ public class PDFGenerator {
 		
 		if(text == null)
 			return new ArrayList<String>();
+		text = text.replace("\n", " ").replace("\r", " ");
 		int end1 = -1 ;
         int end2 = 0;
         List<String> lines = new ArrayList<String>();
