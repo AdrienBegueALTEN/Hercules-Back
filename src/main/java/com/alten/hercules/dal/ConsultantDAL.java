@@ -101,7 +101,7 @@ public class ConsultantDAL {
 	 * @return Optional manager
 	 */
 	public Optional<Manager> findEnabledManager(Long id) {
-		return managerDAO.findByIdAndReleaseDateIsNull(id);
+		return managerDAO.findById(id);
 	}
 	
 	/**

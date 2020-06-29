@@ -150,7 +150,11 @@ public abstract class AppUser implements UserDetails {
 	 */
 	@JsonIgnore
 	@Override
-	public boolean isEnabled() { return releaseDate == null; }
+	public boolean isEnabled() { 
+		if (releaseDate == null) return true;
+		LocalDate today = LocalDate.now();
+		return (today.getYear() <= releaseDate.getYear() && today.getDayOfYear() < releaseDate.getDayOfYear());
+	}
 	
 	@Override
 	public boolean equals(Object o) {
