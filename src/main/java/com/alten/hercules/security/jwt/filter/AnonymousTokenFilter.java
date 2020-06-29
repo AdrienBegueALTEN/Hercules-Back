@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,11 +25,23 @@ import com.alten.hercules.security.jwt.JwtUtils;
 
 import io.jsonwebtoken.Claims;
 
+/**
+ * Class that manages the token for the anonymous users
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AnonymousTokenFilter extends OncePerRequestFilter {
-
+	
+	/**
+	 * DAO for the mission
+	 */
 	@Autowired private MissionDAO missionDao;
+	/**
+	 * DAO for the user
+	 */
 	@Autowired private UserDAO userDao;
-
+	
+	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		try {
@@ -65,6 +76,7 @@ public class AnonymousTokenFilter extends OncePerRequestFilter {
 		} catch (Exception ignored) {}
 		filterChain.doFilter(request, response);
 	}
+	
 	
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

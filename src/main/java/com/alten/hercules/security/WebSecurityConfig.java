@@ -19,18 +19,28 @@ import com.alten.hercules.security.jwt.filter.AnonymousTokenFilter;
 import com.alten.hercules.security.jwt.filter.SessionTokenFilter;
 import com.alten.hercules.service.AppUserDetailsService;
 
+/**
+ * Main class for the management of the security
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
+	
+	/**
+	 * Service for getting the details of the user
+	 */
 	@Autowired AppUserDetailsService service;
 	
 	@Bean
 	public AppUserDetailsService appUserDetailsService() {
 		return new AppUserDetailsService();
 	}
-
+	/**
+	 * Object that manages the beginning of the authentication
+	 */
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
 
@@ -54,7 +64,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-
+	
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().cors().and()

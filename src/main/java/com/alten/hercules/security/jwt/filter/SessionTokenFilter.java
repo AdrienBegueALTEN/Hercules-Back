@@ -19,10 +19,18 @@ import com.alten.hercules.security.jwt.JwtUtils;
 
 import io.jsonwebtoken.Claims;
 
+/**
+ * Class that manages the token for a connected user
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class SessionTokenFilter extends OncePerRequestFilter  {
-
+	
+	/**
+	 * DAO for the user
+	 */
 	@Autowired private UserDAO userDao;
-
+	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		try {

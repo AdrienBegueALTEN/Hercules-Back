@@ -274,7 +274,7 @@ public class PDFGenerator {
 	}
 	
 	/**
-	 * Function that manages the generation of a PDF for projects and missions.
+	 * Function that manages the generation of a PDF page for projects and missions.
 	 * @param mission Main mission or mission related to the project
 	 * @param projects Set of the projects of the mission or a set with only the main project
 	 * @param document PDDocument from PDFBox that represents the PDF document
