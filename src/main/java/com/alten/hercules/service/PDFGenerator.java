@@ -48,30 +48,30 @@ public class PDFGenerator {
 	/**
 	 * Helvetica font
 	 */
-    PDFont font1 = PDType1Font.HELVETICA;
+    private PDFont font1 = PDType1Font.HELVETICA;
     /**
      * Bold helvetica font
      */
-    PDFont font2 = PDType1Font.HELVETICA_BOLD;
+    private PDFont font2 = PDType1Font.HELVETICA_BOLD;
     /**
      * Oblique helvetica font
      */
-    PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
+    private PDFont font3 = PDType1Font.HELVETICA_OBLIQUE;
 	
     //Couleurs utilisées
-    PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
-    PDColor black = new PDColor(new float[] { 0f, 0f, 0f }, PDDeviceRGB.INSTANCE);
-    PDColor darkblue = new PDColor(new float[] { 4/255f, 57/255f, 98/255f }, PDDeviceRGB.INSTANCE);
-    PDColor lightblue = new PDColor(new float[] { 0f, 139/255f, 210/255f }, PDDeviceRGB.INSTANCE);
-    PDColor yellow = new PDColor(new float[] { 1f, 186/255f, 0f }, PDDeviceRGB.INSTANCE);
+    private PDColor white = new PDColor(new float[] { 1f, 1f, 1f }, PDDeviceRGB.INSTANCE);
+    private PDColor black = new PDColor(new float[] { 0f, 0f, 0f }, PDDeviceRGB.INSTANCE);
+    private PDColor darkblue = new PDColor(new float[] { 4/255f, 57/255f, 98/255f }, PDDeviceRGB.INSTANCE);
+    private PDColor lightblue = new PDColor(new float[] { 0f, 139/255f, 210/255f }, PDDeviceRGB.INSTANCE);
+    private PDColor yellow = new PDColor(new float[] { 1f, 186/255f, 0f }, PDDeviceRGB.INSTANCE);
     
     // Images utilisées
-    PDImageXObject layoutAlten;
-    PDImageXObject blueStick;
-    PDImageXObject contractIcon;
-    PDImageXObject teamIcon;
-    PDImageXObject durationIcon;
-    PDImageXObject localizationIcon;
+    private PDImageXObject layoutAlten;
+    private PDImageXObject blueStick;
+    private PDImageXObject contractIcon;
+    private PDImageXObject teamIcon;
+    private PDImageXObject durationIcon;
+    private PDImageXObject localizationIcon;
     
     /**
      * Constructor that takes a PDDocument from PDFBox and initializes the used pictures
@@ -390,29 +390,32 @@ public class PDFGenerator {
         contentStream.showText(text);
         contentStream.newLineAtOffset(0, -5);
         
+        
         int limitForDiploma = 5;
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
-        for(Diploma diploma : diplomas ) {
-	        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
-	        	contentStream.newLineAtOffset(0, -15);
-	        	contentStream.showText(line);
-	        	limitForDiploma += 15;
-	        	if(limitForDiploma>=140)
+        if( !(diplomas == null) && !(diplomas.size() < 0) ) {
+	        for(Diploma diploma : diplomas ) {
+		        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
+		        	contentStream.newLineAtOffset(0, -15);
+		        	contentStream.showText(line);
+		        	limitForDiploma += 15;
+		        	if(limitForDiploma>=140)
+		        		break;
+		        }
+		        if(limitForDiploma>=140)
+	        		break;
+		        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
+		        	contentStream.newLineAtOffset(0, -15);
+		        	contentStream.showText(line);
+		        	limitForDiploma += 15;
+		        	if(limitForDiploma>=140)
+		        		break;
+		        }
+		        contentStream.newLineAtOffset(0, -5);
+		        limitForDiploma += 5;
+		        if(limitForDiploma>=140)
 	        		break;
 	        }
-	        if(limitForDiploma>=140)
-        		break;
-	        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
-	        	contentStream.newLineAtOffset(0, -15);
-	        	contentStream.showText(line);
-	        	limitForDiploma += 15;
-	        	if(limitForDiploma>=140)
-	        		break;
-	        }
-	        contentStream.newLineAtOffset(0, -5);
-	        limitForDiploma += 5;
-	        if(limitForDiploma>=140)
-        		break;
         }
         contentStream.endText();
 		
