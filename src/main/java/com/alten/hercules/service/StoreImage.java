@@ -59,6 +59,7 @@ public class StoreImage {
 	/**
 	 * Function that saves the file of the given picture file.
 	 * @param file file to be saved
+	 * @param name file's name
 	 * @param type String that shows if the file is a picture for a customer or a picture for a project.
 	 */
 	public void save(MultipartFile file, String name, String type) {

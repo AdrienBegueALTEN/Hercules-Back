@@ -8,9 +8,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
-
-
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,19 +25,16 @@ import com.alten.hercules.model.user.Manager;
 class PDFGeneratorTest {
 	
 	
-	static PDFGenerator pdfgen;
 	static Mission missionTest;
 	static PDDocument document;
 	static Set<Project> projects;
 	
+	/**
+	 * Initialization for the tests
+	 */
 	@BeforeAll
 	static void initializationTest() {
 		document = new PDDocument();
-		try {
-			pdfgen = new PDFGenerator(document);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		try {
 			missionTest = new Mission(new Consultant("consultant.consultant@alten.com","consultant","consultant",new Manager("mana.mana@alten.com","mana","mana",true)), 
@@ -82,11 +76,22 @@ class PDFGeneratorTest {
 		
 	}
 	
+	/**
+	 * Tests of the 5 public methods from the class PDFGenerator
+	 */
 	@Test
-	void Test() {
+	void PDFTest() { 
 		
 		
 		try {
+			
+			PDFGenerator.init();
+			
+			PDFGenerator pdfgen;
+			pdfgen = new PDFGenerator(document);
+			Assertions.assertTrue(pdfgen!=null);
+	
+			
 			pdfgen.makePDFPage(missionTest, missionTest.getLastVersion().getProjects(), document, true);
 			pdfgen.makePDFPage(projects.iterator().next().getMissionSheet().getMission(),
 					           projects,document, false);
