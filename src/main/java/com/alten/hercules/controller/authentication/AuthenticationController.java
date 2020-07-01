@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alten.hercules.controller.authentication.http.request.ChangePasswordRequest;
 import com.alten.hercules.controller.authentication.http.request.LoginRequest;
+import com.alten.hercules.controller.http.response.JWTResponse;
 import com.alten.hercules.dal.AuthenticationDAL;
 import com.alten.hercules.model.exception.InvalidSheetStatusException;
 import com.alten.hercules.model.exception.InvalidValueException;
@@ -38,7 +39,6 @@ import com.alten.hercules.model.exception.ResourceNotFoundException;
 import com.alten.hercules.model.exception.ResponseEntityException;
 import com.alten.hercules.model.mission.ESheetStatus;
 import com.alten.hercules.model.mission.Mission;
-import com.alten.hercules.model.response.JWTResponse;
 import com.alten.hercules.model.user.AppUser;
 import com.alten.hercules.utils.EmlFileUtils;
 
