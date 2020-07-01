@@ -701,33 +701,49 @@ public class PDFGenerator {
 	}
 	
 	/**
-	 * Function that given a duration in days, months and years will choose the more appropriate String for it
-	 * @param days duration in days
-	 * @param months duration in months
-	 * @param years duration in years
-	 * @return a string that gives the duration with the appropriate unit
+	 * Function that given a duration in days, months and years in numbers will create a String from it for the PDF with the 2 biggest or the biggest unit
+	 * @param days part of the duration in days
+	 * @param months part of the duration in months
+	 * @param years part of the duration in years
+	 * @return a string that gives the duration with the 2 biggest or the biggest unit
 	 */
 	private static String durationToText(Integer days, Integer months, Integer years) {
-		if(days<7) {
-			if(days == 0 || days==1 )
-				return days.toString()+" jour";
-			else
-				return days.toString()+" jours";
-		}
-		else if(days>=7 && months<1) {
-			if(days/7 == 1)
-				return Integer.valueOf(days/7).toString()+" semaine";
-			else
-				return Integer.valueOf(days/7).toString()+" semaines";
-		}
-		else if(months>=1 && years<1) {
-			return months.toString()+" mois";
+		
+		if(days+months+years < 0 ) {
+			return "0 jour";
 		}
 		else {
-			if(years==1)
-				return years.toString()+" année";
-			else
-				return years.toString()+" années";
+			
+			Integer weeks = Integer.valueOf(days/7) ;
+			days = days - 7*weeks ;
+			String duration = "";
+			if( years >=1 ) {
+				if(years==1) 
+					duration += years.toString()+" année, ";
+				else
+					duration += years.toString()+" années, ";
+			}
+			if(months>=1 ) {
+				duration += months.toString()+" mois, ";
+			}
+			if( weeks>=1 && years == 0 ) {
+				if(weeks == 1)
+					duration += weeks.toString()+" semaine, ";
+				else
+					duration += weeks.toString()+" semaines, ";
+			}
+			if( days>0 && months+years == 0 ) {
+				if( days==1 )
+					duration += days.toString()+" jour  ";
+				else
+					duration += days.toString()+" jours  ";
+			}
+			
+			duration = duration.substring(0, duration.length()-2);
+			int index = duration.lastIndexOf(", ");
+			if(index != -1)
+				duration = duration.substring(0,index)+" et "+duration.substring(index+2) ;
+			return duration;
 		}
 	}
 }
