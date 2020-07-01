@@ -1,4 +1,4 @@
-package com.alten.hercules.model.response;
+package com.alten.hercules.controller.http.response;
 
 import java.util.HashMap;
 import java.util.Map;
