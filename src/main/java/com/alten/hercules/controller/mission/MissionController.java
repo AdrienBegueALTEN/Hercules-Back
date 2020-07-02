@@ -147,7 +147,7 @@ public class MissionController {
 	private ResponseEntity<?> getMissionDetails(Long missionId, boolean complete) {
 		try {
 			Mission mission = dal.findById(missionId)
-					.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
+				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 			return ResponseEntity.ok(complete ? 
 					new CompleteMissionResponse(mission, true, true) :
 					new RefinedMissionResponse(mission));
@@ -207,15 +207,11 @@ public class MissionController {
 		try {
 			Mission mission = dal.findById(missionId)
 				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
-			if (!(mission.getLastVersion().getVersionDate()==null))
+			if (mission.getLastVersion().getVersionDate() != null)
 				throw new EntityDeletionException("The mission is not on waiting and has a last version date.");
 			dal.delete(mission);
-			return ResponseEntity
-					.ok()
-					.build();
-		} catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
+			return ResponseEntity.ok().build();
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -310,21 +306,19 @@ public class MissionController {
 			@PathVariable Long missionId) {
 		try {
 			Mission mission = dal.findById(missionId)
-					.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
-				if (!mission.isValidated())
-					throw new InvalidSheetStatusException();
-				MissionSheet lastVersion = dal.findMostRecentVersion(mission.getId()).get();;
-				if (isToday(lastVersion.getVersionDate()))
-					throw new AlreadyExistingVersionException();
-				MissionSheet newVersion = dal.saveSheet(new MissionSheet(lastVersion));
-				newVersion.getProjects().forEach(project -> dal.saveProject(project));
-				mission.changeSecret();
-				mission.setSheetStatus(ESheetStatus.ON_WAITING);
-				dal.save(mission);
-		} catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
+			if (!mission.isValidated())
+				throw new InvalidSheetStatusException();
+			MissionSheet lastVersion = dal.findMostRecentVersion(mission.getId()).get();;
+			if (isToday(lastVersion.getVersionDate()))
+				throw new AlreadyExistingVersionException();
+			MissionSheet newVersion = dal.saveSheet(new MissionSheet(lastVersion));
+			newVersion.getProjects().forEach(project -> dal.saveProject(project));
+			mission.changeSecret();
+			mission.setSheetStatus(ESheetStatus.ON_WAITING);
+			dal.save(mission);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -373,34 +367,38 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PutMapping("/anonymous")
-	public ResponseEntity<?> putMissionFromToken(
+	public ResponseEntity<?> putMissionAnonymous(
 			@ApiParam(
 					"id : mission's identifier (unused because contained into the token);\n"
 					+ "fieldName : mission's fieldname to update;\n"
 					+ "value : field's new value."
 			)
 			@RequestBody UpdateEntityRequest request) {
-		Long id = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
-		if (request.getFieldName() == null)
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.build();
-		return updateMission(id, request.getFieldName(), request.getValue());
+		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
+		try {
+			Mission mission = dal.findById(missionId)
+				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
+			if (mission.isValidated())
+				throw new InvalidSheetStatusException();
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
+		return updateMission(missionId, request.getFieldName(), request.getValue());
 	}
 	
 	/**
 	 * Function that modifies a specific field of the given mission.
-	 * @param id ID of the mission
+	 * @param missionId
 	 * @param key name of the field to be modified
 	 * @param value modified value of the field
 	 * @return 200 The mission is modified<br> 400 the field name or the value is bad<br>403 The status doesn't give the right to modify<br>404 The mission is not found
+	 * @throws InvalidFieldnameException 
+	 * @throws  
 	 */
-	private ResponseEntity<?> updateMission(Long id, String key, Object value) {
+	private ResponseEntity<?> updateMission(Long missionId, String key, Object value) {
 		try {
-			Mission mission = dal.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
-			MissionSheet mostRecentVersion = dal.findMostRecentVersion(id).get();
-			
+			Mission mission = dal.findById(missionId)
+					.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
+			MissionSheet mostRecentVersion = dal.findMostRecentVersion(missionId)
+				.orElseThrow(() -> new ResourceNotFoundException(MissionSheet.class));
 			EMissionFieldname fieldname;
 			try { fieldname = EMissionFieldname.valueOf(key); }
 			catch (IllegalArgumentException e) { throw new InvalidFieldnameException(); }
@@ -453,11 +451,9 @@ public class MissionController {
 			updateSheetStatus(mission);
 			dal.saveSheet(mostRecentVersion);
 			return ResponseEntity.ok().build();
-		} catch (ResponseEntityException e) {
-			return e.buildResponse();
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
-		}
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -477,14 +473,10 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@GetMapping("/new-project/{missionId}")
-	public ResponseEntity<?> newProject(
+	public ResponseEntity<?> postProject(
 			@ApiParam("Mission identifier.")
 			@PathVariable Long missionId) {
-		try { _newProject(missionId); }
-		catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return newProject(missionId);
 	}
 	
 	/**
@@ -503,29 +495,27 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@GetMapping("/new-project-anonymous")
-	public ResponseEntity<?> newProjectAnonymous() {
+	public ResponseEntity<?> postProjectAnonymous() {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
-		try { _newProject(missionId); }
-		catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return newProject(missionId);
 	}
 	
 	/**
 	 * Function that creates a new project for a given mission if the mission is modifiable and has less than 5 projects.
 	 * @param missionId Id of the mission
-	 * @throws ResponseEntityException exception thrown if the mission is not found, the mission has already 5 projects or is validated.
 	 */
-	private void _newProject(Long missionId) throws ResponseEntityException {
-		Mission mission = dal.findById(missionId)
+	private ResponseEntity<?> newProject(Long missionId) {
+		try {
+			Mission mission = dal.findById(missionId)
 				.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
-		if (mission.isValidated())
-			throw new InvalidSheetStatusException();
-		MissionSheet lastVersion = mission.getLastVersion();
-		Project newProject = new Project(lastVersion);
-		dal.addProjectForSheet(lastVersion, newProject);
-		updateSheetStatus(mission);
+			if (mission.isValidated())
+				throw new InvalidSheetStatusException();
+			MissionSheet lastVersion = mission.getLastVersion();
+			Project newProject = new Project(lastVersion);
+			dal.addProjectForSheet(lastVersion, newProject);
+			updateSheetStatus(mission);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -574,7 +564,7 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@PutMapping("projects/anonymous")
-	public ResponseEntity<?> putProjectFromToken(
+	public ResponseEntity<?> putProjectAnonymous(
 			@ApiParam(
 					"id : project's identifier;\n"
 					+ "fieldName : project's fieldname to update;\n"
@@ -584,28 +574,27 @@ public class MissionController {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(request.getId())
-					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
-			if (project.getMissionSheet().getMission().getId() != missionId)
+				.orElseThrow(() -> new ResourceNotFoundException(Project.class));
+			final Mission mission = project.getMissionSheet().getMission();
+			if (mission.getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		}
+			if (mission.isValidated())
+				throw new InvalidSheetStatusException();
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 		return updateProject(request.getId(), request.getFieldName(), request.getValue());
 	}
 	
 	/**
 	 * Function that will modify a specific field of a project.
-	 * @param id ID of the project to be modified
+	 * @param projectId
 	 * @param key name of the field that will be modified
 	 * @param value the modified value of the field
 	 * @return 200 The project is updated <br>403 The sheet status is not good<br>404 The project is not found<br>400 The field name is not good<br>
 	 */
-	private ResponseEntity<?> updateProject(Long id, String key, Object value){
+	private ResponseEntity<?> updateProject(Long projectId, String key, Object value) {
 		try {
-			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
-			if (project.getMissionSheet().getMission().isValidated())
-				throw new InvalidSheetStatusException();
+			Project project = dal.findProjectById(projectId)
+				.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			checkIfProjectOfLastVersion(project);
 			EProjectFieldname fieldName;
 			try { fieldName = EProjectFieldname.valueOf(key); }
@@ -629,11 +618,9 @@ public class MissionController {
 			updateSheetStatus(project.getMissionSheet().getMission());
 			dal.saveProject(project);
 			return ResponseEntity.ok(null);
-		} catch (ResponseEntityException e) { 
-			return e.buildResponse();
 		} catch (ClassCastException | NullPointerException e) {
 			return new InvalidValueException().buildResponse();
-		}
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -654,11 +641,7 @@ public class MissionController {
 	public ResponseEntity<?> deleteProject(
 			@ApiParam("Project identifier.")
 			@PathVariable Long projectId) {
-		try { projectDeletion(projectId); }
-		catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
-		return ResponseEntity.ok(null);
+		return projectDeletion(projectId);
 	}
 	
 	/**
@@ -682,23 +665,21 @@ public class MissionController {
 		try {
 			Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 			Project project = dal.findProjectById(projectId)
-					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
+				.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-			projectDeletion(projectId);
-		} catch (ResponseEntityException e) {
-			return e.buildResponse();
-		}
-		return ResponseEntity.ok(null);
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
+		return projectDeletion(projectId);
 	}
 	
 	/**
 	 * Function that will delete a project by using its ID.
-	 * @param id ID of the project
+	 * @param projectId
 	 * @throws ResponseEntityException exception thrown if the project is not found
 	 */
-	private void projectDeletion(Long id) throws ResponseEntityException {
-			Project project = dal.findProjectById(id)
+	private ResponseEntity<?> projectDeletion(Long projectId) {
+		try {
+			Project project = dal.findProjectById(projectId)
 					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			if (project.getMissionSheet().getMission().isValidated())
 				throw new InvalidSheetStatusException();
@@ -709,6 +690,8 @@ public class MissionController {
 			this.storeImage.delete(StoreImage.PROJECT_FOLDER+project.getPicture());
 			dal.removeProject(project);
 			updateSheetStatus(project.getMissionSheet().getMission());
+			return ResponseEntity.ok(null);
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
 	}
 	
 	/**
@@ -980,9 +963,9 @@ public class MissionController {
 		@ApiResponse(code = 200, message="Skills are created and added to the project.")
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
-	@PostMapping("/projects/{id}/skills")
-	public ResponseEntity<?> addSkillToProjectManager(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Name of all the skills")@RequestBody String... labels) {
-		return this.addSkillToProject(id, labels);
+	@PostMapping("/projects/{projectId}/skills")
+	public ResponseEntity<?> addSkillToProjectManager(@ApiParam("ID of the project")@PathVariable Long projectId, @ApiParam("Name of all the skills")@RequestBody String... labels) {
+		return this.addSkillToProject(projectId, labels);
 	}
 	
 	/**
@@ -1003,38 +986,36 @@ public class MissionController {
 		@ApiResponse(code = 200, message="Skills are created and added to the project.")
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
-	@PostMapping("/projects/anonymous/{id}/skills")
-	public ResponseEntity<?> addSkillToProjectToken(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Name of all the skills")@RequestBody String... labels) {
+	@PostMapping("/projects/anonymous/{projectId}/skills")
+	public ResponseEntity<?> addSkillToProjectToken(@ApiParam("ID of the project")@PathVariable Long projectId, @ApiParam("Name of all the skills")@RequestBody String... labels) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
-			Project project = dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
+			Project project = dal.findProjectById(projectId)
+				.orElseThrow(() -> new ResourceNotFoundException(Project.class));
+			if (project.getMissionSheet().getMission().isValidated())
+				throw new InvalidSheetStatusException();
 			if (project.getMissionSheet().getMission().getId() != missionId)
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		}
-		return this.addSkillToProject(id, labels);
+		} catch (ResponseEntityException e) { return e.buildResponse(); }
+		return addSkillToProject(projectId, labels);
 	}
 	
 	/**
 	 * Add skills to a project. It creates if needed the skills, or else it find the existing one to use it.
-	 * @param id  project id
+	 * @param projectId Id of the project
 	 * @param labels  array of skill labels
 	 * @return 404 if the project is not found<br>200 if all skills are added to the project
 	 */
-	private ResponseEntity<?> addSkillToProject(Long id, String... labels) {
+	private ResponseEntity<?> addSkillToProject(Long projectId, String... labels) {
 		try {
-			Project proj = this.dal.findProjectById(id)
-					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
+			Project project = dal.findProjectById(projectId)
+				.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 			for(int i=0;i<labels.length;i++) {
 				Skill s = this.dal.findSkillByLabel(labels[i]).orElse(new Skill(labels[i]));
-				this.dal.addSkillToProject(proj, s);
+				this.dal.addSkillToProject(project, s);
 			}
 			return ResponseEntity.ok().build();
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		}
+		} catch (ResponseEntityException e) {return e.buildResponse(); }
 	}
 	
 	/**
@@ -1057,8 +1038,8 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MANAGER')")
 	@DeleteMapping("/projects/{id}/skills")
-	public ResponseEntity<?> removeSkillFromProjectManager(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Skill to remove")@RequestBody Skill skill) {
-		return this.removeSkillFromProject(id, skill);
+	public ResponseEntity<?> deleteSkill(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Skill to remove")@RequestBody Skill skill) {
+		return removeSkillFromProject(id, skill.getLabel());
 	}
 	
 	/**
@@ -1080,7 +1061,7 @@ public class MissionController {
 	})
 	@PreAuthorize("hasAuthority('MISSION')")
 	@DeleteMapping("/projects/anonymous/{id}/skills")
-	public ResponseEntity<?> removeSkillFromProjectToken(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Skill to remove")@RequestBody Skill skill) {
+	public ResponseEntity<?> deleteSkillAnonymous(@ApiParam("ID of the project")@PathVariable Long id, @ApiParam("Skill to remove")@RequestBody Skill skill) {
 		Long missionId = ((Mission)(SecurityContextHolder.getContext().getAuthentication().getPrincipal())).getId();
 		try {
 			Project project = dal.findProjectById(id)
@@ -1090,26 +1071,24 @@ public class MissionController {
 		} catch (ResourceNotFoundException e) {
 			return e.buildResponse();
 		}
-		return this.removeSkillFromProject(id, skill);
+		return this.removeSkillFromProject(id, skill.getLabel());
 	}
 	
 	/**
 	 * Delete a skill from  a project. If the skill is no longer attached to a project, it will be also deleted.
-	 * @param id  project id
+	 * @param projectId	Id of the project
 	 * @param skill  skill object
 	 * @return 404 if the project or the skill is not found<br>200 if the deletion is done
 	 */
-	private ResponseEntity<?> removeSkillFromProject(Long id, Skill skill) {
+	private ResponseEntity<?> removeSkillFromProject(Long projectId, String label) {
 		try {
-			Project project = this.dal.findProjectById(id)
+			Project project = dal.findProjectById(projectId)
 					.orElseThrow(() -> new ResourceNotFoundException(Project.class));
-			Skill s = this.dal.findSkillByLabel(skill.getLabel())
-					.orElseThrow(() -> new ResourceNotFoundException(Skill.class));
-			this.dal.removeSkillFromProject(project, s);
+			Skill skill = this.dal.findSkillByLabel(label)
+				.orElseThrow(() -> new ResourceNotFoundException(Skill.class));
+			dal.removeSkillFromProject(project, skill);
 			return ResponseEntity.ok().build();
-		} catch (ResourceNotFoundException e) {
-			return e.buildResponse();
-		}
+		} catch (ResourceNotFoundException e ) { return e.buildResponse(); }
 	}
 	
 	/**
