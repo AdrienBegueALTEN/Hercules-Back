@@ -76,7 +76,7 @@ public class PDFGenerator {
     /**
      * Constructor that takes a PDDocument from PDFBox and initializes the used pictures
      * @param document PDDocument from PDFBox that represents the pdf document
-     * @throws IOException
+     * @throws IOException if the files are not found
      */
 	public PDFGenerator(PDDocument document) throws IOException {
 		// Images utilisées
@@ -130,7 +130,7 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(darkblue);
         contentStream.showText( "Mission");
         contentStream.setFont(font1, 18);
-        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
+        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75,18) );
         contentStream.endText();
         
         
@@ -158,26 +158,30 @@ public class PDFGenerator {
         contentStream.endText();
 
         
+        
         // Comment
-        contentStream.setNonStrokingColor(lightblue);
-        contentStream.beginText();
-        contentStream.newLineAtOffset(60, 240);
-        contentStream.setFont( font2, 15 );
-        contentStream.showText("«");
-        contentStream.newLineAtOffset(0, -5);
-        contentStream.setFont( font1, 10 );
-        String commentary = mission.getLastVersion().getComment();
         
-        for(String line : separateLines(commentary,font1,220,10)) {
-        	contentStream.newLineAtOffset(0, -15);
-        	contentStream.showText(line);
+        if( mission.getLastVersion().getComment() != null && !mission.getLastVersion().getComment().equals("") ) {
+	        
+        	contentStream.setNonStrokingColor(lightblue);
+	        contentStream.beginText();
+	        contentStream.newLineAtOffset(60, 240);
+	        contentStream.setFont( font2, 15 );
+	        contentStream.showText("«");
+	        contentStream.newLineAtOffset(0, -5);
+	        contentStream.setFont( font1, 10 );
+	        String commentary = mission.getLastVersion().getComment();
+	        
+	        for(String line : separateLines(commentary,font1,220,10)) {
+	        	contentStream.newLineAtOffset(0, -15);
+	        	contentStream.showText(line);
+	        }
+	        contentStream.newLineAtOffset(220, -15);
+	        contentStream.setFont( font2, 15 );
+	        contentStream.showText("»");
+	        contentStream.endText();
+        
         }
-        contentStream.newLineAtOffset(220, -15);
-        contentStream.setFont( font2, 15 );
-        contentStream.showText("»");
-        contentStream.endText();
-        
-
         
         
         
@@ -211,7 +215,7 @@ public class PDFGenerator {
         contentStream.showText(cutText( " « "+ project.getMissionSheet().getConsultantRole()+
         						" » chez "+ mission.getCustomer().getName()+ 
         						" par "+ mission.getConsultant().getFirstname()+
-        						" "+mission.getConsultant().getLastname()+" ",font1,(int) height-70-75,18) );
+        						" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75,18) );
         contentStream.endText();
         
        
@@ -371,7 +375,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(340, 240);
         contentStream.setFont( font1, 15 );
         contentStream.setNonStrokingColor(lightblue);
-        contentStream.showText(cutText(mission.getConsultant().getFirstname()+" "+mission.getConsultant().getLastname(),font1,210,15));
+        contentStream.showText(cutText(mission.getConsultant().getFirstname()+" "+anonymiseLastname(mission.getConsultant().getLastname()),font1,210,15));
         contentStream.newLineAtOffset(15, -15);
         contentStream.setFont( font1, 10 );
         contentStream.setNonStrokingColor(black);
@@ -576,7 +580,7 @@ public class PDFGenerator {
 	/**
 	 * Function that takes a PDFBox document and saves it as a pdf file
 	 * @param document  PDDocument from PDFBox that represents a pdf document
-	 * @throws IOException
+	 * @throws IOException if the file was not saved
 	 */
 	public void saveFinalPDF(PDDocument document) throws IOException {
 		document.save("pdf\\fichesMissionsEtProjets.pdf");
@@ -591,7 +595,7 @@ public class PDFGenerator {
 	 * @param maxWidth maximal length of a line
 	 * @param fontSize size of the font
 	 * @return a List<String> that contains the sliced parts of the text
-	 * @throws IOException
+	 * @throws IOException Text can't be cut
 	 */
 	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize ) throws IOException{
 		
@@ -640,7 +644,7 @@ public class PDFGenerator {
 	 * @param text text to display
 	 * @param cx x coordinate from c
 	 * @param cy y coordinate from c
-	 * @throws IOException
+	 * @throws IOException the given String is null
 	 */
 	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx,int cy) throws IOException {
 		List<String> lines = separateLines(text,PDType1Font.HELVETICA,55,8);
@@ -664,7 +668,7 @@ public class PDFGenerator {
 	 * @param maxWidth maximal length of the text
 	 * @param fontSize size of the font
 	 * @return the shortened String if it's too long with ... at the end
-	 * @throws IOException
+	 * @throws IOException the given String is null
 	 */
 	private static String cutText(String text, PDFont font, int maxWidth, int fontSize) throws IOException {
 		
@@ -684,7 +688,7 @@ public class PDFGenerator {
 	/**
 	 * Function that modifies a String by replacing it by a corresponding one
 	 * @param text text to replace
-	 * @return
+	 * @return French translation of the given word
 	 */
 	private static String modifyText(String text) {
 		if(text.equals("technical_assistance")) {
@@ -745,5 +749,16 @@ public class PDFGenerator {
 				duration = duration.substring(0,index)+" et "+duration.substring(index+2) ;
 			return duration;
 		}
+	}
+	
+	/**
+	 * Function that takes a String and keeps only the first char and adds a point
+	 * @param lastname Given last name
+	 * @return last name with only the first letter followed by a point
+	 */
+	private String anonymiseLastname(String lastname) {
+		
+		return lastname.charAt(0)+"." ;
+		
 	}
 }
