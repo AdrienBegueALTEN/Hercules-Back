@@ -4,6 +4,11 @@ import com.alten.hercules.controller.user.http.request.AddUserRequest;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.user.Manager;
 
+/**
+ * Class that contains the information for a request that adds a manager
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public class AddManagerRequest extends AddUserRequest {
 	
 	/**

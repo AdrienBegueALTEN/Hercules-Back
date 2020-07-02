@@ -7,6 +7,11 @@ import com.alten.hercules.consts.AppConst;
 import com.alten.hercules.model.exception.InvalidValueException;
 import com.alten.hercules.model.user.AppUser;
 
+/**
+ * Class that contains information for a request that adds a user 
+ * @author mfoltz, rjesson, abegue, jbaudot
+ *
+ */
 public abstract class AddUserRequest {
 	
 	/**
