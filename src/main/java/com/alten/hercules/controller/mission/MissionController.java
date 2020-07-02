@@ -523,8 +523,6 @@ public class MissionController {
 		if (mission.isValidated())
 			throw new InvalidSheetStatusException();
 		MissionSheet lastVersion = mission.getLastVersion();
-		if (!(lastVersion.getProjects().size() < 5))
-			throw new ProjectsBoundsException();
 		Project newProject = new Project(lastVersion);
 		dal.addProjectForSheet(lastVersion, newProject);
 		updateSheetStatus(mission);
