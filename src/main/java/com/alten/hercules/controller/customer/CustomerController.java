@@ -255,8 +255,8 @@ public class CustomerController {
 		try {
 			String extension = FilenameUtils.getExtension(name).toLowerCase();
 			if(extension.equals("jpg") || extension.equals("png") || extension.equals("jpeg") 
-					|| extension.equals("gif") || extension.equals("webp") || extension.equals("ico") 
-					|| extension.equals("svg")) {
+					|| extension.equals("bmp") || extension.equals("gif") 
+					|| extension.equals("tif") || extension.equals("tiff")) {
 				Customer customer = dal.findById(id).orElseThrow(() -> new ResourceNotFoundException(Customer.class));
 				if(customer.getLogo()!=null) {
 					this.storeImage.delete(StoreImage.LOGO_FOLDER+customer.getLogo());

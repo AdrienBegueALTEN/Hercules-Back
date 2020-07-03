@@ -802,7 +802,7 @@ public class MissionController {
 	
 	/**
 	 * Upload a project picture on server side and and the file name to the project.
-	 * @param file  project picture (weight is less than 1 Mo)
+	 * @param file  project picture (weight is less than 3 Mo)
 	 * @param id  project id
 	 * @return 404 if the project is not found<br>200 if the image is added<br>400 if the extension of the file is not good
 	 */
@@ -810,8 +810,8 @@ public class MissionController {
 		try {
 			String extension = FilenameUtils.getExtension(name).toLowerCase();
 			if(extension.equals("jpg") || extension.equals("png") || extension.equals("jpeg") 
-					|| extension.equals("gif") || extension.equals("webp") || extension.equals("ico") 
-					|| extension.equals("svg")) {
+					|| extension.equals("bmp") || extension.equals("gif") 
+					|| extension.equals("tif") || extension.equals("tiff")) {
 				Project proj = this.dal.findProjectById(id).orElseThrow(() -> new ResourceNotFoundException(Project.class));
 				if(proj.getPicture()!=null) {
 					this.storeImage.delete("img/proj/"+proj.getPicture());
