@@ -144,7 +144,6 @@ public class MissionDAL {
 	 * @return the list of missions which corresponds to all the criteria.
 	 */
 	public List<Mission> advancedSearchQuery(Map<String, String> criteria, Optional<Long> manager) {
-		
 		CriteriaBuilder builder = em.getCriteriaBuilder();
 	    CriteriaQuery<Mission> query = builder.createQuery(Mission.class);
 	    
@@ -175,10 +174,8 @@ public class MissionDAL {
 	    		builder.isNull(subQuery));
 	    sheetJoin.on(sheetDatePredicate);
 
-
 	    //Contains the criteria used to create the final query
         List<Predicate> criteriaList = new ArrayList<>();
-        
        
         //It checks if the title is here. If it's present, the criterion is added to the criteriaList
         String key = "title";
@@ -227,8 +224,6 @@ public class MissionDAL {
         		criteriaList.add(builder.or(skillPredicates));
         }
         
-        
-        
         Predicate AllValidatedMissions = builder.equal(root.get("sheetStatus").as(String.class), ESheetStatus.VALIDATED.name());
         
         //If the user is authenticated, the manager long exists and the query retrieves all of his missions and all validated missions of other managers
@@ -238,29 +233,22 @@ public class MissionDAL {
 	    			AllValidatedMissions,
 	    			builder.equal(consultantJoin.get("manager"), managerDAO.getOne(manager.get()))));
         else criteriaList.add(AllValidatedMissions);
-          
-        
-        //caseExpression watches the sheetStatus and sorts the mission by their status
-        Expression<Object> caseExpression = builder.selectCase()
-    	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("VALIDATED")), 3)
-    	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("ON_GOING")), 2)
-    	    	.when(builder.equal(root.get("sheetStatus").as(String.class), builder.literal("ON_WAITING")), 1);
      
-    	query = query.orderBy(builder.asc(caseExpression));
+    	query = query.distinct(true);
     	
     	//Query is created using the criteriaList
     	query.where(builder.and(criteriaList.toArray(new Predicate[0])));
     	
     	//The skills create duplicates. The set remove duplicates, and must be re-ordered with the sheet status
     	List<Mission> foundMissions = em.createQuery(query).getResultList();
-    	Set<Mission> setMissions = new HashSet<>(foundMissions);
-    	List<Mission> uniqueMissions = new ArrayList<Mission>(setMissions);
-    	uniqueMissions.sort((m1,m2)->{ 
-    		if(m1.getSheetStatus()==ESheetStatus.VALIDATED) return 1;
-    		else if(m1.getSheetStatus()==ESheetStatus.ON_GOING) return 0;
-    		else return -1;
+    	foundMissions.sort((m1,m2)->{ 
+    		switch (m1.getSheetStatus()) {
+    			case VALIDATED : return 1;
+    			case ON_GOING : return 0;
+    			default : return -1;
+    		}
     	});
-	    return uniqueMissions;
+    	return foundMissions;
 	}
 	
 	/**
