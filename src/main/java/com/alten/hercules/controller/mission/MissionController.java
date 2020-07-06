@@ -1123,7 +1123,6 @@ public class MissionController {
 	@PostMapping("/pdf")
 	public ResponseEntity<?> generatePDF(@ApiParam("List of the projects and missions to put in the PDF")@Valid @RequestBody List<GeneratePDFRequest> elements ) {
 		
-		
 			int n = elements.size();
 		
 			PDDocument document = new PDDocument();
@@ -1133,25 +1132,20 @@ public class MissionController {
 			try {
 				pdfGenerator = new PDFGenerator(document);
 			
-			
 				for(int i = 0; i<n ; i++) {
 					
-						
 							if(elements.get(i).getType().equals("m")){
 								Mission mission = dal.findById(elements.get(i).getId())
 										.orElseThrow(() -> new ResourceNotFoundException(Mission.class));
 								pdfGenerator.makePDFPage(mission, mission.getLastVersion().getProjects(), document, true);
 								missionIndex.add(i);
-							
 							}
 				}
-				
 				
 				if(missionIndex.size()>0) {
 					Set<Project> projectsToAdd = new HashSet<Project>();
 					Set<Project> projectsAlreadyAdded = new HashSet<Project>();
 					for(Integer index : missionIndex) {
-						
 						
 						Long id = elements.get(index).getId();
 						PDPage missionToMove = document.getPage(0);
@@ -1163,9 +1157,8 @@ public class MissionController {
 										.orElseThrow(() -> new ResourceNotFoundException(Project.class));
 								if(project.getMissionSheet().getMission().getId()==id) {
 									
-									if(projectsToAdd.contains(project)) {
+									if(projectsToAdd.contains(project)) 
 										projectsToAdd.remove(project);
-									}
 									
 									pdfGenerator.makePDFPage(project.getMissionSheet().getMission(), Set.of(project), document, false);
 									projectsAlreadyAdded.add(project);
@@ -1173,7 +1166,6 @@ public class MissionController {
 								else if(!projectsAlreadyAdded.contains(project)) {
 									
 									projectsToAdd.add(project);
-									
 								}
 							}
 						}
@@ -1185,7 +1177,6 @@ public class MissionController {
 				}
 				else {
 					for(int i = 0; i<n ; i++) {
-						
 						
 						if(elements.get(i).getType().equals("p")){
 							Project project = dal.findProjectById(elements.get(i).getId())
