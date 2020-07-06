@@ -42,8 +42,6 @@ public class PDFGenerator {
 	 */
 	private final static Path pdfFolder = Paths.get("pdf");
 	
-	
-	
 	// Polices utilisées
 	/**
 	 * Helvetica font
@@ -101,7 +99,7 @@ public class PDFGenerator {
 	}
 	
 	/**
-	 * Function that cleans everything into the pdf folder
+	 * Function that cleans everything into the PDF folder
 	 */
 	public static void deleteAll() {
 	    FileSystemUtils.deleteRecursively(pdfFolder.toFile());
@@ -116,8 +114,6 @@ public class PDFGenerator {
 	 * @throws IOException exception that indicates the failure of the PDF creation
 	 */
 	private void makeMissionPDF(PDPageContentStream contentStream, Mission mission, float height, float width) throws IOException {
-
-		
         
         // text of the mission in the header
         contentStream.beginText();
@@ -132,9 +128,7 @@ public class PDFGenerator {
         contentStream.setFont(font1, 18);
         contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75,18) );
         contentStream.endText();
-        
-        
-                
+         
         // description of the mission
         contentStream.drawImage(blueStick,315,280,15,220);
         contentStream.setNonStrokingColor(white);
@@ -157,10 +151,7 @@ public class PDFGenerator {
         }
         contentStream.endText();
 
-        
-        
         // Comment
-        
         if( mission.getLastVersion().getComment() != null && !mission.getLastVersion().getComment().equals("") ) {
 	        
         	contentStream.setNonStrokingColor(lightblue);
@@ -180,11 +171,8 @@ public class PDFGenerator {
 	        contentStream.setFont( font2, 15 );
 	        contentStream.showText("»");
 	        contentStream.endText();
-        
         }
-        
-        
-        
+
 	}
 	
 	/**
@@ -200,7 +188,6 @@ public class PDFGenerator {
 		
 		Mission mission = project.getMissionSheet().getMission();
 		
-        
         // text for the project in the header
         contentStream.beginText();
         contentStream.setFont( font1, 12 );
@@ -217,9 +204,7 @@ public class PDFGenerator {
         						" par "+ mission.getConsultant().getFirstname()+
         						" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75,18) );
         contentStream.endText();
-        
-       
-                
+          
         // description of the project
         contentStream.drawImage(blueStick,315,280,15,220);
         contentStream.setNonStrokingColor(white);
@@ -242,8 +227,6 @@ public class PDFGenerator {
         }
         contentStream.endText();
         
-        
-        
         // photo of the project
         if(project.getPicture()!=null) {
 	        PDImageXObject projectPicture = 
@@ -262,7 +245,6 @@ public class PDFGenerator {
 	        		optimalHeight = 235;
 	        	}
 	        }
-	        
 	        contentStream.drawImage(projectPicture, 60+(235-optimalWidth)/2,25+(235-optimalHeight),optimalWidth,optimalHeight); //235 max en hauteur   235 max en largeur
         }
         /*else {
@@ -271,10 +253,6 @@ public class PDFGenerator {
             showCenteredText(contentStream,"aucune photo disponible",175,160);
             
         }*/ //texte à afficher si photo indisponible
-        
-        
-        
-		
 	}
 	
 	/**
@@ -286,8 +264,6 @@ public class PDFGenerator {
 	 * @throws IOException exception that indicates the failure of the PDF creation
 	 */
 	public void makePDFPage(Mission mission,Set<Project> projects, PDDocument document, boolean isMission) throws IOException {
-		
-		float constantForCircleWithBezierCurve = (float) 0.551915024494; // look for Bezier Curves
 		
 		// Creation of a new page
 		PDPage page = new PDPage(PDRectangle.A4);
@@ -304,8 +280,6 @@ public class PDFGenerator {
 		// landscape format
 		contentStream.transform(new Matrix(0, 1, -1, 0, width, 0));
 		
-		
-		
 		// header
         contentStream.drawImage(layoutAlten,0,0,height,width);
         
@@ -314,14 +288,14 @@ public class PDFGenerator {
 	        		PDImageXObject.createFromFile("img\\logo\\"+mission.getCustomer().getLogo(), document);
 	        float optimalHeight = customerLogo.getHeight();
 	        float optimalWidth = customerLogo.getWidth();
-	        if(customerLogo.getWidth()>customerLogo.getHeight()) {
-	        	if(customerLogo.getWidth()>=65) {
+	        if(customerLogo.getWidth() > customerLogo.getHeight()) {
+	        	if(customerLogo.getWidth() >= 65) {
 	        		optimalHeight = customerLogo.getHeight()/(customerLogo.getWidth()/65);
 	        		optimalWidth = 65;
 	        	}
 	        }
 	        else {
-	        	if(customerLogo.getHeight()>=65) {
+	        	if(customerLogo.getHeight() >= 65) {
 	        		optimalWidth = customerLogo.getWidth()/(customerLogo.getHeight()/65);
 	        		optimalHeight = 65;
 	        	}
@@ -342,7 +316,7 @@ public class PDFGenerator {
      		makeProjectPDF(document, contentStream, projects.iterator().next(), height, width);
 		
 		// description of the customer
-        contentStream.drawImage(blueStick,60,280,15,220);
+        contentStream.drawImage(blueStick, 60, 280, 15, 220);
         contentStream.setNonStrokingColor(white);
         contentStream.addRect(75, 280, 220, 220);
         contentStream.fill();
@@ -354,7 +328,7 @@ public class PDFGenerator {
         contentStream.newLineAtOffset(15, -20);
         contentStream.setFont( font3, 10 );
         contentStream.setNonStrokingColor(black);
-        contentStream.showText(cutText(mission.getCustomer().getActivitySector(),font3,195,10));
+        contentStream.showText(cutText(mission.getCustomer().getActivitySector(), font3, 195, 10));
         contentStream.setFont( font1, 10 );
         contentStream.newLineAtOffset(0, -5);
         
@@ -383,7 +357,7 @@ public class PDFGenerator {
         String text;
         switch (exp) {
         	case 0:
-        		text = "Jeune diplomé";
+        		text = "Jeune diplômé";
         		break;
         	case 1:
         		text = "Un an d'expérience";
@@ -397,27 +371,27 @@ public class PDFGenerator {
         
         int limitForDiploma = 5;
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
-        if( !(diplomas == null) && !(diplomas.size() < 0) ) {
+        if( diplomas != null && diplomas.size() >= 0 ) {
 	        for(Diploma diploma : diplomas ) {
 		        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
 		        	contentStream.newLineAtOffset(0, -15);
 		        	contentStream.showText(line);
 		        	limitForDiploma += 15;
-		        	if(limitForDiploma>=140)
+		        	if(limitForDiploma >= 140)
 		        		break;
 		        }
-		        if(limitForDiploma>=140)
+		        if(limitForDiploma >= 140)
 	        		break;
 		        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
 		        	contentStream.newLineAtOffset(0, -15);
 		        	contentStream.showText(line);
 		        	limitForDiploma += 15;
-		        	if(limitForDiploma>=140)
+		        	if(limitForDiploma >= 140)
 		        		break;
 		        }
 		        contentStream.newLineAtOffset(0, -5);
 		        limitForDiploma += 5;
-		        if(limitForDiploma>=140)
+		        if(limitForDiploma >= 140)
 	        		break;
 	        }
         }
@@ -441,32 +415,20 @@ public class PDFGenerator {
         	
         	for(Skill skill : project.getSkills()) {
         		
-        		
-        		if(counter<20 && counter>=10) {
+        		if(counter < 20 && counter >= 10) {
         			int cx = 588+115;
         			int cyBis  = cy + 150;
 	        		contentStream.setNonStrokingColor(yellow);
-	                contentStream.moveTo(cx - 2, cyBis);
-	                contentStream.curveTo(cx - 2, cyBis + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cyBis + 2, cx, cyBis + 2);
-	                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cyBis + 2, cx + 2, cyBis + constantForCircleWithBezierCurve*2, cx + 2, cyBis);
-	                contentStream.curveTo(cx + 2, cyBis - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cyBis - 2, cx, cyBis - 2);
-	                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cyBis - 2, cx - 2, cyBis - constantForCircleWithBezierCurve*2, cx - 2, cyBis);
-	                contentStream.fill();
-	                contentStream.setNonStrokingColor(black);
+	                createBubble(contentStream, 2, cx, cyBis);
         		}
-        		else if(counter<10) {
+        		else if(counter < 10) {
         			int cx = 588;
         			contentStream.setNonStrokingColor(yellow);
-	                contentStream.moveTo(cx - 2, cy);
-	                contentStream.curveTo(cx - 2, cy + constantForCircleWithBezierCurve*2, cx - constantForCircleWithBezierCurve*2, cy + 2, cx, cy + 2);
-	                contentStream.curveTo(cx + constantForCircleWithBezierCurve*2, cy + 2, cx + 2, cy + constantForCircleWithBezierCurve*2, cx + 2, cy);
-	                contentStream.curveTo(cx + 2, cy - constantForCircleWithBezierCurve*2, cx + constantForCircleWithBezierCurve*2, cy - 2, cx, cy - 2);
-	                contentStream.curveTo(cx - constantForCircleWithBezierCurve*2, cy - 2, cx - 2, cy - constantForCircleWithBezierCurve*2, cx - 2, cy);
-	                contentStream.fill();
-	                contentStream.setNonStrokingColor(black);
-
+	                createBubble(contentStream, 2, cx, cy);
         		}
                 
+        		contentStream.setNonStrokingColor(black);
+        		
 		        for(String line : separateLines(skill.getLabel(),font1,95,10)) {
 		        	if(counter<20) {
 			        	contentStream.beginText();
@@ -495,10 +457,7 @@ public class PDFGenerator {
 	        contentStream.endText();
         }
 		
-		
 		// Bubbles
-        
-        
         int rayon = 28;
         int cx1 = 420;
         int cy1 = 40;
@@ -506,29 +465,18 @@ public class PDFGenerator {
         int cx3 = 620;
         int cx4 = 720;
         
-        
         // Contract bubble
         contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx1 - rayon, cy1);
-        contentStream.curveTo(cx1 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1, cy1 + rayon);
-        contentStream.curveTo(cx1 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx1 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx1 + rayon, cy1);
-        contentStream.curveTo(cx1 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx1 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx1, cy1 - rayon);
-        contentStream.curveTo(cx1 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx1 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx1 - rayon, cy1);
-        contentStream.fill();
-        contentStream.drawImage(contractIcon,411,45,contractIcon.getWidth()/3,contractIcon.getHeight()/3);
+        createBubble(contentStream, rayon, cx1, cy1);
+        contentStream.drawImage(contractIcon, 411, 45, contractIcon.getWidth()/3, contractIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
-        showCenteredText(contentStream,modifyText(mission.getLastVersion().getContractType().name()),cx1,35);
+        showCenteredText(contentStream, modifyText(mission.getLastVersion().getContractType().name()), cx1, 35);
         
         
         // Team bubble
         contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx2 - rayon, cy1);
-        contentStream.curveTo(cx2 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2, cy1 + rayon);
-        contentStream.curveTo(cx2 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx2 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx2 + rayon, cy1);
-        contentStream.curveTo(cx2 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx2 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx2, cy1 - rayon);
-        contentStream.curveTo(cx2 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx2 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx2 - rayon, cy1);
-        contentStream.fill();
+        createBubble(contentStream, rayon, cx2, cy1);
         contentStream.drawImage(teamIcon,512,45,teamIcon.getWidth()/3,teamIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
@@ -536,20 +484,15 @@ public class PDFGenerator {
 		
 		// Duration bubble
         contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx3 - rayon, cy1);
-        contentStream.curveTo(cx3 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3, cy1 + rayon);
-        contentStream.curveTo(cx3 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx3 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx3 + rayon, cy1);
-        contentStream.curveTo(cx3 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx3 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx3, cy1 - rayon);
-        contentStream.curveTo(cx3 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx3 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx3 - rayon, cy1);
-        contentStream.fill();
-        contentStream.drawImage(durationIcon,610,45,durationIcon.getWidth()/3,durationIcon.getHeight()/3);
+        createBubble(contentStream, rayon, cx3, cy1);
+        contentStream.drawImage(durationIcon, 610, 45, durationIcon.getWidth()/3, durationIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
         int durationDay = 0;
         int durationMonth = 0;
         int durationYear = 0;
         for(Project project : projects ) {
-        	if(project.getBeginDate()!=null && project.getEndDate()!=null) {
+        	if(project.getBeginDate() != null && project.getEndDate() != null) {
 	        	Period period = Period.between(project.getBeginDate(), project.getEndDate());
 	        	durationDay +=  period.getDays();
 	        	durationMonth += period.getMonths();
@@ -557,23 +500,16 @@ public class PDFGenerator {
         	}
         	
         }
-        
         showCenteredText(contentStream,modifyText(durationToText(durationDay,durationMonth, durationYear)),cx3,35);
 		
 		// Localization bubble
         contentStream.setNonStrokingColor(white);
-        contentStream.moveTo(cx4 - rayon, cy1);
-        contentStream.curveTo(cx4 - rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 - constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4, cy1 + rayon);
-        contentStream.curveTo(cx4 + constantForCircleWithBezierCurve*rayon, cy1 + rayon, cx4 + rayon, cy1 + constantForCircleWithBezierCurve*rayon, cx4 + rayon, cy1);
-        contentStream.curveTo(cx4 + rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx4 + constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx4, cy1 - rayon);
-        contentStream.curveTo(cx4 - constantForCircleWithBezierCurve*rayon, cy1 - rayon, cx4 - rayon, cy1 - constantForCircleWithBezierCurve*rayon, cx4 - rayon, cy1);
-        contentStream.fill();
+        createBubble(contentStream, rayon, cx4, cy1);
         contentStream.drawImage(localizationIcon,709,45,localizationIcon.getWidth()/3,localizationIcon.getHeight()/3);
         contentStream.setNonStrokingColor(black);
         contentStream.setFont( font1, 8 );
         showCenteredText(contentStream,modifyText(mission.getLastVersion().getCity()+", "+mission.getLastVersion().getCountry()),cx4,35);
 	
-        
         contentStream.close();
 	}
 	
@@ -624,7 +560,6 @@ public class PDFGenerator {
         			lines.add(text.substring(0, end1));
         		text = text.substring(end1).trim();
         		end1 = -1;
-        		
         	}
         	else if (end2 == text.length()){
         		lines.add(text);
@@ -634,7 +569,6 @@ public class PDFGenerator {
         		end1 = end2 ;
         	}
         }
-        
         return lines;
 	}
     
@@ -657,9 +591,7 @@ public class PDFGenerator {
 			contentStream.endText();
 			count ++;
 		}
-		
 	}
-	
 	
 	/**
 	 * Function that takes a String and given its characteristics, shortens it so that it doesn't exceed a given length
@@ -717,7 +649,6 @@ public class PDFGenerator {
 			return "0 jour";
 		}
 		else {
-			
 			Integer weeks = Integer.valueOf(days/7) ;
 			days = days - 7*weeks ;
 			String duration = "";
@@ -759,6 +690,25 @@ public class PDFGenerator {
 	private String anonymiseLastname(String lastname) {
 		
 		return lastname.charAt(0)+"." ;
+	}
+	
+	/**
+	 * Function 
+	 * @param contentStream stream for a PDF page
+	 * @param radius radius of the circle
+	 * @param centerX x-coordinate of the center of the circle
+	 * @param centerY y-coordinate of the center of the circle
+	 * @throws IOException The circle wasn't added to the PDF page
+	 */
+	private void createBubble(PDPageContentStream contentStream, int radius, int centerX, int centerY) throws IOException {
 		
+		float constantForCircleWithBezierCurve = (float) 0.551915024494; // constant to make a circle for Bezier Curves
+		
+        contentStream.moveTo(centerX - radius, centerY);
+        contentStream.curveTo(centerX - radius, centerY + constantForCircleWithBezierCurve*radius, centerX - constantForCircleWithBezierCurve*radius, centerY + radius, centerX, centerY + radius);
+        contentStream.curveTo(centerX + constantForCircleWithBezierCurve*radius, centerY + radius, centerX + radius, centerY + constantForCircleWithBezierCurve*radius, centerX + radius, centerY);
+        contentStream.curveTo(centerX + radius, centerY - constantForCircleWithBezierCurve*radius, centerX + constantForCircleWithBezierCurve*radius, centerY - radius, centerX, centerY - radius);
+        contentStream.curveTo(centerX - constantForCircleWithBezierCurve*radius, centerY - radius, centerX - radius, centerY - constantForCircleWithBezierCurve*radius, centerX - radius, centerY);
+        contentStream.fill();
 	}
 }
