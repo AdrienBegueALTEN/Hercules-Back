@@ -129,7 +129,7 @@ public class PDFGenerator {
         contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+
         							" » chez "+ mission.getCustomer().getName()+ 
         							" par "+ mission.getConsultant().getFirstname()+
-        							" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75-50,18) );
+        							" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75-55,18) );
         contentStream.endText();
          
         // description of the mission
@@ -205,7 +205,7 @@ public class PDFGenerator {
         contentStream.showText(cutText( " « "+ project.getMissionSheet().getConsultantRole()+
         						" » chez "+ mission.getCustomer().getName()+ 
         						" par "+ mission.getConsultant().getFirstname()+
-        						" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75-40,18) );
+        						" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75-45,18) );
         contentStream.endText();
           
         // description of the project
@@ -304,7 +304,7 @@ public class PDFGenerator {
 	        	}
 	        }
 	        
-	        contentStream.drawImage(customerLogo, height-70,width-70,optimalWidth,optimalHeight); //65 max en hauteur   65 max en largeur
+	        contentStream.drawImage(customerLogo, height-5-optimalWidth,width-5-optimalHeight,optimalWidth,optimalHeight); //65 max en hauteur   65 max en largeur
         }
         /*else {
         	contentStream.setNonStrokingColor(black);
