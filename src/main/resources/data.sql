@@ -33,3 +33,7 @@ INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 1-1', 1) ON C
 INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 1-2', 1) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 2-1', 2) ON CONFLICT DO NOTHING;
 INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 2-2', 2) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 3-1', 3) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 3-2', 3) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 4-1', 4) ON CONFLICT DO NOTHING;
+INSERT INTO PROJECT(description, mission_sheet_id) VALUES ('projet 4-2', 4) ON CONFLICT DO NOTHING;
