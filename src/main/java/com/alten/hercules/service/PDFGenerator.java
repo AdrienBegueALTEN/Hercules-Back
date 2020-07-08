@@ -126,7 +126,10 @@ public class PDFGenerator {
         contentStream.setNonStrokingColor(darkblue);
         contentStream.showText( "Mission");
         contentStream.setFont(font1, 18);
-        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+" » chez "+ mission.getCustomer().getName()+ " par "+ mission.getConsultant().getFirstname()+" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75,18) );
+        contentStream.showText(cutText( " « "+ mission.getLastVersion().getConsultantRole()+
+        							" » chez "+ mission.getCustomer().getName()+ 
+        							" par "+ mission.getConsultant().getFirstname()+
+        							" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75-50,18) );
         contentStream.endText();
          
         // description of the mission
@@ -202,7 +205,7 @@ public class PDFGenerator {
         contentStream.showText(cutText( " « "+ project.getMissionSheet().getConsultantRole()+
         						" » chez "+ mission.getCustomer().getName()+ 
         						" par "+ mission.getConsultant().getFirstname()+
-        						" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75,18) );
+        						" "+anonymiseLastname(mission.getConsultant().getLastname())+" ",font1,(int) height-70-75-40,18) );
         contentStream.endText();
           
         // description of the project
@@ -533,7 +536,7 @@ public class PDFGenerator {
 	 * @return a List<String> that contains the sliced parts of the text
 	 * @throws IOException Text can't be cut
 	 */
-	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize ) throws IOException{
+	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize) throws IOException{
 		
 		if(text == null)
 			return new ArrayList<String>();
