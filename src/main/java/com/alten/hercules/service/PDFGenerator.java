@@ -148,7 +148,7 @@ public class PDFGenerator {
         
         String missionDescription = mission.getLastVersion().getDescription();
 
-        for(String line : separateLines(missionDescription,font1,445,10)) {
+        for(String line : separateLines(missionDescription, font1, 445, 10, 13)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
         }
@@ -166,7 +166,7 @@ public class PDFGenerator {
 	        contentStream.setFont( font1, 10 );
 	        String commentary = mission.getLastVersion().getComment();
 	        
-	        for(String line : separateLines(commentary,font1,220,10)) {
+	        for(String line : separateLines(commentary, font1, 220, 10, 10)) {
 	        	contentStream.newLineAtOffset(0, -15);
 	        	contentStream.showText(line);
 	        }
@@ -224,7 +224,7 @@ public class PDFGenerator {
         
         String projectDescription = project.getDescription();
         
-        for(String line : separateLines(projectDescription,font1,445,10)) {
+        for(String line : separateLines(projectDescription, font1, 445, 10, 13)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
         }
@@ -337,7 +337,7 @@ public class PDFGenerator {
         
         String customerDescription = mission.getCustomer().getDescription();
         
-        for(String line : separateLines(customerDescription,font1,185,10)) {
+        for(String line : separateLines(customerDescription, font1, 185, 10, 11)) {
         	contentStream.newLineAtOffset(0, -15);
         	contentStream.showText(line);
         }
@@ -376,7 +376,7 @@ public class PDFGenerator {
         Set<Diploma> diplomas =  mission.getConsultant().getDiplomas();
         if( diplomas != null && diplomas.size() >= 0 ) {
 	        for(Diploma diploma : diplomas ) {
-		        for(String line : separateLines(diploma.getEntitled(),font1,185,10)) {
+		        for(String line : separateLines(diploma.getEntitled(), font1, 185, 10, 5)) {
 		        	contentStream.newLineAtOffset(0, -15);
 		        	contentStream.showText(line);
 		        	limitForDiploma += 15;
@@ -385,7 +385,7 @@ public class PDFGenerator {
 		        }
 		        if(limitForDiploma >= 140)
 	        		break;
-		        for(String line : separateLines(diploma.getEstablishment(),font1,185,10)) {
+		        for(String line : separateLines(diploma.getEstablishment(), font1, 185, 10, 5)) {
 		        	contentStream.newLineAtOffset(0, -15);
 		        	contentStream.showText(line);
 		        	limitForDiploma += 15;
@@ -432,7 +432,7 @@ public class PDFGenerator {
                 
         		contentStream.setNonStrokingColor(black);
         		
-		        for(String line : separateLines(skill.getLabel(),font1,95,10)) {
+		        for(String line : separateLines(skill.getLabel(), font1, 95, 10, 10)) {
 		        	if(counter<20) {
 			        	contentStream.beginText();
 		        		contentStream.setFont( font1, 10 );
@@ -536,7 +536,7 @@ public class PDFGenerator {
 	 * @return a List<String> that contains the sliced parts of the text
 	 * @throws IOException Text can't be cut
 	 */
-	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize) throws IOException{
+	private static List<String> separateLines(String text,PDFont font, int maxWidth,int fontSize, int maxLines) throws IOException{
 		
 		if(text == null)
 			return new ArrayList<String>();
@@ -544,7 +544,7 @@ public class PDFGenerator {
 		int end1 = -1 ;
         int end2 = 0;
         List<String> lines = new ArrayList<String>();
-        while(text.length()>0) {
+        while(text.length()>0 && lines.size()<maxLines) {
         	end2 = text.indexOf(" ", end1+1);
         	if(end2<0)
         		end2 = text.length();
@@ -572,6 +572,8 @@ public class PDFGenerator {
         		end1 = end2 ;
         	}
         }
+    
+        
         return lines;
 	}
     
@@ -584,7 +586,7 @@ public class PDFGenerator {
 	 * @throws IOException the given String is null
 	 */
 	private static void showCenteredText(PDPageContentStream contentStream, String text,int cx,int cy) throws IOException {
-		List<String> lines = separateLines(text,PDType1Font.HELVETICA,55,8);
+		List<String> lines = separateLines(text, PDType1Font.HELVETICA, 55, 8, 3);
 		int count = 0;
 		for(String line : lines) {
 			float size = 8*PDType1Font.HELVETICA.getStringWidth(line)/1000;
