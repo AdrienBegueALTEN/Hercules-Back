@@ -184,9 +184,12 @@ public class MissionDAL {
         	criteriaList.add(builder.like(builder.lower(sheetJoin.get("title")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
         try {
-            key = "customer";
-	        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
-	        	criteriaList.add(builder.equal(customerJoin.get("id"), Long.parseLong(criteria.get(key))));
+            key = "customers";
+            String[] customers = criteria.get(key).split(",");
+        	Predicate[] predicates = new Predicate[customers.length];
+        	for (int i = 0 ; i < customers.length ; i++)
+        		predicates[i] = builder.equal(customerJoin.get("id"), Long.parseLong(criteria.get(key)));
+        	criteriaList.add(builder.or(predicates));
         } catch (NumberFormatException ignored) {}
 	        
         try {
