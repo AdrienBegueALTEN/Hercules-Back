@@ -188,7 +188,7 @@ public class MissionDAL {
             String[] customers = criteria.get(key).split(",");
         	Predicate[] predicates = new Predicate[customers.length];
         	for (int i = 0 ; i < customers.length ; i++)
-        		predicates[i] = builder.equal(customerJoin.get("id"), Long.parseLong(criteria.get(key)));
+        		predicates[i] = builder.equal(customerJoin.get("id"), Long.parseLong(customers[i]));
         	criteriaList.add(builder.or(predicates));
         } catch (NumberFormatException ignored) {}
 	        
