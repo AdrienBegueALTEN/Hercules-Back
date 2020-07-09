@@ -533,6 +533,7 @@ public class PDFGenerator {
 	 * @param font PDFont used for the text
 	 * @param maxWidth maximal length of a line
 	 * @param fontSize size of the font
+	 * @param maxLines maximal number of lines to give back
 	 * @return a List<String> that contains the sliced parts of the text
 	 * @throws IOException Text can't be cut
 	 */
