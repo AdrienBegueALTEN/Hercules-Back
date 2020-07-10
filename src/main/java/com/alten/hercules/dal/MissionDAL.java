@@ -183,13 +183,17 @@ public class MissionDAL {
         
         	criteriaList.add(builder.like(builder.lower(sheetJoin.get("title")), ("%" + criteria.get(key) + "%").toLowerCase()));
         
+        String[] values;
+        Predicate[] predicates;
         try {
             key = "customers";
-            String[] customers = criteria.get(key).split(",");
-        	Predicate[] predicates = new Predicate[customers.length];
-        	for (int i = 0 ; i < customers.length ; i++)
-        		predicates[i] = builder.equal(customerJoin.get("id"), Long.parseLong(customers[i]));
-        	criteriaList.add(builder.or(predicates));
+            if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
+	            values = criteria.get(key).split(",");
+	        	predicates = new Predicate[values.length];
+	        	for (int i = 0 ; i < values.length ; i++)
+	        		predicates[i] = builder.equal(customerJoin.get("id"), Long.parseLong(values[i]));
+	        	criteriaList.add(builder.or(predicates));
+            }
         } catch (NumberFormatException ignored) {}
 	        
         try {
@@ -209,9 +213,14 @@ public class MissionDAL {
         	criteriaList.add(builder.or(city, country));
         }
         
-        key = "activitySector";
-        if (criteria.containsKey(key) && !criteria.get(key).isBlank())
-        	criteriaList.add(builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + criteria.get(key) + "%").toLowerCase()));
+        key = "activitySectors";
+        if (criteria.containsKey(key) && !criteria.get(key).isBlank()) {
+        	values = criteria.get(key).split(",");
+        	predicates = new Predicate[values.length];
+        	for (int i = 0 ; i < values.length ; i++)
+        		predicates[i] = builder.like(builder.lower(customerJoin.get("activitySector")), ("%" + values[i] + "%").toLowerCase());
+        	criteriaList.add(builder.or(predicates));
+        }
         
         //the array of skill is received as a string with skills separated with commas
         //an array of string is then created by splitting the string

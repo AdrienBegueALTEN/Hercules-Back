@@ -170,20 +170,17 @@ public class MissionController {
 	)
 	@ApiResponses({
 		@ApiResponse(code = 200, message="OK."),
-		@ApiResponse(code = 400, message="No criteria."),
 		@ApiResponse(code = 401, message="Invalid authentification token.")
 	})
 	@GetMapping("/advancedSearch")
 	public ResponseEntity<?> advancedSearch(
 			@ApiParam(value="Research criteria associated to their value.")
-			@RequestParam Optional<Map<String, String>> criteria) {
+			@RequestParam Map<String, String> criteria) {
 		
-		if (criteria.isEmpty())
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		AppUser user = ((AppUser)(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
 		Optional<Long> optManagerId = Optional.ofNullable(user instanceof Manager ? user.getId() : null);
 		
-		List<CompleteMissionResponse> bodyComplete = dal.advancedSearchQuery(criteria.get(), optManagerId).stream()
+		List<CompleteMissionResponse> bodyComplete = dal.advancedSearchQuery(criteria, optManagerId).stream()
 				.map(mission -> new CompleteMissionResponse(mission, false, optManagerId.isPresent()))
 				.collect(Collectors.toList());
 		
